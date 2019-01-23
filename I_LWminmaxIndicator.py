@@ -96,12 +96,11 @@ class LWminmaxIndicator(bt.Indicator):
                     msg += 'UP, '
                     if self.prev < 0: # down
                         msg += 'prev=down, '
-                        if (self.ref_max != 0) and (self.ref_min != 0): ###
+                        if self.ref_max != 0: 
                             self.LW_max[-self.ref_max] = self.data.high[-self.ref_max] 
-                            self.LW_min[-self.ref_min] = self.data.low[-self.ref_min]
-                            msg += 'SET->LWmin=' + str(self.LW_min[-self.ref_min]) + ', LWmax=' + str(self.LW_max[-self.ref_max])
+                            msg += 'SET->LWmax=' + str(self.LW_max[-self.ref_max])
                             self.ref_max = 1 
-                            self.ref_min = 0 
+                            self.ref_min+= 1
                         else:
                             self.ref_max = 1 
                             if self.ref_min != 0:
@@ -121,12 +120,11 @@ class LWminmaxIndicator(bt.Indicator):
                     msg += 'DOWN, '
                     if self.prev > 0: #up
                         msg += 'prev=up, '
-                        if (self.ref_min != 0) and (self.ref_max != 0):
-                            self.LW_max[-self.ref_max] = self.data.high[-self.ref_max]
+                        if (self.ref_min != 0): 
                             self.LW_min[-self.ref_min] = self.data.low[-self.ref_min]
-                            msg += 'SET->LWmin=' + str(self.LW_min[-self.ref_min]) + ', LWmax=' + str(self.LW_max[-self.ref_max])
-                            self.ref_max = 0 
+                            msg += 'SET->LWmin=' + str(self.LW_min[-self.ref_min])
                             self.ref_min = 1 
+                            self.ref_max+= 1
                         else:
                             self.ref_min = 1 
                             if self.ref_max != 0: self.ref_max +=1

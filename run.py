@@ -89,7 +89,7 @@ def main():
     cerebro.addstrategy(MyStrategy)
 
     for (name, fname) in app_config['DATAFEEDS'].items():
-        cerebro.adddata(btfeeds.YahooFinanceCSVData(dataname=path+fname, adjustclose=False, decimals=5), name)
+        cerebro.adddata(btfeeds.YahooFinanceCSVData(dataname=path+fname, adjclose=False, decimals=5), name)
         log.info('Configured DATAFEED : ' + name +'-->'+fname + ' Succesfully added to cerebro')
 
     cerebro.broker.setcash(10000.0)
