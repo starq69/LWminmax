@@ -90,7 +90,6 @@ class LWminmaxIndicator(bt.Indicator):
         #self.log.info(self.data.datetime.datetime().strftime('%d-%m-%Y')+ 'low: ' + repr(self.data.low[0]) + ', high:' + repr(self.data.high[0]))
 
         if not self.inside:
-            #self.ins_count = 0
             if not self.outside: 
                 if self.up: # 4^ 
                     msg += 'UP, '
@@ -99,22 +98,18 @@ class LWminmaxIndicator(bt.Indicator):
                         if self.ref_max != 0: 
                             self.LW_max[-self.ref_max] = self.data.high[-self.ref_max] 
                             msg += 'SET->LWmax=' + str(self.LW_max[-self.ref_max])
-                            self.ref_max = 1 
                             self.ref_min+= 1
                         else:
-                            self.ref_max = 1 
-                            if self.ref_min != 0:
-                                self.ref_min +=1
+                            if self.ref_min != 0: self.ref_min +=1
 
                     elif self.prev > 0:
                         msg += 'prev=up, '
-                        self.ref_max = 1 
                         if self.ref_min !=0 : self.ref_min +=1
                     else:
-                        self.ref_max = 1 
                         self.ref_min +=1
 
-                    self.prev = 1 # up
+                    self.ref_max = 1 # OK 
+                    self.prev    = 1 # up
 
                 elif self.down: # 3^ 
                     msg += 'DOWN, '
@@ -123,25 +118,23 @@ class LWminmaxIndicator(bt.Indicator):
                         if (self.ref_min != 0): 
                             self.LW_min[-self.ref_min] = self.data.low[-self.ref_min]
                             msg += 'SET->LWmin=' + str(self.LW_min[-self.ref_min])
-                            self.ref_min = 1 
                             self.ref_max+= 1
                         else:
-                            self.ref_min = 1 
                             if self.ref_max != 0: self.ref_max +=1
 
                     elif self.prev < 0: #down
                         msg += 'prev=down, '
-                        self.ref_min = 1 
                         if self.ref_max !=0 : self.ref_max +=1
                     else:
-                        self.ref_min = 1 
                         self.ref_max +=1
 
-                    self.prev = -1 # down
+                    self.ref_min = 1 # OK
+                    self.prev    =-1 # down
             
             else: # outside
-
                 msg += self._outside_01(msg)
+
+            #self.ins_count = 0
 
         else: # inside
             #self.ins_count += 1
