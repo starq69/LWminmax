@@ -61,9 +61,9 @@ class MyStrategy(bt.Strategy):
             self.log.info('*** datafeed name : ' + datafeed._name)
             self.lw_min_max[datafeed._name] = LWminmax(datafeed)
 
+    '''
     def next(self):
         pass
-        '''
         ### print max/min for log analisys purpose
         #
         for _, d in enumerate(self.datas):
@@ -72,8 +72,7 @@ class MyStrategy(bt.Strategy):
                 self.log.info(msg + ' MAX : ' + str(self.lw_min_max[d._name].lines.LW_max[0]))
             if not isNaN(self.lw_min_max[d._name].lines.LW_min[0]):
                 self.log.info(msg + ' MIN : ' + str(self.lw_min_max[d._name].lines.LW_min[0]))
-        '''
-
+    '''
     def stop(self):
 
         self.log.info('EXIT STRATEGY '+repr(self.__class__))

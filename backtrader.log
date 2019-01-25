@@ -1,114 +1,58 @@
-19:04:52 [__main__    ] [INFO ]  ***********************
-19:04:52 [__main__    ] [INFO ]  *** session started ***
-19:04:52 [__main__    ] [INFO ]  *** session configuration file </REP/JOBS/2019/backtrader/app.ini> loaded
-19:04:52 [__main__    ] [INFO ]  ***********************
-19:04:52 [__main__    ] [INFO ]  Configured DATAFEED : nvda-test-15-->NVDA-test-15.csv Succesfully added to cerebro
-19:04:52 [__main__    ] [INFO ]  Configured DATAFEED : nvda-test-19-->NVDA-test-19.csv Succesfully added to cerebro
-19:04:52 [__main__    ] [INFO ]  Configured DATAFEED : nvda-test-20-->NVDA-test-20.csv Succesfully added to cerebro
-19:04:52 [__main__    ] [INFO ]  ENTER STRATEGY <class '__main__.MyStrategy'>
-19:04:52 [__main__    ] [INFO ]  *** datafeed name : nvda-test-15
-19:04:52 [__main__    ] [INFO ]  *** datafeed name : nvda-test-19
-19:04:52 [__main__    ] [INFO ]  *** datafeed name : nvda-test-20
-19:04:52 [I_LWminmaxIndicator] [INFO ]  12-09-2000 - PRENEXT
-19:04:52 [I_LWminmaxIndicator] [INFO ]  13-09-2000 - DOWN,  ref_min =1, ref_max=2, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  14-09-2000 - UP, prev=down, SET->LWmax=12.375 ref_min =2, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  15-09-2000 - inside,  ref_min =3, ref_max=2, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  18-09-2000 - DOWN, prev=up, SET->LWmin=11.39583 ref_min =1, ref_max=3, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  19-09-2000 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  20-09-2000 - inside,  ref_min =2, ref_max=5, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  21-09-2000 - UP, prev=down, SET->LWmax=12.25 ref_min =3, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  22-09-2000 - outside, max incluso,  ref_min =4, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  25-09-2000 - UP, prev=up,  ref_min =5, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  26-09-2000 - UP, prev=up,  ref_min =6, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  27-09-2000 - UP, prev=up,  ref_min =7, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  28-09-2000 - inside,  ref_min =8, ref_max=2, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  29-09-2000 - inside,  ref_min =9, ref_max=3, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  02-10-2000 - outside, max incluso,  ref_min =10, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  03-10-2000 - DOWN, prev=up, SET->LWmin=10.5 ref_min =1, ref_max=2, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  04-10-2000 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  05-10-2000 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  06-10-2000 - DOWN, prev=down,  ref_min =1, ref_max=5, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  09-10-2000 - DOWN, prev=down,  ref_min =1, ref_max=6, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  10-10-2000 - inside,  ref_min =2, ref_max=7, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  11-10-2000 - DOWN, prev=down,  ref_min =1, ref_max=8, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  12-10-2000 - UP, prev=down, SET->LWmax=14.375 ref_min =2, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  13-10-2000 - inside,  ref_min =3, ref_max=2, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  16-10-2000 - inside,  ref_min =4, ref_max=3, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  17-10-2000 - DOWN, prev=up, SET->LWmin=9.70833 ref_min =1, ref_max=4, prev=-1, LAST 
-19:04:52 [I_LWminmaxIndicator] [INFO ]  11-04-2005 - PRENEXT
-19:04:52 [I_LWminmaxIndicator] [INFO ]  12-04-2005 - DOWN,  ref_min =1, ref_max=2, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  13-04-2005 - outside, min incluso,  ref_min =1, ref_max=3, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  14-04-2005 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  15-04-2005 - DOWN, prev=down,  ref_min =1, ref_max=5, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  18-04-2005 - DOWN, prev=down,  ref_min =1, ref_max=6, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  19-04-2005 - UP, prev=down, SET->LWmax=7.9 ref_min =2, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  20-04-2005 - outside, max incluso,  ref_min =3, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  21-04-2005 - UP, prev=up,  ref_min =4, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  22-04-2005 - inside,  ref_min =5, ref_max=2, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  25-04-2005 - UP, prev=up,  ref_min =6, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  26-04-2005 - outside, max incluso,  ref_min =7, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  27-04-2005 - DOWN, prev=up, SET->LWmin=7.03333 ref_min =1, ref_max=2, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  28-04-2005 - UP, prev=down, SET->LWmax=7.69 ref_min =2, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  29-04-2005 - outside, max incluso,  ref_min =3, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  02-05-2005 - UP, prev=up,  ref_min =4, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  03-05-2005 - inside,  ref_min =5, ref_max=2, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  04-05-2005 - UP, prev=up,  ref_min =6, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  05-05-2005 - UP, prev=up,  ref_min =7, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  06-05-2005 - UP, prev=up,  ref_min =8, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  09-05-2005 - UP, prev=up,  ref_min =9, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  10-05-2005 - DOWN, prev=up, SET->LWmin=7.06 ref_min =1, ref_max=2, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  11-05-2005 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  12-05-2005 - UP, prev=down, SET->LWmax=7.92 ref_min =2, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  13-05-2005 - UP, prev=up,  ref_min =3, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  16-05-2005 - UP, prev=up,  ref_min =4, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  17-05-2005 - UP, prev=up,  ref_min =5, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  18-05-2005 - UP, prev=up,  ref_min =6, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  19-05-2005 - UP, prev=up,  ref_min =7, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  20-05-2005 - outside, max incluso,  ref_min =8, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  23-05-2005 - UP, prev=up,  ref_min =9, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  24-05-2005 - UP, prev=up,  ref_min =10, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  25-05-2005 - inside,  ref_min =11, ref_max=2, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  26-05-2005 - UP, prev=up,  ref_min =12, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  27-05-2005 - inside,  ref_min =13, ref_max=2, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  31-05-2005 - DOWN, prev=up, SET->LWmin=7.42 ref_min =1, ref_max=3, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  01-06-2005 - outside, min incluso,  ref_min =1, ref_max=4, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  02-06-2005 - UP, prev=down, SET->LWmax=9.30333 ref_min =2, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  03-06-2005 - UP, prev=up,  ref_min =3, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  06-06-2005 - DOWN, prev=up, SET->LWmin=8.86667 ref_min =1, ref_max=2, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  07-06-2005 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  08-06-2005 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, LAST 
-19:04:52 [I_LWminmaxIndicator] [INFO ]  29-06-2005 - PRENEXT
-19:04:52 [I_LWminmaxIndicator] [INFO ]  30-06-2005 - outside,  ref_min =1, ref_max=1, prev=0
-19:04:52 [I_LWminmaxIndicator] [INFO ]  01-07-2005 - DOWN,  ref_min =1, ref_max=2, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  05-07-2005 - UP, prev=down, SET->LWmax=9.07333 ref_min =2, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  06-07-2005 - UP, prev=up,  ref_min =3, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  07-07-2005 - inside,  ref_min =4, ref_max=2, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  08-07-2005 - UP, prev=up,  ref_min =5, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  11-07-2005 - UP, prev=up,  ref_min =6, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  12-07-2005 - DOWN, prev=up, SET->LWmin=8.76667 ref_min =1, ref_max=2, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  13-07-2005 - inside,  ref_min =2, ref_max=3, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  14-07-2005 - outside, min incluso,  ref_min =1, ref_max=4, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  15-07-2005 - DOWN, prev=down,  ref_min =1, ref_max=5, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  18-07-2005 - DOWN, prev=down,  ref_min =1, ref_max=6, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  19-07-2005 - inside,  ref_min =2, ref_max=7, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  20-07-2005 - outside, min incluso,  ref_min =1, ref_max=8, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  21-07-2005 - inside,  ref_min =2, ref_max=9, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  22-07-2005 - outside, min incluso,  ref_min =1, ref_max=10, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  25-07-2005 - DOWN, prev=down,  ref_min =1, ref_max=11, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  26-07-2005 - inside,  ref_min =2, ref_max=12, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  27-07-2005 - UP, prev=down, SET->LWmax=9.61667 ref_min =3, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  28-07-2005 - UP, prev=up,  ref_min =4, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  29-07-2005 - UP, prev=up,  ref_min =5, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  01-08-2005 - UP, prev=up,  ref_min =6, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  02-08-2005 - UP, prev=up,  ref_min =7, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  03-08-2005 - UP, prev=up,  ref_min =8, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  04-08-2005 - DOWN, prev=up, SET->LWmin=8.47333 ref_min =1, ref_max=2, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  05-08-2005 - outside, min incluso,  ref_min =1, ref_max=3, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  08-08-2005 - UP, prev=down, SET->LWmax=9.36667 ref_min =2, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  09-08-2005 - DOWN, prev=up, SET->LWmin=9.10667 ref_min =1, ref_max=2, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  10-08-2005 - outside, min incluso,  ref_min =1, ref_max=3, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  11-08-2005 - inside,  ref_min =2, ref_max=4, prev=-1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  12-08-2005 - UP, prev=down, SET->LWmax=9.65667 ref_min =3, ref_max=1, prev=1
-19:04:52 [I_LWminmaxIndicator] [INFO ]  15-08-2005 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, LAST 
-19:04:52 [__main__    ] [INFO ]  EXIT STRATEGY <class '__main__.MyStrategy'>
-19:05:47 [__main__    ] [INFO ]  *** finished ***
+01:24:32 [__main__    ] [INFO ]  ***********************
+01:24:32 [__main__    ] [INFO ]  *** session started ***
+01:24:32 [__main__    ] [INFO ]  *** session configuration file </REP/JOBS/2019/backtrader/app.ini> loaded
+01:24:32 [__main__    ] [INFO ]  ***********************
+01:24:32 [__main__    ] [INFO ]  Configured DATAFEED : nvda-test-21-->NVDA-test-21.csv Succesfully added to cerebro
+01:24:32 [__main__    ] [INFO ]  ENTER STRATEGY <class '__main__.MyStrategy'>
+01:24:32 [__main__    ] [INFO ]  *** datafeed name : nvda-test-21
+01:24:32 [I_LWminmaxIndicator] [INFO ]  21-10-2005 PRENEXT --> low: 10.57333, high:10.8
+01:24:32 [I_LWminmaxIndicator] [INFO ]  24-10-2005 - UP,  ref_min =2, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  25-10-2005 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  26-10-2005 - DOWN, prev=up, SET->LWmin=10.57333 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  27-10-2005 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  28-10-2005 - outside, min incluso,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  31-10-2005 - UP, prev=down, SET->LWmax=11.04 ref_min =2, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  01-11-2005 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  02-11-2005 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  03-11-2005 - UP, prev=up,  ref_min =5, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  04-11-2005 - DOWN, prev=up, SET->LWmin=10.25 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  07-11-2005 - inside,  ref_min =2, ref_max=3, prev=-1, lookback=2
+01:24:32 [I_LWminmaxIndicator] [INFO ]  08-11-2005 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  09-11-2005 - outside, min incluso,  ref_min =1, ref_max=5, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  10-11-2005 - outside, min incluso,  ref_min =1, ref_max=6, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  11-11-2005 - inside,  ref_min =2, ref_max=7, prev=-1, lookback=2
+01:24:32 [I_LWminmaxIndicator] [INFO ]  14-11-2005 - inside,  ref_min =3, ref_max=8, prev=-1, lookback=3
+01:24:32 [I_LWminmaxIndicator] [INFO ]  15-11-2005 - inside,  ref_min =4, ref_max=9, prev=-1, lookback=4
+01:24:32 [I_LWminmaxIndicator] [INFO ]  16-11-2005 - inside,  ref_min =5, ref_max=10, prev=-1, lookback=5
+01:24:32 [I_LWminmaxIndicator] [INFO ]  17-11-2005 - inside,  ref_min =6, ref_max=11, prev=-1, lookback=6
+01:24:32 [I_LWminmaxIndicator] [INFO ]  18-11-2005 - inside,  ref_min =7, ref_max=12, prev=-1, lookback=7
+01:24:32 [I_LWminmaxIndicator] [INFO ]  21-11-2005 - UP, prev=down, SET->LWmax=11.83333 ref_min =8, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  22-11-2005 - UP, prev=up,  ref_min =9, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  23-11-2005 - UP, prev=up,  ref_min =10, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  25-11-2005 - inside,  ref_min =11, ref_max=2, prev=1, lookback=2
+01:24:32 [I_LWminmaxIndicator] [INFO ]  28-11-2005 - outside, max incluso,  ref_min =12, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  29-11-2005 - DOWN, prev=up, SET->LWmin=10.94667 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  30-11-2005 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  01-12-2005 - UP, prev=down, SET->LWmax=12.83333 ref_min =2, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  02-12-2005 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  05-12-2005 - DOWN, prev=up, SET->LWmin=11.74 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  06-12-2005 - inside,  ref_min =2, ref_max=3, prev=-1, lookback=2
+01:24:32 [I_LWminmaxIndicator] [INFO ]  07-12-2005 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  08-12-2005 - DOWN, prev=down,  ref_min =1, ref_max=5, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  09-12-2005 - inside,  ref_min =2, ref_max=6, prev=-1, lookback=2
+01:24:32 [I_LWminmaxIndicator] [INFO ]  12-12-2005 - UP, prev=down, SET->LWmax=12.28 ref_min =3, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  13-12-2005 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  14-12-2005 - DOWN, prev=up, SET->LWmin=11.80667 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  15-12-2005 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  16-12-2005 - inside,  ref_min =2, ref_max=4, prev=-1, lookback=2
+01:24:32 [I_LWminmaxIndicator] [INFO ]  19-12-2005 - inside,  ref_min =3, ref_max=5, prev=-1, lookback=3
+01:24:32 [I_LWminmaxIndicator] [INFO ]  20-12-2005 - DOWN, prev=down,  ref_min =1, ref_max=6, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  21-12-2005 - inside,  ref_min =2, ref_max=7, prev=-1, lookback=2
+01:24:32 [I_LWminmaxIndicator] [INFO ]  22-12-2005 - UP, prev=down, SET->LWmax=12.55667 ref_min =3, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  23-12-2005 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  27-12-2005 - UP, prev=up,  ref_min =5, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  28-12-2005 - UP, prev=up,  ref_min =6, ref_max=1, prev=1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  29-12-2005 - DOWN, prev=up, SET->LWmin=11.91333 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:24:32 [I_LWminmaxIndicator] [INFO ]  30-12-2005 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, LAST , lookback=1
+01:24:32 [__main__    ] [INFO ]  EXIT STRATEGY <class '__main__.MyStrategy'>
+01:24:47 [__main__    ] [INFO ]  *** finished ***

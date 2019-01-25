@@ -1,0 +1,40 @@
+rsi.py
+======
+
+class UpDay(Indicator):
+    params = (('period', 1),)
+...
+
+class DownDay(Indicator):
+   params = (('period', 1),)
+...
+
+class UpDayBool(Indicator):
+   params = (('period', 1),)
+...
+
+class DownDayBool(Indicator):
+   params = (('period', 1),)
+...
+
+class RelativeStrengthIndex(Indicator):
+    params = (  
+        ('movav', MovAv.Smoothed),
+	...
+        ('lookback', 1),
+    )
+    def __init__(self):                                                                        
+        upday   = UpDay(self.data, period=self.p.lookback)                                       
+        downday = DownDay(self.data, period=self.p.lookback)
+        maup    = self.p.movav(upday, period=self.p.period)                                       
+        madown  = self.p.movav(downday, period=self.p.period)
+
+NOTE:
+=====
+il par. "self.data" in UpDay e DownDay sulla init dell'indicatore RelativeStrengthIndex
+suggerisce come invocare un indicatore nella init di un altro indicatore, quello che mi
+serve è anche la possibilità di mofificare period (self.p.lookback) 
+---> devo utilizzare la get : https://medium.com/@danjrod/custom-indicator-development-in-python-with-backtrader-bc775552dc3e
+Non-declarative Approach class MyStochastic2
+
+

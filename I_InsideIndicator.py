@@ -14,8 +14,8 @@ class InsideIndicator(bt.Indicator):
     
     def next(self):
 
-        inside_high       = self.data.high[0] < self.data.high[- int(self.i)] ### <
-        inside_low        = self.data.low[0]  > self.data.low[- int(self.i)]  ### >
+        inside_high       = self.data.high[0] <= self.data.high[- int(self.i)] ### <
+        inside_low        = self.data.low[0]  >= self.data.low[- int(self.i)]  ### >
 
         if inside_high and inside_low:
             self.i +=1
@@ -26,21 +26,19 @@ class InsideIndicator(bt.Indicator):
 
 
 class New_InsideIndicator(bt.Indicator):
-    lines = ('inside',)
+    lines =  ('inside',)
+    params = (('ref_candle', 1),)
 
     def __init__(self):
 
-        self.i = 1
+        #self.i = 1
         super(New_InsideIndicator, self).__init__()
     
     def next(self):
 
-        inside_high       = self.data.high[0] <= self.data.high[- int(self.i)] ### <
-        inside_low        = self.data.low[0]  >= self.data.low[- int(self.i)]  ### >
-
+        inside_high       = self.data.high[0] <= self.data.high[- int(self.p.ref_candle)]
+        inside_low        = self.data.low[0]  >= self.data.low[- int(self.p.ref_candle)]
         if inside_high and inside_low:
-            self.i +=1
-        else:
-            self.i = 1
-
-        self.inside[0] = self.i - 1
+            self.inside[0] = 1
+        else: 
+            self.inside[0] = 0
