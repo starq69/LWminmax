@@ -54,25 +54,34 @@ class MyStrategy(bt.Strategy):
         self.log = logging.getLogger (__name__)
         self.log.info('ENTER STRATEGY '+repr(self.__class__))
 
-        # compute LWminmaxIndicator over all datafeeds
+        # calcola LWminmaxIndicator x tutti i datafeeds
         #
         self.lw_min_max = dict()
         for _, datafeed in enumerate(self.datas):
             self.log.info('*** datafeed name : ' + datafeed._name)
             self.lw_min_max[datafeed._name] = LWminmax(datafeed)
 
-    '''
     def next(self):
-        pass
+        #pass
         ### print max/min for log analisys purpose
         #
+        msg = ''
         for _, d in enumerate(self.datas):
-            msg = d.datetime.datetime().strftime('%d-%m-%Y') + ' <' + d._name + '>'
-            if not isNaN(self.lw_min_max[d._name].lines.LW_max[0]):
-                self.log.info(msg + ' MAX : ' + str(self.lw_min_max[d._name].lines.LW_max[0]))
-            if not isNaN(self.lw_min_max[d._name].lines.LW_min[0]):
-                self.log.info(msg + ' MIN : ' + str(self.lw_min_max[d._name].lines.LW_min[0]))
-    '''
+            msg += d.datetime.datetime().strftime('%d-%m-%Y') + ' <' + d._name + '>'
+            _max = self.lw_min_max[d._name].lines.LW_max[0]
+            if not isNaN(_max):
+                msg += ', MAX : ' + str(_max)
+            _min = self.lw_min_max[d._name].lines.LW_min[0]    
+            if not isNaN(_min):
+                msg += ', MIN : ' + str(_min)
+
+            _inside = self.lw_min_max[d._name].lines.inside[0]
+            if not isNaN(_inside):
+                msg += ', inside = ' + str(int(_inside)) 
+
+        self.log.info(msg)
+    
+    
     def stop(self):
 
         self.log.info('EXIT STRATEGY '+repr(self.__class__))

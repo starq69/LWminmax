@@ -11,7 +11,7 @@ import backtrader.indicators as btind
 
 class LWminmaxIndicator(bt.Indicator):
 
-    lines       =('LW_max', 'LW_min')
+    lines       =('LW_max', 'LW_min', 'inside')
     #params      = dict(inside=New_InsideIndicator, outside=OutsideIndicator)
     #params = (('lookback',1),)
     plotinfo    = dict(subplot=False)
@@ -37,6 +37,8 @@ class LWminmaxIndicator(bt.Indicator):
 
 
     def _outside_01(self, msg):
+        '''da ottimizzare in quanto non esiste il caso self.ref_min/max == 0
+        '''
         msg += 'outside, '
         if self.ref_max > self.ref_min:
             if self.ref_min > 0:
@@ -181,6 +183,9 @@ class LWminmaxIndicator(bt.Indicator):
             if self.ref_min != 0: self.ref_min += 1
             if self.ref_max != 0: self.ref_max += 1
         
+        #self.l.inside[0] = self.lookback - 1
+        if self.lookback > 1: self.l.inside[0] = self.lookback - 1
+
         msg += ' ref_min ='+str(self.ref_min)+', ref_max='+str(self.ref_max) + ', prev='+str(self.prev)
 
         ### LAST Datapoint

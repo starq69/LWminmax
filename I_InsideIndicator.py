@@ -27,17 +27,18 @@ class InsideIndicator(bt.Indicator):
 
 class New_InsideIndicator(bt.Indicator):
     lines =  ('inside',)
-    params = (('ref_candle', 1),)
+    params = (('period', 1),)
 
     def __init__(self):
 
-        #self.i = 1
         super(New_InsideIndicator, self).__init__()
     
     def next(self):
 
-        inside_high       = self.data.high[0] <= self.data.high[- int(self.p.ref_candle)]
-        inside_low        = self.data.low[0]  >= self.data.low[- int(self.p.ref_candle)]
+        inside_high       = self.data.high[0] <= self.data.high[- int(self.p.period)]
+        inside_low        = self.data.low[0]  >= self.data.low[- int(self.p.period)]
+
+        print ('New_InsideIndicator : ins_count --------> ' + str(self.p.period))
         if inside_high and inside_low:
             self.inside[0] = 1
         else: 
