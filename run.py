@@ -63,15 +63,11 @@ class MyStrategy(bt.Strategy):
             self.log.info('*** datafeed name : ' + datafeed._name)
             self.lw_min_max[datafeed._name] = LWminmax(datafeed)
 
-    def next(self):
-        #pass
-        ### print max/min for log analisys purpose
-        #
-        #msg = ''
-        self.loop_count += 1
-        for _, datafeed in enumerate(self.datas):
+    def next_report(self):
+
+        for _, datafeed in enumerate(d for d in self.datas if len(d)):
             msg = ''
-            msg += datafeed.datetime.datetime().strftime('%d-%m-%Y') + ' <' + datafeed._name + '>'
+            msg += datafeed.datetime.datetime().strftime('%d-%m-%Y') + ' <' + datafeed._name + '>' 
             _max = self.lw_min_max[datafeed._name].lines.LW_max[0]
             if not isNaN(_max):
                 msg += ', MAX : ' + str(_max)
@@ -84,8 +80,28 @@ class MyStrategy(bt.Strategy):
                 msg += ', inside = ' + str(int(_inside)) 
 
             self.log.info(msg)
-    
-    
+
+
+    def next(self):
+        ### print max/min for log analisys purpose
+        #
+        self.loop_count += 1
+        self.next_report()
+
+        '''
+        # https://community.backtrader.com/topic/187/multiple-symbols-each-symbol-multiple-time-frames-issue/7
+        print(','.join(str(x) for x in [
+            'Strategy', len(self),
+            self.datetime.datetime().strftime('%Y-%m-%dT%H:%M:%S')])
+        )
+
+        for i, d in enumerate(d for d in self.datas if len(d)):
+            out = ['Data' + str(i), len(d),
+                   d.datetime.datetime().strftime('%Y-%m-%dT%H:%M:%S'),
+                   d.open[0], d.high[0], d.low[0], d.close[0]]
+            print(', '.join(str(x) for x in out))
+        '''
+
     def stop(self):
 
         self.log.info('EXIT STRATEGY '+repr(self.__class__) + ', strategy.next loop_count = ' + str(self.loop_count))
