@@ -47,12 +47,12 @@ class LWminmaxIndicator(bt.Indicator):
                     self.ref_min = 1 
                     self.ref_max += 1
                 else:
-                    msg += 'min NON incluso, TBD, '
+                    msg += 'min NON inclusoi: min & max +=1, '
                     self.ref_min += 1
                     self.ref_max += 1
             else:
                 if self.data.high >= self.data.high[-self.ref_max]:
-                    msg += 'max incluso, '
+                    msg += 'max incluso: UNCOVERED(1) ref_min <= 0!, '
                     self.ref_max = 1 
                 else:
                     msg += ' UNCOVERED(1), high[0]=' + str(self.data.high[0]) + ', high[-1]=' + \
@@ -66,12 +66,12 @@ class LWminmaxIndicator(bt.Indicator):
                     self.ref_max = 1 
                     self.ref_min += 1
                 else:
-                    msg += 'max NON incluso, TBD, '
+                    msg += 'max NON incluso: min & max +=1, '
                     self.ref_min += 1
                     self.ref_max += 1
             else:
                 if self.data.low <= self.data.low[-self.ref_min]:
-                    msg += 'min incluso, '
+                    msg += 'min incluso: UNCOVERED(2) ref_maxi <= 0!, '
                     self.ref_min = 1 
                 else:
                     msg += ' UNCOVERED(2), high[0]=' + str(self.data.high[0]) + ', high[-1]=' + \

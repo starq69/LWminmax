@@ -54,6 +54,8 @@ class MyStrategy(bt.Strategy):
         self.log = logging.getLogger (__name__)
         self.log.info('ENTER STRATEGY '+repr(self.__class__))
 
+        self.loop_count = 0
+
         # calcola LWminmaxIndicator x tutti i datafeeds
         #
         self.lw_min_max = dict()
@@ -65,26 +67,28 @@ class MyStrategy(bt.Strategy):
         #pass
         ### print max/min for log analisys purpose
         #
-        msg = ''
-        for _, d in enumerate(self.datas):
-            msg += d.datetime.datetime().strftime('%d-%m-%Y') + ' <' + d._name + '>'
-            _max = self.lw_min_max[d._name].lines.LW_max[0]
+        #msg = ''
+        self.loop_count += 1
+        for _, datafeed in enumerate(self.datas):
+            msg = ''
+            msg += datafeed.datetime.datetime().strftime('%d-%m-%Y') + ' <' + datafeed._name + '>'
+            _max = self.lw_min_max[datafeed._name].lines.LW_max[0]
             if not isNaN(_max):
                 msg += ', MAX : ' + str(_max)
-            _min = self.lw_min_max[d._name].lines.LW_min[0]    
+            _min = self.lw_min_max[datafeed._name].lines.LW_min[0]    
             if not isNaN(_min):
                 msg += ', MIN : ' + str(_min)
 
-            _inside = self.lw_min_max[d._name].lines.inside[0]
+            _inside = self.lw_min_max[datafeed._name].lines.inside[0]
             if not isNaN(_inside):
                 msg += ', inside = ' + str(int(_inside)) 
 
-        self.log.info(msg)
+            self.log.info(msg)
     
     
     def stop(self):
 
-        self.log.info('EXIT STRATEGY '+repr(self.__class__))
+        self.log.info('EXIT STRATEGY '+repr(self.__class__) + ', strategy.next loop_count = ' + str(self.loop_count))
 
 
 def main():
@@ -94,11 +98,12 @@ def main():
     path = app_config['DATASOURCE']['path']
 
     cerebro = bt.Cerebro(stdstats=False) ###
-    cerebro.addstrategy(MyStrategy)
 
     for (name, fname) in app_config['DATAFEEDS'].items():
         cerebro.adddata(btfeeds.YahooFinanceCSVData(dataname=path+fname, adjclose=False, decimals=5), name)
         log.info('Configured DATAFEED : ' + name +'-->'+fname + ' Succesfully added to cerebro')
+
+    cerebro.addstrategy(MyStrategy)
 
     cerebro.broker.setcash(10000.0)
     cerebro.run()    
