@@ -11,7 +11,7 @@ import backtrader.indicators as btind
 
 class LWminmaxIndicator(bt.Indicator):
 
-    lines       =('LW_max', 'LW_min', 'inside')
+    lines       =('LW_max', 'LW_min', 'LW_max_inter', 'LW_min_inter', 'inside')
     #params      = dict(inside=New_InsideIndicator, outside=OutsideIndicator)
     #params = (('lookback',1),)
     plotinfo    = dict(subplot=False)
@@ -24,10 +24,10 @@ class LWminmaxIndicator(bt.Indicator):
         self.log = logging.getLogger (__name__)
         self.prev = 0
         self.ref_min = self.ref_max = self.lookback = 1
+        self._lw_max = []
+        self._lw_min = []
 
-        #self.inside     = self.p.inside()
-        #self.outside    = self.p.outside()
-        #self.up         = bt.And(self.data.high(0) > self.data.high(-self.lookback), self.data.low(0) >= self.data.low(-self.lookback))
+        # da rimuovere (per ora serve ad attivare prenext())
         self.down       = bt.And(self.data.low(0) < self.data.low(-self.lookback), self.data.high(0) <= self.data.high(-self.lookback))
 
         #super(LWminmaxIndicator, self).__init__()
@@ -47,7 +47,7 @@ class LWminmaxIndicator(bt.Indicator):
                     self.ref_min = 1 
                     self.ref_max += 1
                 else:
-                    msg += 'min NON inclusoi: min & max +=1, '
+                    msg += 'min NON incluso: min & max +=1, '
                     self.ref_min += 1
                     self.ref_max += 1
             else:
@@ -137,6 +137,8 @@ class LWminmaxIndicator(bt.Indicator):
                         msg += 'prev=down, '
                         if self.ref_max != 0: 
                             self.LW_max[-self.ref_max] = self.data.high[-self.ref_max] 
+                            self._lw_max.append(self.LW_max[-self.ref_max])
+                            
                             msg += 'SET->LWmax=' + str(self.LW_max[-self.ref_max])
                             self.ref_min+= 1
                         else:
@@ -157,6 +159,7 @@ class LWminmaxIndicator(bt.Indicator):
                         msg += 'prev=up, '
                         if (self.ref_min != 0): 
                             self.LW_min[-self.ref_min] = self.data.low[-self.ref_min]
+                            self._lw_min.append(self.LW_min[-self.ref_min])
                             msg += 'SET->LWmin=' + str(self.LW_min[-self.ref_min])
                             self.ref_max+= 1
                         else:
@@ -173,7 +176,6 @@ class LWminmaxIndicator(bt.Indicator):
             
             else: # outside
                 msg += self._outside_01(msg)
-                #msg += self.ex_outside(msg)
 
             self.lookback = 1
 
@@ -185,6 +187,23 @@ class LWminmaxIndicator(bt.Indicator):
         
         #self.l.inside[0] = self.lookback - 1
         if self.lookback > 1: self.l.inside[0] = self.lookback - 1
+ 
+        # usare collections.deque: https://stackoverflow.com/questions/4426663/how-to-remove-the-first-item-from-a-list
+        #
+        if len(self._lw_max) == 3:
+            if self._lw_max[0] < self._lw_max[1] and self._lw_max[1] > self._lw_max[2]:
+                self.LW_max_inter[0] = self._lw_max[1]
+                for x in range(2): self._lw_max.pop(0)
+            else:
+                self._lw_max.pop(0)
+
+        if len(self._lw_min) == 3:
+            if self._lw_min[0] > self._lw_min[1] and self._lw_min[1] < self._lw_min[2]:
+                self.LW_min_inter[0] = self._lw_min[1]
+                for x in range(2): self._lw_min.pop(0)
+            else:
+                self._lw_min.pop(0)
+
 
         msg += ' ref_min ='+str(self.ref_min)+', ref_max='+str(self.ref_max) + ', prev='+str(self.prev)
 
@@ -194,5 +213,9 @@ class LWminmaxIndicator(bt.Indicator):
             msg += ', LAST '
             if self.ref_max > self.ref_min: self.LW_max[-self.ref_max+1] = self.data.high[-self.ref_max+1]
             elif self.ref_max < self.ref_min: self.LW_min[-self.ref_min+1] = self.data.low[-self.ref_min+1]
+
+            # debug (print self.lw_min/max)
+            #self.log.info(self._lw_min)
+            #self.log.info(self._lw_max)
 
         self.log.info(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' - ' + msg + ', lookback='+str(self.lookback))

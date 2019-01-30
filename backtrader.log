@@ -1,225 +1,510 @@
-16:45:44 [__main__    ] [INFO ]  ***********************
-16:45:44 [__main__    ] [INFO ]  *** session started ***
-16:45:44 [__main__    ] [INFO ]  *** session configuration file </REP/JOBS/2019/backtrader/app.ini> loaded
-16:45:44 [__main__    ] [INFO ]  ***********************
-16:45:44 [__main__    ] [INFO ]  Configured DATAFEED : aapl-->AAPL-week-29-1-2018-2019.csv Succesfully added to cerebro
-16:45:44 [__main__    ] [INFO ]  Configured DATAFEED : msft-->MSFT-week-29-1-2018-2019.csv Succesfully added to cerebro
-16:45:44 [__main__    ] [INFO ]  ENTER STRATEGY <class '__main__.MyStrategy'>
-16:45:44 [__main__    ] [INFO ]  *** datafeed name : aapl
-16:45:44 [__main__    ] [INFO ]  *** datafeed name : msft
-16:45:44 [I_LWminmaxIndicator] [INFO ]  29-01-2018 PRENEXT --> low: 160.10001, high:170.16
-16:45:44 [I_LWminmaxIndicator] [INFO ]  05-02-2018 - DOWN,  ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  12-02-2018 - UP, prev=down, SET->LWmax=170.16 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  19-02-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  26-02-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  05-03-2018 - inside,  ref_min =5, ref_max=2, prev=1, lookback=2
-16:45:44 [I_LWminmaxIndicator] [INFO ]  12-03-2018 - UP, prev=up,  ref_min =6, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  19-03-2018 - DOWN, prev=up, SET->LWmin=150.24 ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  26-03-2018 - inside,  ref_min =2, ref_max=3, prev=-1, lookback=2
-16:45:44 [I_LWminmaxIndicator] [INFO ]  02-04-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  09-04-2018 - UP, prev=down, SET->LWmax=183.5 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  16-04-2018 - outside, max incluso,  ref_min =3, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  23-04-2018 - DOWN, prev=up, SET->LWmin=164.47 ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  30-04-2018 - UP, prev=down, SET->LWmax=178.94 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  07-05-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  14-05-2018 - inside,  ref_min =4, ref_max=2, prev=1, lookback=2
-16:45:44 [I_LWminmaxIndicator] [INFO ]  21-05-2018 - inside,  ref_min =5, ref_max=3, prev=1, lookback=3
-16:45:44 [I_LWminmaxIndicator] [INFO ]  28-05-2018 - inside,  ref_min =6, ref_max=4, prev=1, lookback=4
-16:45:44 [I_LWminmaxIndicator] [INFO ]  04-06-2018 - UP, prev=up,  ref_min =7, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  11-06-2018 - DOWN, prev=up, SET->LWmin=160.63001 ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  18-06-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  25-06-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  02-07-2018 - UP, prev=down, SET->LWmax=194.2 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  09-07-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  16-07-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  23-07-2018 - UP, prev=up,  ref_min =5, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  30-07-2018 - outside, max incluso,  ref_min =6, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  06-08-2018 - UP, prev=up,  ref_min =7, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  13-08-2018 - UP, prev=up,  ref_min =8, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  20-08-2018 - UP, prev=up,  ref_min =9, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  27-08-2018 - UP, prev=up,  ref_min =10, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  03-09-2018 - UP, prev=up,  ref_min =11, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  10-09-2018 - DOWN, prev=up, SET->LWmin=180.73 ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  17-09-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  24-09-2018 - UP, prev=down, SET->LWmax=229.67 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  01-10-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  08-10-2018 - DOWN, prev=up, SET->LWmin=215.3 ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  15-10-2018 - inside,  ref_min =2, ref_max=3, prev=-1, lookback=2
-16:45:44 [I_LWminmaxIndicator] [INFO ]  22-10-2018 - inside,  ref_min =3, ref_max=4, prev=-1, lookback=3
-16:45:44 [I_LWminmaxIndicator] [INFO ]  29-10-2018 - DOWN, prev=down,  ref_min =1, ref_max=5, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  05-11-2018 - DOWN, prev=down,  ref_min =1, ref_max=6, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  12-11-2018 - DOWN, prev=down,  ref_min =1, ref_max=7, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  19-11-2018 - DOWN, prev=down,  ref_min =1, ref_max=8, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  26-11-2018 - DOWN, prev=down,  ref_min =1, ref_max=9, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  03-12-2018 - outside, min incluso,  ref_min =1, ref_max=10, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  10-12-2018 - DOWN, prev=down,  ref_min =1, ref_max=11, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  17-12-2018 - DOWN, prev=down,  ref_min =1, ref_max=12, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  24-12-2018 - DOWN, prev=down,  ref_min =1, ref_max=13, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  31-12-2018 - outside, min incluso,  ref_min =1, ref_max=14, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  07-01-2019 - inside,  ref_min =2, ref_max=15, prev=-1, lookback=2
-16:45:44 [I_LWminmaxIndicator] [INFO ]  14-01-2019 - inside,  ref_min =3, ref_max=16, prev=-1, lookback=3
-16:45:44 [I_LWminmaxIndicator] [INFO ]  21-01-2019 - inside,  ref_min =4, ref_max=17, prev=-1, lookback=4
-16:45:44 [I_LWminmaxIndicator] [INFO ]  28-01-2019 - inside,  ref_min =5, ref_max=18, prev=-1, lookback=5
-16:45:44 [I_LWminmaxIndicator] [INFO ]  28-01-2019 - inside,  ref_min =6, ref_max=19, prev=-1, LAST , lookback=6
-16:45:44 [I_LWminmaxIndicator] [INFO ]  29-01-2018 PRENEXT --> low: 91.5, high:96.07
-16:45:44 [I_LWminmaxIndicator] [INFO ]  05-02-2018 - DOWN,  ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  12-02-2018 - UP, prev=down, SET->LWmax=96.07 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  19-02-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  26-02-2018 - outside, max incluso,  ref_min =4, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  05-03-2018 - UP, prev=up,  ref_min =5, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  12-03-2018 - UP, prev=up,  ref_min =6, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  19-03-2018 - DOWN, prev=up, SET->LWmin=83.83 ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  26-03-2018 - UP, prev=down, SET->LWmax=97.24 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  02-04-2018 - DOWN, prev=up, SET->LWmin=87.08 ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  09-04-2018 - UP, prev=down, SET->LWmax=95.14 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  16-04-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  23-04-2018 - outside, max incluso,  ref_min =4, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  30-04-2018 - inside,  ref_min =5, ref_max=2, prev=1, lookback=2
-16:45:44 [I_LWminmaxIndicator] [INFO ]  07-05-2018 - UP, prev=up,  ref_min =6, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  14-05-2018 - UP, prev=up,  ref_min =7, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  21-05-2018 - UP, prev=up,  ref_min =8, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  28-05-2018 - UP, prev=up,  ref_min =9, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  04-06-2018 - UP, prev=up,  ref_min =10, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  11-06-2018 - DOWN, prev=up, SET->LWmin=87.51 ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  18-06-2018 - outside, min incluso,  ref_min =1, ref_max=3, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  25-06-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  02-07-2018 - UP, prev=down, SET->LWmax=102.69 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  09-07-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  16-07-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  23-07-2018 - UP, prev=up,  ref_min =5, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  30-07-2018 - DOWN, prev=up, SET->LWmin=97.26 ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  06-08-2018 - UP, prev=down, SET->LWmax=111.15 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  13-08-2018 - DOWN, prev=up, SET->LWmin=104.76 ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  20-08-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  27-08-2018 - UP, prev=down, SET->LWmax=110.16 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  03-09-2018 - DOWN, prev=up, SET->LWmin=105.78 ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  10-09-2018 - UP, prev=down, SET->LWmax=112.78 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  17-09-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  24-09-2018 - inside,  ref_min =4, ref_max=2, prev=1, lookback=2
-16:45:44 [I_LWminmaxIndicator] [INFO ]  01-10-2018 - outside, max incluso,  ref_min =5, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  08-10-2018 - DOWN, prev=up, SET->LWmin=107.23 ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  15-10-2018 - inside,  ref_min =2, ref_max=3, prev=-1, lookback=2
-16:45:44 [I_LWminmaxIndicator] [INFO ]  22-10-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  29-10-2018 - DOWN, prev=down,  ref_min =1, ref_max=5, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  05-11-2018 - UP, prev=down, SET->LWmax=116.18 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  12-11-2018 - DOWN, prev=up, SET->LWmin=100.11 ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  19-11-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  26-11-2018 - UP, prev=down, SET->LWmax=112.24 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  03-12-2018 - outside, max incluso,  ref_min =3, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  10-12-2018 - DOWN, prev=up, SET->LWmin=99.35 ref_min =1, ref_max=2, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  17-12-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  24-12-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  31-12-2018 - UP, prev=down, SET->LWmax=113.42 ref_min =2, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  07-01-2019 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  14-01-2019 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
-16:45:44 [I_LWminmaxIndicator] [INFO ]  21-01-2019 - inside,  ref_min =5, ref_max=2, prev=1, lookback=2
-16:45:44 [I_LWminmaxIndicator] [INFO ]  28-01-2019 - inside,  ref_min =6, ref_max=3, prev=1, lookback=3
-16:45:44 [I_LWminmaxIndicator] [INFO ]  28-01-2019 - inside,  ref_min =7, ref_max=4, prev=1, LAST , lookback=4
-16:45:44 [__main__    ] [INFO ]  05-02-2018 <aapl>, MIN : 150.24
-16:45:44 [__main__    ] [INFO ]  05-02-2018 <msft>, MIN : 83.83
-16:45:44 [__main__    ] [INFO ]  12-02-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  12-02-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  19-02-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  19-02-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  26-02-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  26-02-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  05-03-2018 <aapl>, inside = 1
-16:45:44 [__main__    ] [INFO ]  05-03-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  12-03-2018 <aapl>, MAX : 183.5
-16:45:44 [__main__    ] [INFO ]  12-03-2018 <msft>, MAX : 97.24
-16:45:44 [__main__    ] [INFO ]  19-03-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  19-03-2018 <msft>, MIN : 87.08
-16:45:44 [__main__    ] [INFO ]  26-03-2018 <aapl>, inside = 1
-16:45:44 [__main__    ] [INFO ]  26-03-2018 <msft>, MAX : 95.14
-16:45:44 [__main__    ] [INFO ]  02-04-2018 <aapl>, MIN : 164.47
-16:45:44 [__main__    ] [INFO ]  02-04-2018 <msft>, MIN : 87.51
-16:45:44 [__main__    ] [INFO ]  09-04-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  09-04-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  16-04-2018 <aapl>, MAX : 178.94
-16:45:44 [__main__    ] [INFO ]  16-04-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  23-04-2018 <aapl>, MIN : 160.63001
-16:45:44 [__main__    ] [INFO ]  23-04-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  30-04-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  30-04-2018 <msft>, inside = 1
-16:45:44 [__main__    ] [INFO ]  07-05-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  07-05-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  14-05-2018 <aapl>, inside = 1
-16:45:44 [__main__    ] [INFO ]  14-05-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  21-05-2018 <aapl>, inside = 2
-16:45:44 [__main__    ] [INFO ]  21-05-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  28-05-2018 <aapl>, inside = 3
-16:45:44 [__main__    ] [INFO ]  28-05-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  04-06-2018 <aapl>, MAX : 194.2
-16:45:44 [__main__    ] [INFO ]  04-06-2018 <msft>, MAX : 102.69
-16:45:44 [__main__    ] [INFO ]  11-06-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  11-06-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  18-06-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  18-06-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  25-06-2018 <aapl>, MIN : 180.73
-16:45:44 [__main__    ] [INFO ]  25-06-2018 <msft>, MIN : 97.26
-16:45:44 [__main__    ] [INFO ]  02-07-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  02-07-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  09-07-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  09-07-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  16-07-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  16-07-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  23-07-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  23-07-2018 <msft>, MAX : 111.15
-16:45:44 [__main__    ] [INFO ]  30-07-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  30-07-2018 <msft>, MIN : 104.76
-16:45:44 [__main__    ] [INFO ]  06-08-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  06-08-2018 <msft>, MAX : 110.16
-16:45:44 [__main__    ] [INFO ]  13-08-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  13-08-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  20-08-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  20-08-2018 <msft>, MIN : 105.78
-16:45:44 [__main__    ] [INFO ]  27-08-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  27-08-2018 <msft>, MAX : 112.78
-16:45:44 [__main__    ] [INFO ]  03-09-2018 <aapl>, MAX : 229.67
-16:45:44 [__main__    ] [INFO ]  03-09-2018 <msft>, MIN : 107.23
-16:45:44 [__main__    ] [INFO ]  10-09-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  10-09-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  17-09-2018 <aapl>, MIN : 215.3
-16:45:44 [__main__    ] [INFO ]  17-09-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  24-09-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  24-09-2018 <msft>, inside = 1
-16:45:44 [__main__    ] [INFO ]  01-10-2018 <aapl>, MAX : 233.47
-16:45:44 [__main__    ] [INFO ]  01-10-2018 <msft>, MAX : 116.18
-16:45:44 [__main__    ] [INFO ]  08-10-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  08-10-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  15-10-2018 <aapl>, inside = 1
-16:45:44 [__main__    ] [INFO ]  15-10-2018 <msft>, inside = 1
-16:45:44 [__main__    ] [INFO ]  22-10-2018 <aapl>, inside = 2
-16:45:44 [__main__    ] [INFO ]  22-10-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  29-10-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  29-10-2018 <msft>, MIN : 100.11
-16:45:44 [__main__    ] [INFO ]  05-11-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  05-11-2018 <msft>, MAX : 112.24
-16:45:44 [__main__    ] [INFO ]  12-11-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  12-11-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  19-11-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  19-11-2018 <msft>, MIN : 99.35
-16:45:44 [__main__    ] [INFO ]  26-11-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  26-11-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  03-12-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  03-12-2018 <msft>, MAX : 113.42
-16:45:44 [__main__    ] [INFO ]  10-12-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  10-12-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  17-12-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  17-12-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  24-12-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  24-12-2018 <msft>, MIN : 93.96
-16:45:44 [__main__    ] [INFO ]  31-12-2018 <aapl>
-16:45:44 [__main__    ] [INFO ]  31-12-2018 <msft>
-16:45:44 [__main__    ] [INFO ]  07-01-2019 <aapl>, inside = 1
-16:45:44 [__main__    ] [INFO ]  07-01-2019 <msft>
-16:45:44 [__main__    ] [INFO ]  14-01-2019 <aapl>, inside = 2
-16:45:44 [__main__    ] [INFO ]  14-01-2019 <msft>
-16:45:44 [__main__    ] [INFO ]  21-01-2019 <aapl>, inside = 3
-16:45:44 [__main__    ] [INFO ]  21-01-2019 <msft>, inside = 1
-16:45:44 [__main__    ] [INFO ]  28-01-2019 <aapl>, inside = 4
-16:45:44 [__main__    ] [INFO ]  28-01-2019 <msft>, inside = 2
-16:45:44 [__main__    ] [INFO ]  28-01-2019 <aapl>, inside = 5
-16:45:44 [__main__    ] [INFO ]  28-01-2019 <msft>, inside = 3
-16:45:44 [__main__    ] [INFO ]  EXIT STRATEGY <class '__main__.MyStrategy'>, strategy.next loop_count = 53
-16:46:56 [__main__    ] [INFO ]  *** finished ***
+01:56:31 [__main__    ] [INFO ]  ***********************
+01:56:31 [__main__    ] [INFO ]  *** session started ***
+01:56:31 [__main__    ] [INFO ]  *** session configuration file </REP/JOBS/2019/backtrader/app.ini> loaded
+01:56:31 [__main__    ] [INFO ]  ***********************
+01:56:31 [__main__    ] [INFO ]  Configured DATAFEED : msft-daily-->MSFT-daily-29-01-18_19.csv Succesfully added to cerebro
+01:56:31 [__main__    ] [INFO ]  ENTER STRATEGY <class '__main__.MyStrategy'>
+01:56:31 [__main__    ] [INFO ]  *** datafeed name : msft-daily
+01:56:31 [I_LWminmaxIndicator] [INFO ]  29-01-2018 PRENEXT --> low: 93.72, high:95.45
+01:56:31 [I_LWminmaxIndicator] [INFO ]  30-01-2018 - DOWN,  ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  31-01-2018 - UP, prev=down, SET->LWmax=95.45 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  01-02-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  02-02-2018 - DOWN, prev=up, SET->LWmin=92.1 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  05-02-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  06-02-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  07-02-2018 - UP, prev=down, SET->LWmax=96.07 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  08-02-2018 - DOWN, prev=up, SET->LWmin=85.25 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  09-02-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  12-02-2018 - UP, prev=down, SET->LWmax=91.77 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  13-02-2018 - outside, max incluso,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  14-02-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  15-02-2018 - UP, prev=up,  ref_min =5, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  16-02-2018 - UP, prev=up,  ref_min =6, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  20-02-2018 - DOWN, prev=up, SET->LWmin=83.83 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  21-02-2018 - UP, prev=down, SET->LWmax=93.5 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  22-02-2018 - DOWN, prev=up, SET->LWmin=91.01 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  23-02-2018 - UP, prev=down, SET->LWmax=93.36 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  26-02-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  27-02-2018 - outside, max incluso,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  28-02-2018 - DOWN, prev=up, SET->LWmin=91.36 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  01-03-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  02-03-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  05-03-2018 - UP, prev=down, SET->LWmax=95.84 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  06-03-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  07-03-2018 - DOWN, prev=up, SET->LWmin=90.86 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  08-03-2018 - UP, prev=down, SET->LWmax=94.49 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  09-03-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  12-03-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  13-03-2018 - outside, max incluso,  ref_min =5, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  14-03-2018 - DOWN, prev=up, SET->LWmin=92.43 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  15-03-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  16-03-2018 - UP, prev=down, SET->LWmax=97.24 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  19-03-2018 - DOWN, prev=up, SET->LWmin=92.83 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  20-03-2018 - inside,  ref_min =2, ref_max=3, prev=-1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  21-03-2018 - UP, prev=down, SET->LWmax=95.38 ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  22-03-2018 - DOWN, prev=up, SET->LWmin=92.11 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  23-03-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  26-03-2018 - UP, prev=down, SET->LWmax=94.05 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  27-03-2018 - outside, max incluso,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  28-03-2018 - inside,  ref_min =4, ref_max=2, prev=1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  29-03-2018 - DOWN, prev=up, SET->LWmin=87.08 ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  02-04-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  03-04-2018 - inside,  ref_min =2, ref_max=5, prev=-1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  04-04-2018 - UP, prev=down, SET->LWmax=95.14 ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  05-04-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  06-04-2018 - DOWN, prev=up, SET->LWmin=87.51 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  09-04-2018 - UP, prev=down, SET->LWmax=93.07 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  10-04-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  11-04-2018 - outside, max incluso,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  12-04-2018 - UP, prev=up,  ref_min =5, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  13-04-2018 - UP, prev=up,  ref_min =6, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  16-04-2018 - UP, prev=up,  ref_min =7, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  17-04-2018 - UP, prev=up,  ref_min =8, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  18-04-2018 - UP, prev=up,  ref_min =9, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  19-04-2018 - outside, max incluso,  ref_min =10, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  20-04-2018 - DOWN, prev=up, SET->LWmin=89.48 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  23-04-2018 - UP, prev=down, SET->LWmax=97.07 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  24-04-2018 - outside, max incluso,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  25-04-2018 - DOWN, prev=up, SET->LWmin=94.05 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  26-04-2018 - UP, prev=down, SET->LWmax=96.47 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  27-04-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  30-04-2018 - DOWN, prev=up, SET->LWmin=90.28 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  01-05-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  02-05-2018 - inside,  ref_min =2, ref_max=4, prev=-1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  03-05-2018 - DOWN, prev=down,  ref_min =1, ref_max=5, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  04-05-2018 - UP, prev=down, SET->LWmax=97.9 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  07-05-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  08-05-2018 - DOWN, prev=up, SET->LWmin=92.45 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  09-05-2018 - outside, min incluso,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  10-05-2018 - UP, prev=down, SET->LWmax=96.71 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  11-05-2018 - DOWN, prev=up, SET->LWmin=95.05 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  14-05-2018 - UP, prev=down, SET->LWmax=97.95 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  15-05-2018 - DOWN, prev=up, SET->LWmin=97.04 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  16-05-2018 - inside,  ref_min =2, ref_max=3, prev=-1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  17-05-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  18-05-2018 - inside,  ref_min =2, ref_max=5, prev=-1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  21-05-2018 - UP, prev=down, SET->LWmax=98.69 ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  22-05-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  23-05-2018 - outside, max incluso,  ref_min =5, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  24-05-2018 - UP, prev=up,  ref_min =6, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  25-05-2018 - UP, prev=up,  ref_min =7, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  29-05-2018 - DOWN, prev=up, SET->LWmin=95.83 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  30-05-2018 - UP, prev=down, SET->LWmax=98.98 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  31-05-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  01-06-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  04-06-2018 - UP, prev=up,  ref_min =5, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  05-06-2018 - UP, prev=up,  ref_min =6, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  06-06-2018 - UP, prev=up,  ref_min =7, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  07-06-2018 - outside, max incluso,  ref_min =8, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  08-06-2018 - inside,  ref_min =9, ref_max=2, prev=1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  11-06-2018 - inside,  ref_min =10, ref_max=3, prev=1, lookback=3
+01:56:31 [I_LWminmaxIndicator] [INFO ]  12-06-2018 - inside,  ref_min =11, ref_max=4, prev=1, lookback=4
+01:56:31 [I_LWminmaxIndicator] [INFO ]  13-06-2018 - inside,  ref_min =12, ref_max=5, prev=1, lookback=5
+01:56:31 [I_LWminmaxIndicator] [INFO ]  14-06-2018 - inside,  ref_min =13, ref_max=6, prev=1, lookback=6
+01:56:31 [I_LWminmaxIndicator] [INFO ]  15-06-2018 - DOWN, prev=up, SET->LWmin=97.23 ref_min =1, ref_max=7, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  18-06-2018 - DOWN, prev=down,  ref_min =1, ref_max=8, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  19-06-2018 - inside,  ref_min =2, ref_max=9, prev=-1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  20-06-2018 - UP, prev=down, SET->LWmax=102.69 ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  21-06-2018 - DOWN, prev=up, SET->LWmin=99.42 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  22-06-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  25-06-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  26-06-2018 - inside,  ref_min =2, ref_max=5, prev=-1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  27-06-2018 - inside,  ref_min =3, ref_max=6, prev=-1, lookback=3
+01:56:31 [I_LWminmaxIndicator] [INFO ]  28-06-2018 - DOWN, prev=down,  ref_min =1, ref_max=7, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  29-06-2018 - UP, prev=down, SET->LWmax=102.52 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  02-07-2018 - outside, max incluso,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  03-07-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  05-07-2018 - inside,  ref_min =5, ref_max=2, prev=1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  06-07-2018 - UP, prev=up,  ref_min =6, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  09-07-2018 - UP, prev=up,  ref_min =7, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  10-07-2018 - UP, prev=up,  ref_min =8, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  11-07-2018 - DOWN, prev=up, SET->LWmin=97.26 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  12-07-2018 - UP, prev=down, SET->LWmax=102.51 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  13-07-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  16-07-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  17-07-2018 - outside, max incluso,  ref_min =5, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  18-07-2018 - inside,  ref_min =6, ref_max=2, prev=1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  19-07-2018 - DOWN, prev=up, SET->LWmin=101.1 ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  20-07-2018 - UP, prev=down, SET->LWmax=106.5 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  23-07-2018 - inside,  ref_min =3, ref_max=2, prev=1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  24-07-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  25-07-2018 - UP, prev=up,  ref_min =5, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  26-07-2018 - inside,  ref_min =6, ref_max=2, prev=1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  27-07-2018 - DOWN, prev=up, SET->LWmin=103.89 ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  30-07-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  31-07-2018 - inside,  ref_min =2, ref_max=5, prev=-1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  01-08-2018 - inside,  ref_min =3, ref_max=6, prev=-1, lookback=3
+01:56:31 [I_LWminmaxIndicator] [INFO ]  02-08-2018 - UP, prev=down, SET->LWmax=111.15 ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  03-08-2018 - inside,  ref_min =5, ref_max=2, prev=1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  06-08-2018 - UP, prev=up,  ref_min =6, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  07-08-2018 - UP, prev=up,  ref_min =7, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  08-08-2018 - UP, prev=up,  ref_min =8, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  09-08-2018 - UP, prev=up,  ref_min =9, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  10-08-2018 - DOWN, prev=up, SET->LWmin=104.76 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  13-08-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  14-08-2018 - outside, min incluso,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  15-08-2018 - DOWN, prev=down,  ref_min =1, ref_max=5, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  16-08-2018 - inside,  ref_min =2, ref_max=6, prev=-1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  17-08-2018 - DOWN, prev=down,  ref_min =1, ref_max=7, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  20-08-2018 - DOWN, prev=down,  ref_min =1, ref_max=8, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  21-08-2018 - DOWN, prev=down,  ref_min =1, ref_max=9, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  22-08-2018 - DOWN, prev=down,  ref_min =1, ref_max=10, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  23-08-2018 - UP, prev=down, SET->LWmax=110.16 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  24-08-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  27-08-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  28-08-2018 - UP, prev=up,  ref_min =5, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  29-08-2018 - UP, prev=up,  ref_min =6, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  30-08-2018 - UP, prev=up,  ref_min =7, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  31-08-2018 - UP, prev=up,  ref_min =8, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  04-09-2018 - DOWN, prev=up, SET->LWmin=105.78 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  05-09-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  06-09-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  07-09-2018 - DOWN, prev=down,  ref_min =1, ref_max=5, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  10-09-2018 - UP, prev=down, SET->LWmax=112.78 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  11-09-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  12-09-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  13-09-2018 - UP, prev=up,  ref_min =5, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  14-09-2018 - inside,  ref_min =6, ref_max=2, prev=1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  17-09-2018 - DOWN, prev=up, SET->LWmin=107.23 ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  18-09-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  19-09-2018 - DOWN, prev=down,  ref_min =1, ref_max=5, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  20-09-2018 - UP, prev=down, SET->LWmax=113.73 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  21-09-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  24-09-2018 - DOWN, prev=up, SET->LWmin=111.04 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  25-09-2018 - UP, prev=down, SET->LWmax=115.29 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  26-09-2018 - DOWN, prev=up, SET->LWmin=112.22 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  27-09-2018 - inside,  ref_min =2, ref_max=3, prev=-1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  28-09-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  01-10-2018 - UP, prev=down, SET->LWmax=115.1 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  02-10-2018 - outside, max incluso,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  03-10-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  04-10-2018 - DOWN, prev=up, SET->LWmin=113.68 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  05-10-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  08-10-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  09-10-2018 - UP, prev=down, SET->LWmax=116.18 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  10-10-2018 - DOWN, prev=up, SET->LWmin=109.34 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  11-10-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  12-10-2018 - UP, prev=down, SET->LWmax=113.08 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  15-10-2018 - DOWN, prev=up, SET->LWmin=104.2 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  16-10-2018 - UP, prev=down, SET->LWmax=111.24 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  17-10-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  18-10-2018 - DOWN, prev=up, SET->LWmin=106.95 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  19-10-2018 - UP, prev=down, SET->LWmax=111.81 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  22-10-2018 - inside,  ref_min =3, ref_max=2, prev=1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  23-10-2018 - DOWN, prev=up, SET->LWmin=107.83 ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  24-10-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  25-10-2018 - UP, prev=down, SET->LWmax=110.86 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  26-10-2018 - DOWN, prev=up, SET->LWmin=101.59 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  29-10-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  30-10-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  31-10-2018 - UP, prev=down, SET->LWmax=109.27 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  01-11-2018 - inside,  ref_min =3, ref_max=2, prev=1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  02-11-2018 - DOWN, prev=up, SET->LWmin=100.11 ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  05-11-2018 - UP, prev=down, SET->LWmax=108.14 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  06-11-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  07-11-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  08-11-2018 - inside,  ref_min =5, ref_max=2, prev=1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  09-11-2018 - DOWN, prev=up, SET->LWmin=104.98 ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  12-11-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  13-11-2018 - inside,  ref_min =2, ref_max=5, prev=-1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  14-11-2018 - DOWN, prev=down,  ref_min =1, ref_max=6, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  15-11-2018 - DOWN, prev=down,  ref_min =1, ref_max=7, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  16-11-2018 - UP, prev=down, SET->LWmax=112.24 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  19-11-2018 - DOWN, prev=up, SET->LWmin=103.91 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  20-11-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  21-11-2018 - UP, prev=down, SET->LWmax=108.88 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  23-11-2018 - DOWN, prev=up, SET->LWmin=99.35 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  26-11-2018 - UP, prev=down, SET->LWmax=104.43 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  27-11-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  28-11-2018 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  29-11-2018 - inside,  ref_min =5, ref_max=2, prev=1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  30-11-2018 - inside,  ref_min =6, ref_max=3, prev=1, lookback=3
+01:56:31 [I_LWminmaxIndicator] [INFO ]  03-12-2018 - UP, prev=up,  ref_min =7, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  04-12-2018 - DOWN, prev=up, SET->LWmin=102.0 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  06-12-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  07-12-2018 - outside, min incluso,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  10-12-2018 - DOWN, prev=down,  ref_min =1, ref_max=5, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  11-12-2018 - UP, prev=down, SET->LWmax=113.42 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  12-12-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  13-12-2018 - DOWN, prev=up, SET->LWmin=103.89 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  14-12-2018 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  17-12-2018 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  18-12-2018 - inside,  ref_min =2, ref_max=5, prev=-1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  19-12-2018 - outside, min incluso,  ref_min =1, ref_max=6, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  20-12-2018 - DOWN, prev=down,  ref_min =1, ref_max=7, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  21-12-2018 - DOWN, prev=down,  ref_min =1, ref_max=8, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  24-12-2018 - DOWN, prev=down,  ref_min =1, ref_max=9, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  26-12-2018 - outside, min incluso,  ref_min =1, ref_max=10, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  27-12-2018 - UP, prev=down, SET->LWmax=111.27 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  28-12-2018 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  31-12-2018 - inside,  ref_min =4, ref_max=2, prev=1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  02-01-2019 - DOWN, prev=up, SET->LWmin=93.96 ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  03-01-2019 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  04-01-2019 - UP, prev=down, SET->LWmax=102.41 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  07-01-2019 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  08-01-2019 - UP, prev=up,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  09-01-2019 - UP, prev=up,  ref_min =5, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  10-01-2019 - DOWN, prev=up, SET->LWmin=97.2 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  11-01-2019 - DOWN, prev=down,  ref_min =1, ref_max=3, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  14-01-2019 - DOWN, prev=down,  ref_min =1, ref_max=4, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  15-01-2019 - UP, prev=down, SET->LWmax=104.88 ref_min =2, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  16-01-2019 - UP, prev=up,  ref_min =3, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  17-01-2019 - outside, max incluso,  ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  18-01-2019 - UP, prev=up,  ref_min =5, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  22-01-2019 - DOWN, prev=up, SET->LWmin=101.26 ref_min =1, ref_max=2, prev=-1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  23-01-2019 - inside,  ref_min =2, ref_max=3, prev=-1, lookback=2
+01:56:31 [I_LWminmaxIndicator] [INFO ]  24-01-2019 - inside,  ref_min =3, ref_max=4, prev=-1, lookback=3
+01:56:31 [I_LWminmaxIndicator] [INFO ]  25-01-2019 - UP, prev=down, SET->LWmax=107.9 ref_min =4, ref_max=1, prev=1, lookback=1
+01:56:31 [I_LWminmaxIndicator] [INFO ]  28-01-2019 - DOWN, prev=up, SET->LWmin=104.86 ref_min =1, ref_max=2, prev=-1, LAST , lookback=1
+01:56:31 [__main__    ] [INFO ]  30-01-2018 <msft-daily>, MIN : 92.1
+01:56:31 [__main__    ] [INFO ]  31-01-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  01-02-2018 <msft-daily>, MAX : 96.07
+01:56:31 [__main__    ] [INFO ]  02-02-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  05-02-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  06-02-2018 <msft-daily>, MIN : 85.25
+01:56:31 [__main__    ] [INFO ]  07-02-2018 <msft-daily>, MAX : 91.77
+01:56:31 [__main__    ] [INFO ]  08-02-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  09-02-2018 <msft-daily>, MIN : 83.83
+01:56:31 [__main__    ] [INFO ]  12-02-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  13-02-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  14-02-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  15-02-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  16-02-2018 <msft-daily>, MAX : 93.5
+01:56:31 [__main__    ] [INFO ]  20-02-2018 <msft-daily>, MIN : 91.01
+01:56:31 [__main__    ] [INFO ]  21-02-2018 <msft-daily>, MAX : 93.36
+01:56:31 [__main__    ] [INFO ]  22-02-2018 <msft-daily>, MIN : 91.36
+01:56:31 [__main__    ] [INFO ]  23-02-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  26-02-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  27-02-2018 <msft-daily>, MAX : 95.84
+01:56:31 [__main__    ] [INFO ]  28-02-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  01-03-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  02-03-2018 <msft-daily>, MIN : 90.86
+01:56:31 [__main__    ] [INFO ]  05-03-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  06-03-2018 <msft-daily>, MAX : 94.49
+01:56:31 [__main__    ] [INFO ]  07-03-2018 <msft-daily>, MIN : 92.43
+01:56:31 [__main__    ] [INFO ]  08-03-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  09-03-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  12-03-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  13-03-2018 <msft-daily>, MAX : 97.24
+01:56:31 [__main__    ] [INFO ]  14-03-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  15-03-2018 <msft-daily>, MIN : 92.83
+01:56:31 [__main__    ] [INFO ]  16-03-2018 <msft-daily>, MAX : 95.38
+01:56:31 [__main__    ] [INFO ]  19-03-2018 <msft-daily>, MIN : 92.11
+01:56:31 [__main__    ] [INFO ]  20-03-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  21-03-2018 <msft-daily>, MAX : 94.05
+01:56:31 [__main__    ] [INFO ]  22-03-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  23-03-2018 <msft-daily>, MIN : 87.08
+01:56:31 [__main__    ] [INFO ]  26-03-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  27-03-2018 <msft-daily>, MAX : 95.14
+01:56:31 [__main__    ] [INFO ]  28-03-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  29-03-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  02-04-2018 <msft-daily>, MIN : 87.51
+01:56:31 [__main__    ] [INFO ]  03-04-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  04-04-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  05-04-2018 <msft-daily>, MAX : 93.07
+01:56:31 [__main__    ] [INFO ]  06-04-2018 <msft-daily>, MIN : 89.48
+01:56:31 [__main__    ] [INFO ]  09-04-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  10-04-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  11-04-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  12-04-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  13-04-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  16-04-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  17-04-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  18-04-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  19-04-2018 <msft-daily>, MAX : 97.07
+01:56:31 [__main__    ] [INFO ]  20-04-2018 <msft-daily>, MIN : 94.05
+01:56:31 [__main__    ] [INFO ]  23-04-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  24-04-2018 <msft-daily>, MAX : 96.47
+01:56:31 [__main__    ] [INFO ]  25-04-2018 <msft-daily>, MIN : 90.28
+01:56:31 [__main__    ] [INFO ]  26-04-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  27-04-2018 <msft-daily>, MAX : 97.9
+01:56:31 [__main__    ] [INFO ]  30-04-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  01-05-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  02-05-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  03-05-2018 <msft-daily>, MIN : 92.45
+01:56:31 [__main__    ] [INFO ]  04-05-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  07-05-2018 <msft-daily>, MAX : 96.71
+01:56:31 [__main__    ] [INFO ]  08-05-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  09-05-2018 <msft-daily>, MIN : 95.05
+01:56:31 [__main__    ] [INFO ]  10-05-2018 <msft-daily>, MAX : 97.95
+01:56:31 [__main__    ] [INFO ]  11-05-2018 <msft-daily>, MIN : 97.04
+01:56:31 [__main__    ] [INFO ]  14-05-2018 <msft-daily>, MAX : 98.69
+01:56:31 [__main__    ] [INFO ]  15-05-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  16-05-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  17-05-2018 <msft-daily>, MIN : 95.83
+01:56:31 [__main__    ] [INFO ]  18-05-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  21-05-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  22-05-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  23-05-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  24-05-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  25-05-2018 <msft-daily>, MAX : 98.98
+01:56:31 [__main__    ] [INFO ]  29-05-2018 <msft-daily>, MIN : 97.23
+01:56:31 [__main__    ] [INFO ]  30-05-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  31-05-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  01-06-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  04-06-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  05-06-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  06-06-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  07-06-2018 <msft-daily>, MAX : 102.69
+01:56:31 [__main__    ] [INFO ]  08-06-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  11-06-2018 <msft-daily>, inside = 2
+01:56:31 [__main__    ] [INFO ]  12-06-2018 <msft-daily>, inside = 3
+01:56:31 [__main__    ] [INFO ]  13-06-2018 <msft-daily>, inside = 4
+01:56:31 [__main__    ] [INFO ]  14-06-2018 <msft-daily>, inside = 5
+01:56:31 [__main__    ] [INFO ]  15-06-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  18-06-2018 <msft-daily>, MIN : 99.42
+01:56:31 [__main__    ] [INFO ]  19-06-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  20-06-2018 <msft-daily>, MAX : 102.52
+01:56:31 [__main__    ] [INFO ]  21-06-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  22-06-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  25-06-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  26-06-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  27-06-2018 <msft-daily>, inside = 2
+01:56:31 [__main__    ] [INFO ]  28-06-2018 <msft-daily>, MIN : 97.26
+01:56:31 [__main__    ] [INFO ]  29-06-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  02-07-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  03-07-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  05-07-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  06-07-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  09-07-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  10-07-2018 <msft-daily>, MAX : 102.51
+01:56:31 [__main__    ] [INFO ]  11-07-2018 <msft-daily>, MIN : 101.1
+01:56:31 [__main__    ] [INFO ]  12-07-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  13-07-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  16-07-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  17-07-2018 <msft-daily>, MAX : 106.5
+01:56:31 [__main__    ] [INFO ]  18-07-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  19-07-2018 <msft-daily>, MIN : 103.89
+01:56:31 [__main__    ] [INFO ]  20-07-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  23-07-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  24-07-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  25-07-2018 <msft-daily>, MAX : 111.15
+01:56:31 [__main__    ] [INFO ]  26-07-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  27-07-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  30-07-2018 <msft-daily>, MIN : 104.76
+01:56:31 [__main__    ] [INFO ]  31-07-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  01-08-2018 <msft-daily>, inside = 2
+01:56:31 [__main__    ] [INFO ]  02-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  03-08-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  06-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  07-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  08-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  09-08-2018 <msft-daily>, MAX : 110.16
+01:56:31 [__main__    ] [INFO ]  10-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  13-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  14-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  15-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  16-08-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  17-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  20-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  21-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  22-08-2018 <msft-daily>, MIN : 105.78
+01:56:31 [__main__    ] [INFO ]  23-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  24-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  27-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  28-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  29-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  30-08-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  31-08-2018 <msft-daily>, MAX : 112.78
+01:56:31 [__main__    ] [INFO ]  04-09-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  05-09-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  06-09-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  07-09-2018 <msft-daily>, MIN : 107.23
+01:56:31 [__main__    ] [INFO ]  10-09-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  11-09-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  12-09-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  13-09-2018 <msft-daily>, MAX : 113.73
+01:56:31 [__main__    ] [INFO ]  14-09-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  17-09-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  18-09-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  19-09-2018 <msft-daily>, MIN : 111.04
+01:56:31 [__main__    ] [INFO ]  20-09-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  21-09-2018 <msft-daily>, MAX : 115.29
+01:56:31 [__main__    ] [INFO ]  24-09-2018 <msft-daily>, MIN : 112.22
+01:56:31 [__main__    ] [INFO ]  25-09-2018 <msft-daily>, MAX : 115.1
+01:56:31 [__main__    ] [INFO ]  26-09-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  27-09-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  28-09-2018 <msft-daily>, MIN : 113.68
+01:56:31 [__main__    ] [INFO ]  01-10-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  02-10-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  03-10-2018 <msft-daily>, MAX : 116.18
+01:56:31 [__main__    ] [INFO ]  04-10-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  05-10-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  08-10-2018 <msft-daily>, MIN : 109.34
+01:56:31 [__main__    ] [INFO ]  09-10-2018 <msft-daily>, MAX : 113.08
+01:56:31 [__main__    ] [INFO ]  10-10-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  11-10-2018 <msft-daily>, MIN : 104.2
+01:56:31 [__main__    ] [INFO ]  12-10-2018 <msft-daily>, MAX : 111.24
+01:56:31 [__main__    ] [INFO ]  15-10-2018 <msft-daily>, MIN : 106.95
+01:56:31 [__main__    ] [INFO ]  16-10-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  17-10-2018 <msft-daily>, MAX : 111.81
+01:56:31 [__main__    ] [INFO ]  18-10-2018 <msft-daily>, MIN : 107.83
+01:56:31 [__main__    ] [INFO ]  19-10-2018 <msft-daily>, MAX : 110.86
+01:56:31 [__main__    ] [INFO ]  22-10-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  23-10-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  24-10-2018 <msft-daily>, MIN : 101.59
+01:56:31 [__main__    ] [INFO ]  25-10-2018 <msft-daily>, MAX : 109.27
+01:56:31 [__main__    ] [INFO ]  26-10-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  29-10-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  30-10-2018 <msft-daily>, MIN : 100.11
+01:56:31 [__main__    ] [INFO ]  31-10-2018 <msft-daily>, MAX : 108.14
+01:56:31 [__main__    ] [INFO ]  01-11-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  02-11-2018 <msft-daily>, MIN : 104.98
+01:56:31 [__main__    ] [INFO ]  05-11-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  06-11-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  07-11-2018 <msft-daily>, MAX : 112.24
+01:56:31 [__main__    ] [INFO ]  08-11-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  09-11-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  12-11-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  13-11-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  14-11-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  15-11-2018 <msft-daily>, MIN : 103.91
+01:56:31 [__main__    ] [INFO ]  16-11-2018 <msft-daily>, MAX : 108.88
+01:56:31 [__main__    ] [INFO ]  19-11-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  20-11-2018 <msft-daily>, MIN : 99.35
+01:56:31 [__main__    ] [INFO ]  21-11-2018 <msft-daily>, MAX : 104.43
+01:56:31 [__main__    ] [INFO ]  23-11-2018 <msft-daily>, MIN : 102.0
+01:56:31 [__main__    ] [INFO ]  26-11-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  27-11-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  28-11-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  29-11-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  30-11-2018 <msft-daily>, inside = 2
+01:56:31 [__main__    ] [INFO ]  03-12-2018 <msft-daily>, MAX : 113.42
+01:56:31 [__main__    ] [INFO ]  04-12-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  06-12-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  07-12-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  10-12-2018 <msft-daily>, MIN : 103.89
+01:56:31 [__main__    ] [INFO ]  11-12-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  12-12-2018 <msft-daily>, MAX : 111.27
+01:56:31 [__main__    ] [INFO ]  13-12-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  14-12-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  17-12-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  18-12-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  19-12-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  20-12-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  21-12-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  24-12-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  26-12-2018 <msft-daily>, MIN : 93.96
+01:56:31 [__main__    ] [INFO ]  27-12-2018 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  28-12-2018 <msft-daily>, MAX : 102.41
+01:56:31 [__main__    ] [INFO ]  31-12-2018 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  02-01-2019 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  03-01-2019 <msft-daily>, MIN : 97.2
+01:56:31 [__main__    ] [INFO ]  04-01-2019 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  07-01-2019 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  08-01-2019 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  09-01-2019 <msft-daily>, MAX : 104.88
+01:56:31 [__main__    ] [INFO ]  10-01-2019 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  11-01-2019 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  14-01-2019 <msft-daily>, MIN : 101.26
+01:56:31 [__main__    ] [INFO ]  15-01-2019 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  16-01-2019 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  17-01-2019 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  18-01-2019 <msft-daily>, MAX : 107.9
+01:56:31 [__main__    ] [INFO ]  22-01-2019 <msft-daily>, MIN : 104.86
+01:56:31 [__main__    ] [INFO ]  23-01-2019 <msft-daily>, inside = 1
+01:56:31 [__main__    ] [INFO ]  24-01-2019 <msft-daily>, inside = 2
+01:56:31 [__main__    ] [INFO ]  25-01-2019 <msft-daily>, MAX : 107.88
+01:56:31 [__main__    ] [INFO ]  28-01-2019 <msft-daily>
+01:56:31 [__main__    ] [INFO ]  EXIT STRATEGY <class '__main__.MyStrategy'>, strategy.next loop_count = 250
+01:56:39 [__main__    ] [INFO ]  *** finished ***
