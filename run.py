@@ -75,6 +75,14 @@ class MyStrategy(bt.Strategy):
             if not isNaN(_min):
                 msg += ', MIN : ' + str(_min)
 
+            _min_inter = self.lw_min_max[datafeed._name].lines.LW_min_inter[0]    
+            if not isNaN(_min_inter):
+                msg += ', MIN-INTER : ' + str(_min_inter)
+
+            _max_inter = self.lw_min_max[datafeed._name].lines.LW_max_inter[0]    
+            if not isNaN(_max_inter):
+                msg += ', MAX-INTER : ' + str(_max_inter)
+
             _inside = self.lw_min_max[datafeed._name].lines.inside[0]
             if not isNaN(_inside):
                 msg += ', inside = ' + str(int(_inside)) 
