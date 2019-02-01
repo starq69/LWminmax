@@ -30,10 +30,7 @@ class LWminmaxIndicator(bt.Indicator):
         self.log = logging.getLogger (__name__)
         self.prev = self.min_max_inter_flag = 0
         self.ref_min = self.ref_max = self.lookback = 1
-        self.neg_data_idx = 0
         self.c_inter_max = self.c_inter_min = 0
-        self.ref_max_list = [] # index list
-        self.ref_min_list = []
         self.test_max = []
         self.test_min = []
 
@@ -47,10 +44,9 @@ class LWminmaxIndicator(bt.Indicator):
 
     def prenext(self):
         self.log.info(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' PRENEXT --> low: ' + repr(self.data.low[0]) + ', high:' + repr(self.data.high[0]))
-        self.neg_data_idx -= 1
 
 
-    def _outside_01(self, msg):
+    def eval_outside(self, msg):
         '''da ottimizzare in quanto non esiste il caso self.ref_min/max == 0
         '''
         msg += 'outside, '
@@ -100,32 +96,6 @@ class LWminmaxIndicator(bt.Indicator):
         return msg
 
 
-    def ex_outside(self, msg):
-        msg += 'outside, '
-        if self.ref_max > self.ref_min:
-            if self.data.high >= self.data.high[-self.ref_max]:
-                msg += 'max incluso, '
-                self.ref_max = 1 
-            else:
-                msg += 'max NON incluso, '
-                self.ref_max += 1
-
-        elif self.ref_max < self.ref_min:
-            if self.data.low <= self.data.low[-self.ref_min]:
-                msg += 'min incluso, '
-                self.ref_min = 1 
-            else:
-                msg += 'min NON incluso, '
-                self.ref_min += 1
-
-        else: #superfluo
-            # sia ref_min sia ref_max sono inclusi (sono uguali solo all'inizio)
-            #
-            self.ref_min = self.ref_max = 1 
-
-        return msg
-
-
     def _inside(self, lookback):
         return (self.data.high[0] <= self.data.high[-lookback] and self.data.low[0]  >= self.data.low[-lookback])
 
@@ -137,22 +107,6 @@ class LWminmaxIndicator(bt.Indicator):
 
     def _down(self, lookback):
         return (self.data.low[0] < self.data.low[-lookback]  and self.data.high[0] <= self.data.high[-lookback])
-
-
-    def reset_last_inter(self, LW_inter):
-        #
-        #
-        for idx, value in reversed(list(enumerate(LW_inter))):
-            if not isNaN(value):
-                LW_inter[idx] = float("nan") 
-                break
-
-
-    def get_last_inter_value(self, LW_inter):
-        for idx, value in reversed(list(enumerate(LW_inter))):
-            if not isNaN(value):
-                return value
-        return None
 
 
     def update_offset_idx(self, which=0, reset=False, offset=0): 
@@ -184,7 +138,9 @@ class LWminmaxIndicator(bt.Indicator):
         msg = ''
         if len(self.test_ref_max) == 3: 
 
-            msg += 'IMAX=(' + str(self.LW_max[self.test_ref_max[0]]) + ', ' + str(self.LW_max[self.test_ref_max[1]]) + ', ' + str(self.LW_max[self.test_ref_max[2]])+')'
+            msg += 'IMAX=(' + str(self.LW_max[self.test_ref_max[0]]) + ', ' + \
+                    str(self.LW_max[self.test_ref_max[1]]) + ', ' + \
+                    str(self.LW_max[self.test_ref_max[2]])+')'
 
             if self.LW_max[self.test_ref_max[0]] < self.LW_max[self.test_ref_max[1]] and \
                     self.LW_max[self.test_ref_max[1]] > self.LW_max[self.test_ref_max[2]]:
@@ -221,13 +177,19 @@ class LWminmaxIndicator(bt.Indicator):
     def check_intermediate_min(self, ref_min):
         self.test_ref_min.append(ref_min) 
         msg = ''
+
         if len(self.test_ref_min) == 3: ## ed test_min
-            msg += 'IMIN=(' + str(self.LW_min[self.test_ref_min[0]]) + ', ' + str(self.LW_min[self.test_ref_min[1]]) + ', ' + str(self.LW_min[self.test_ref_min[2]])+')'
+            msg += 'IMIN=(' + str(self.LW_min[self.test_ref_min[0]]) + ', ' + \
+                    str(self.LW_min[self.test_ref_min[1]]) + ', ' + \
+                    str(self.LW_min[self.test_ref_min[2]])+')'
+
             if self.LW_min[self.test_ref_min[0]] > self.LW_min[self.test_ref_min[1]] and \
                     self.LW_min[self.test_ref_min[1]] < self.LW_min[self.test_ref_min[2]]:
                 msg+=' <INTER MIN found> '
-                if self.min_max_inter_flag > 0: # trovato nuovo min quando si attendeva un max...
+                if self.min_max_inter_flag > 0: 
                     msg += 'atteso max '
+                    # 
+                    # trovato nuovo min quando si attendeva un max...
                     # ...si confronta il precedente inter.min con il nuovo...
                     #
                     if self.c_inter_min != 0 and self.LW_min[self.c_inter_min] > self.LW_min[self.test_ref_min[1]]: 
@@ -237,6 +199,7 @@ class LWminmaxIndicator(bt.Indicator):
                         self.update_offset_idx(which=-1, reset=True, offset=self.test_ref_min[1]) 
 
                     for x in range(2): self.test_ref_min.pop(0)
+
                 else: # flush max (su self.lines.LW_inter_max) e aggiorna indice candidato min (c_inter_min)
                     if self.c_inter_max != 0:
                         self.LW_max_inter[self.c_inter_max] = self.LW_max[self.c_inter_max]
@@ -259,7 +222,6 @@ class LWminmaxIndicator(bt.Indicator):
     def next(self):
 
         msg = ''
-        self.neg_data_idx -= 1
         #self.log.info(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' low: ' + repr(self.data.low[0]) + ', high:' + repr(self.data.high[0]))
 
         if not self._inside(self.lookback):
@@ -285,7 +247,7 @@ class LWminmaxIndicator(bt.Indicator):
                     self.ref_max = 1 # OK 
                     self.prev    = 1 # up
 
-                elif self._down(self.lookback): # 3^ 
+                elif self._down(self.lookback): 
                     msg += 'DOWN, '
                     if self.prev > 0: #up
                         msg += 'prev=up, '
@@ -307,7 +269,7 @@ class LWminmaxIndicator(bt.Indicator):
                     self.prev    =-1 # down
             
             else: # outside
-                msg += self._outside_01(msg)
+                msg += self.eval_outside(msg)
 
             self.lookback = 1
 
@@ -324,7 +286,6 @@ class LWminmaxIndicator(bt.Indicator):
 
         msg += ' ref_min ='+str(self.ref_min)+', ref_max='+str(self.ref_max) + ', prev='+str(self.prev)
 
-
         ### LAST Datapoint
         #
         if len(self.data) == self.data.buflen():
@@ -335,10 +296,5 @@ class LWminmaxIndicator(bt.Indicator):
             # debug (print self.lw_min/max)
             #self.log.info(self.test_min)
             #self.log.info(self.test_max)
-
-            #point = 2 ### point corrisp. a neg_data_idx in un det. momento
-            #print('****** ------>' + str(self.data.high[-(self.neg_data_idx - point)]))
-
-
 
         self.log.info(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' - ' + msg + ', lookback='+str(self.lookback))
