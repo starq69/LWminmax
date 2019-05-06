@@ -4,13 +4,18 @@
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 import logging
 #from I_InsideIndicator import InsideIndicator, New_InsideIndicator
-from I_OutsideIndicator import OutsideIndicator, ex_OutsideIndicator
+#from I_OutsideIndicator import OutsideIndicator, ex_OutsideIndicator
 import backtrader as bt
 import backtrader.indicators as btind
+from backtrader.utils.date import num2date # https://community.backtrader.com/topic/1151/datetime-format-internally/3
 
+import pandas as pd
+import numpy as np
+
+'''
 def isNaN(num):
     return num != num
-
+'''
 
 class LWminmaxIndicator(bt.Indicator):
 
@@ -26,21 +31,81 @@ class LWminmaxIndicator(bt.Indicator):
 
     )
 
-    def __init__(self):
-        self.log = logging.getLogger (__name__)
-        self.prev = self.min_max_inter_flag = 0
-        self.ref_min = self.ref_max = self.lookback = 1
-        self.c_inter_max = self.c_inter_min = 0
-        self.test_max = []
-        self.test_min = []
+    #def __init__(self, *args):
+    def __init__(self, pandas_df=None):
+        ''' *args contiene un dataframe si veda MyStrategy.__init__() ''' 
+        self.log        = logging.getLogger (__name__)
+        self.prev       = self.min_max_inter_flag = 0
+        self.ref_min    = self.ref_max = self.lookback = 1
+        self.c_inter_max= self.c_inter_min = 0
+        self.test_max   = []
+        self.test_min   = []
 
         self.test_ref_max= []
         self.test_ref_min= []
 
+        if pandas_df is not None and isinstance(pandas_df, pd.DataFrame):
+            print('pandas DataFrame PASSED')
+            self.pdf = pandas_df
+        else:
+            print('Warning : No pandas.DataFrame is passed to LWminmaxIndicator istance')
+
+        '''
+        #self.pdf = args[0]  ##
+        if not isinstance(self.pdf, pd.DataFrame):
+            print('Warning : No pandas.DataFrame is passed to LWminmaxIndicator istance')
+        else:
+            print('pandas DataFrame PASSED')
+        '''
         # da rimuovere (per ora serve ad attivare prenext())
         self.down       = bt.And(self.data.low(0) < self.data.low(-self.lookback), self.data.high(0) <= self.data.high(-self.lookback))
 
         #super(LWminmaxIndicator, self).__init__()
+
+
+    def report_dataframe(self):
+        '''
+        invocata nella next() sull'ultimo datapoint
+
+        può essere implementato anche nella Strategy.stop() per ottenere un dataframe con tutti gli indicatori calcolati x ogni datafeed (symbol)
+
+        '''
+        _len = len(self.data)
+
+        #self.pdf['float_dt']        = self.data.datetime.get(size=_len) ## KEY
+        # # https://community.backtrader.com/topic/1151/datetime-format-internally/3
+
+        self.pdf['datetime']        = [self.data.num2date(_internal_date).strftime('%d-%m-%Y') for _internal_date in self.data.datetime.get(size=_len)]
+
+        self.pdf['LW_max']          = self.LW_max.get(size=_len)
+        #self.pdf['LW_max']          = self.pdf['LW_max'].apply(pd.to_numeric, downcast='float') 
+        self.pdf['LW_max']          = self.pdf['LW_max'].replace(np.nan,0).apply(pd.to_numeric, downcast='float') 
+
+        self.pdf['LW_min']          = self.LW_min.get(size=_len)
+        #self.pdf['LW_min']          = self.pdf['LW_min'].apply(pd.to_numeric, downcast='float') 
+        self.pdf['LW_min']          = self.pdf['LW_min'].replace(np.nan, 0).apply(pd.to_numeric, downcast='float') 
+
+        self.pdf['LW_max_inter']    = self.LW_max_inter.get(size=_len)
+        #self.pdf['LW_max_inter']    = self.pdf['LW_max_inter'].apply(pd.to_numeric, downcast='float') 
+        self.pdf['LW_max_inter']    = self.pdf['LW_max_inter'].replace(np.nan, 0).apply(pd.to_numeric, downcast='float') 
+
+        self.pdf['LW_min_inter']    = self.LW_min_inter.get(size=_len)
+        #self.pdf['LW_min_inter']    = self.pdf['LW_min_inter'].apply(pd.to_numeric, downcast='float') 
+        self.pdf['LW_min_inter']    = self.pdf['LW_min_inter'].replace(np.nan, 0).apply(pd.to_numeric, downcast='float') 
+
+        # per convertire a int debbo prima sostituire NaN con 0
+        self.pdf['inside']          = self.inside.get(size=_len)
+        self.pdf['inside']          = self.pdf['inside'].replace(np.nan, 0).astype('int16', errors='ignore')
+
+        self.pdf.set_index('datetime', inplace=True)
+
+        #print(self.pdf.info())
+
+
+    def get_dataframe(self):
+
+        return self.pdf
+
 
     def prenext(self):
         self.log.info(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' PRENEXT --> low: ' + repr(self.data.low[0]) + ', high:' + repr(self.data.high[0]))
@@ -297,4 +362,7 @@ class LWminmaxIndicator(bt.Indicator):
             #self.log.info(self.test_min)
             #self.log.info(self.test_max)
 
+            self.report_dataframe()
+
         self.log.info(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' - ' + msg + ', lookback='+str(self.lookback))
+

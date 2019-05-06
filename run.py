@@ -7,11 +7,15 @@ from datetime import datetime
 import os, sys
 import logging, logging.config, configparser
 from I_LWminmaxIndicator import LWminmaxIndicator as LWminmax  
+from I_InsideIndicator import InsideIndicator
 import backtrader as bt
 import backtrader.feeds as btfeeds
+import pandas as pd
+
 
 def isNaN(num):
     return num != num
+
 
 def setting_up():
 
@@ -55,13 +59,37 @@ class MyStrategy(bt.Strategy):
         self.log.info('ENTER STRATEGY '+repr(self.__class__))
 
         self.loop_count = 0
+        self.indicators = dict() ##
 
         # calcola LWminmaxIndicator x tutti i datafeeds
         #
         self.lw_min_max = dict()
+        # altri indicatori ...
+        self.inside_ind = dict() 
+
         for _, datafeed in enumerate(self.datas):
-            self.log.info('*** datafeed name : ' + datafeed._name)
-            self.lw_min_max[datafeed._name] = LWminmax(datafeed)
+            pdf = pd.DataFrame() ## da rimuovere : uso ev. un flag
+            self.log.info('*** datafeed name : ' + datafeed._name) ## https://www.backtrader.com/blog/posts/2017-04-09-multi-example/multi-example.html
+            '''
+            self.lw_min_max[datafeed._name] = LWminmax(datafeed, pdf)
+            self.lw_min_max[datafeed._name]['output_dataframe'] = 'KO' #pd.DataFrame() ## NEW
+            self.lw_min_max[datafeed._name].csv = True
+
+            self.inside_ind[datafeed._name] = InsideIndicator(datafeed) ## test
+            self.inside_ind[datafeed._name]['output_dataframe'] = 'KO' #pd.DataFrame() ## NEW
+            '''
+            self.lw_min_max[datafeed._name] = dict()
+            self.lw_min_max[datafeed._name]['backtrader_indicator'] = LWminmax(datafeed, pdf)
+            self.lw_min_max[datafeed._name]['backtrader_indicator'].csv = True
+            self.lw_min_max[datafeed._name]['output_dataframe'] = pd.DataFrame() ## NEW
+
+            self.inside_ind[datafeed._name] = dict()
+            self.inside_ind[datafeed._name]['backtrader_indicator'] = InsideIndicator(datafeed) ## test
+            self.inside_ind[datafeed._name]['output_dataframe'] = pd.DataFrame() ## NEW
+
+        self.indicators['lw_min_max'] = self.lw_min_max ##
+        self.indicators['inside_ind'] = self.inside_ind ## test
+
 
     def next_report(self):
 
@@ -94,7 +122,7 @@ class MyStrategy(bt.Strategy):
         ### print max/min for log analisys purpose
         #
         self.loop_count += 1
-        self.next_report()
+        #self.next_report()
 
         '''
         # https://community.backtrader.com/topic/187/multiple-symbols-each-symbol-multiple-time-frames-issue/7
@@ -111,8 +139,35 @@ class MyStrategy(bt.Strategy):
         '''
 
     def stop(self):
+        '''
+        https://community.backtrader.com/topic/1448/convert-datas-0-into-a-pandas-dataframe/2
+        https://community.backtrader.com/topic/11/porting-a-pandas-dataframe-dependent-indicator/2
 
+        ...As for writing the values to a DataFrame, you may pass a DataFrame as a named argument to the indicator and add the values, 
+        but taking into account that appending values to a DataFrame is a very expensive operation, you may prefer to do it at once during Strategy.stop
+
+        Getting a slice # https://www.backtrader.com/docu/concepts.html
+        myslice = self.my_sma.get(size=len(self.mysma))
+        '''
         self.log.info('EXIT STRATEGY '+repr(self.__class__) + ', strategy.next loop_count = ' + str(self.loop_count))
+
+        for indicator, obj in self.indicators.items():
+            print(str(indicator)) # es.: inside_ind
+            for datafeed, i_dict in obj.items():
+                print(str(datafeed)) # es.: stne
+                # OLD....
+                #print(ind.get_dataframe())
+
+                #...NEW (da convertire in dataframe vedi report_dataframe())
+                ind = i_dict['backtrader_indicator']
+                pdf = i_dict['output_dataframe']
+                _len = len(ind)
+                pdf['datetime'] = [ind.data.num2date(_internal_date).strftime('%d-%m-%Y') for _internal_date in ind.data.datetime.get(size=_len)]
+
+                for line in ind.lines:
+                    print(line.get(size=_len))
+
+
 
 
 def main():
@@ -127,11 +182,12 @@ def main():
         cerebro.adddata(btfeeds.YahooFinanceCSVData(dataname=path+fname, adjclose=False, decimals=5), name)
         log.info('Configured DATAFEED : ' + name +'-->'+fname + ' Succesfully added to cerebro')
 
+    cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
     cerebro.addstrategy(MyStrategy)
 
     cerebro.broker.setcash(10000.0)
     cerebro.run()    
-    cerebro.plot(style='candlestick', barup='green', bardown='black')
+    #cerebro.plot(style='candlestick', barup='green', bardown='black')
 
     log.info('*** finished ***')
 
