@@ -63,40 +63,28 @@ class MyStrategy(bt.Strategy):
 
         # calcola LWminmaxIndicator x tutti i datafeeds
         #
-        self.lw_min_max = dict()
-        # altri indicatori ...
-        self.inside_ind = dict() 
+        self.indicators[LWminmax._name] = dict() 
+        # ...altri indicatori 
+
+        print('.... ' + LWminmax._name + ' .....')
 
         for _, datafeed in enumerate(self.datas):
-            pdf = pd.DataFrame() ## da rimuovere : uso ev. un flag
             self.log.info('*** datafeed name : ' + datafeed._name) ## https://www.backtrader.com/blog/posts/2017-04-09-multi-example/multi-example.html
-            '''
-            self.lw_min_max[datafeed._name] = LWminmax(datafeed, pdf)
-            self.lw_min_max[datafeed._name]['output_dataframe'] = 'KO' #pd.DataFrame() ## NEW
-            self.lw_min_max[datafeed._name].csv = True
 
-            self.inside_ind[datafeed._name] = InsideIndicator(datafeed) ## test
-            self.inside_ind[datafeed._name]['output_dataframe'] = 'KO' #pd.DataFrame() ## NEW
-            '''
-            self.lw_min_max[datafeed._name] = dict()
-            self.lw_min_max[datafeed._name]['backtrader_indicator'] = LWminmax(datafeed, pdf)
-            self.lw_min_max[datafeed._name]['backtrader_indicator'].csv = True
-            self.lw_min_max[datafeed._name]['output_dataframe'] = pd.DataFrame() ## NEW
+            self.indicators[LWminmax._name][datafeed._name] = dict()
+            self.indicators[LWminmax._name][datafeed._name]['backtrader_indicator'] = LWminmax(datafeed, strategy=self)
+            self.indicators[LWminmax._name][datafeed._name]['backtrader_indicator'].csv = True
+            self.indicators[LWminmax._name][datafeed._name]['output_dataframe'] = pd.DataFrame()
 
-            self.inside_ind[datafeed._name] = dict()
-            self.inside_ind[datafeed._name]['backtrader_indicator'] = InsideIndicator(datafeed) ## test
-            self.inside_ind[datafeed._name]['output_dataframe'] = pd.DataFrame() ## NEW
-
-        self.indicators['lw_min_max'] = self.lw_min_max ##
-        self.indicators['inside_ind'] = self.inside_ind ## test
 
 
     def next_report(self):
-
+        '''
         for _, datafeed in enumerate(d for d in self.datas if len(d)):
             msg = ''
             msg += datafeed.datetime.datetime().strftime('%d-%m-%Y') + ' <' + datafeed._name + '>' 
             _max = self.lw_min_max[datafeed._name].lines.LW_max[0]
+            #_max = self.indicators[LWminmax._name][datafeed._name]['backtrader_indicator'].lines.LW_max[0]
             if not isNaN(_max):
                 msg += ', MAX : ' + str(_max)
             _min = self.lw_min_max[datafeed._name].lines.LW_min[0]    
@@ -116,7 +104,8 @@ class MyStrategy(bt.Strategy):
                 msg += ', inside = ' + str(int(_inside)) 
 
             self.log.info(msg)
-
+        '''
+        pass
 
     def next(self):
         ### print max/min for log analisys purpose
@@ -142,32 +131,16 @@ class MyStrategy(bt.Strategy):
         '''
         https://community.backtrader.com/topic/1448/convert-datas-0-into-a-pandas-dataframe/2
         https://community.backtrader.com/topic/11/porting-a-pandas-dataframe-dependent-indicator/2
-
         ...As for writing the values to a DataFrame, you may pass a DataFrame as a named argument to the indicator and add the values, 
         but taking into account that appending values to a DataFrame is a very expensive operation, you may prefer to do it at once during Strategy.stop
-
-        Getting a slice # https://www.backtrader.com/docu/concepts.html
-        myslice = self.my_sma.get(size=len(self.mysma))
         '''
+
         self.log.info('EXIT STRATEGY '+repr(self.__class__) + ', strategy.next loop_count = ' + str(self.loop_count))
 
         for indicator, obj in self.indicators.items():
-            print(str(indicator)) # es.: inside_ind
             for datafeed, i_dict in obj.items():
-                print(str(datafeed)) # es.: stne
-                # OLD....
-                #print(ind.get_dataframe())
-
-                #...NEW (da convertire in dataframe vedi report_dataframe())
-                ind = i_dict['backtrader_indicator']
-                pdf = i_dict['output_dataframe']
-                _len = len(ind)
-                pdf['datetime'] = [ind.data.num2date(_internal_date).strftime('%d-%m-%Y') for _internal_date in ind.data.datetime.get(size=_len)]
-
-                for line in ind.lines:
-                    print(line.get(size=_len))
-
-
+                print(str(indicator) + '/' + str(datafeed))
+                print(i_dict['output_dataframe'])               ### NEW
 
 
 def main():

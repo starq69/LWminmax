@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import (absolute_import, division, print_function, unicode_literals)
-import logging
+import logging, sys
 #from I_InsideIndicator import InsideIndicator, New_InsideIndicator
 #from I_OutsideIndicator import OutsideIndicator, ex_OutsideIndicator
 import backtrader as bt
@@ -24,17 +24,25 @@ class LWminmaxIndicator(bt.Indicator):
     #params = (('lookback',1),)
     plotinfo    = dict(subplot=False)
     plotlines   = dict(
-        LW_max=dict(marker='^', markersize=8.0, color='green', fillstyle='full'),
-        LW_min=dict(marker='v', markersize=8.0, color='red', fillstyle='full'),
-        LW_max_inter=dict(marker='^', markersize=16.0, color='blue', fillstyle='full'),
-        LW_min_inter=dict(marker='v', markersize=16.0, color='black', fillstyle='full'),
-
+        LW_max      = dict(marker='^', markersize=8.0, color='green', fillstyle='full'),
+        LW_min      = dict(marker='v', markersize=8.0, color='red', fillstyle='full'),
+        LW_max_inter= dict(marker='^', markersize=16.0, color='blue', fillstyle='full'),
+        LW_min_inter= dict(marker='v', markersize=16.0, color='black', fillstyle='full'),
     )
 
-    #def __init__(self, *args):
-    def __init__(self, pandas_df=None):
-        ''' *args contiene un dataframe si veda MyStrategy.__init__() ''' 
+    _name = 'LWminmax'
+
+    def __init__(self, strategy=None):
+
         self.log        = logging.getLogger (__name__)
+
+        if strategy is not None and isinstance(strategy, bt.Strategy):
+            print('LWminmax indicator attached to strategy')
+            self.strategy = strategy
+        else:
+            self.log.error('Pls link the indicator to Strategy')
+            sys.exit(1)
+
         self.prev       = self.min_max_inter_flag = 0
         self.ref_min    = self.ref_max = self.lookback = 1
         self.c_inter_max= self.c_inter_min = 0
@@ -44,19 +52,6 @@ class LWminmaxIndicator(bt.Indicator):
         self.test_ref_max= []
         self.test_ref_min= []
 
-        if pandas_df is not None and isinstance(pandas_df, pd.DataFrame):
-            print('pandas DataFrame PASSED')
-            self.pdf = pandas_df
-        else:
-            print('Warning : No pandas.DataFrame is passed to LWminmaxIndicator istance')
-
-        '''
-        #self.pdf = args[0]  ##
-        if not isinstance(self.pdf, pd.DataFrame):
-            print('Warning : No pandas.DataFrame is passed to LWminmaxIndicator istance')
-        else:
-            print('pandas DataFrame PASSED')
-        '''
         # da rimuovere (per ora serve ad attivare prenext())
         self.down       = bt.And(self.data.low(0) < self.data.low(-self.lookback), self.data.high(0) <= self.data.high(-self.lookback))
 
@@ -66,11 +61,13 @@ class LWminmaxIndicator(bt.Indicator):
     def report_dataframe(self):
         '''
         invocata nella next() sull'ultimo datapoint
-
-        può essere implementato anche nella Strategy.stop() per ottenere un dataframe con tutti gli indicatori calcolati x ogni datafeed (symbol)
-
         '''
+
+        self.pdf = pd.DataFrame() # può essere locale
+
         _len = len(self.data)
+
+        print('***' + self.data._name + '***')
 
         #self.pdf['float_dt']        = self.data.datetime.get(size=_len) ## KEY
         # # https://community.backtrader.com/topic/1151/datetime-format-internally/3
@@ -99,12 +96,7 @@ class LWminmaxIndicator(bt.Indicator):
 
         self.pdf.set_index('datetime', inplace=True)
 
-        #print(self.pdf.info())
-
-
-    def get_dataframe(self):
-
-        return self.pdf
+        self.strategy.indicators[self._name][self.data._name]['output_dataframe'] = self.pdf ### NEW
 
 
     def prenext(self):
