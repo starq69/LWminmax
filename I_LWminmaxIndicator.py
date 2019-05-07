@@ -30,7 +30,7 @@ class LWminmaxIndicator(bt.Indicator):
         LW_min_inter= dict(marker='v', markersize=16.0, color='black', fillstyle='full'),
     )
 
-    _name = 'LWminmax'
+    _name = 'LWminmax'      ##
 
     def __init__(self, strategy=None):
 
@@ -62,12 +62,8 @@ class LWminmaxIndicator(bt.Indicator):
         '''
         invocata nella next() sull'ultimo datapoint
         '''
-
         self.pdf = pd.DataFrame() # può essere locale
-
         _len = len(self.data)
-
-        print('***' + self.data._name + '***')
 
         #self.pdf['float_dt']        = self.data.datetime.get(size=_len) ## KEY
         # # https://community.backtrader.com/topic/1151/datetime-format-internally/3
@@ -79,15 +75,12 @@ class LWminmaxIndicator(bt.Indicator):
         self.pdf['LW_max']          = self.pdf['LW_max'].replace(np.nan,0).apply(pd.to_numeric, downcast='float') 
 
         self.pdf['LW_min']          = self.LW_min.get(size=_len)
-        #self.pdf['LW_min']          = self.pdf['LW_min'].apply(pd.to_numeric, downcast='float') 
         self.pdf['LW_min']          = self.pdf['LW_min'].replace(np.nan, 0).apply(pd.to_numeric, downcast='float') 
 
         self.pdf['LW_max_inter']    = self.LW_max_inter.get(size=_len)
-        #self.pdf['LW_max_inter']    = self.pdf['LW_max_inter'].apply(pd.to_numeric, downcast='float') 
         self.pdf['LW_max_inter']    = self.pdf['LW_max_inter'].replace(np.nan, 0).apply(pd.to_numeric, downcast='float') 
 
         self.pdf['LW_min_inter']    = self.LW_min_inter.get(size=_len)
-        #self.pdf['LW_min_inter']    = self.pdf['LW_min_inter'].apply(pd.to_numeric, downcast='float') 
         self.pdf['LW_min_inter']    = self.pdf['LW_min_inter'].replace(np.nan, 0).apply(pd.to_numeric, downcast='float') 
 
         # per convertire a int debbo prima sostituire NaN con 0
@@ -350,11 +343,7 @@ class LWminmaxIndicator(bt.Indicator):
             if self.ref_max > self.ref_min: self.LW_max[-self.ref_max+1] = self.data.high[-self.ref_max+1]
             elif self.ref_max < self.ref_min: self.LW_min[-self.ref_min+1] = self.data.low[-self.ref_min+1]
 
-            # debug (print self.lw_min/max)
-            #self.log.info(self.test_min)
-            #self.log.info(self.test_max)
-
-            self.report_dataframe()
+            self.report_dataframe()     ###
 
         self.log.info(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' - ' + msg + ', lookback='+str(self.lookback))
 

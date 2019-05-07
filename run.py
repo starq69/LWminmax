@@ -55,28 +55,30 @@ def setting_up():
 class MyStrategy(bt.Strategy):
 
     def __init__(self):
+
         self.log = logging.getLogger (__name__)
         self.log.info('ENTER STRATEGY '+repr(self.__class__))
 
         self.loop_count = 0
-        self.indicators = dict() ##
 
-        # calcola LWminmaxIndicator x tutti i datafeeds
-        #
-        self.indicators[LWminmax._name] = dict() 
-        # ...altri indicatori 
-
-        print('.... ' + LWminmax._name + ' .....')
+        self.indicators     = dict() ##
+        I_LWminmax          = self.indicators[LWminmax._name]         = dict()    ##
+        I_InsideIndicator   = self.indicators[InsideIndicator._name]  = dict()    ##
 
         for _, datafeed in enumerate(self.datas):
             self.log.info('*** datafeed name : ' + datafeed._name) ## https://www.backtrader.com/blog/posts/2017-04-09-multi-example/multi-example.html
+            df_name = datafeed._name
+            
+            I_LWminmax[df_name] = dict()
+            I_LWminmax[df_name]['backtrader_indicator']         = LWminmax(datafeed, strategy=self)
+            I_LWminmax[df_name]['backtrader_indicator'].csv     = True
+            I_LWminmax[df_name]['output_dataframe']             = pd.DataFrame()
 
-            self.indicators[LWminmax._name][datafeed._name] = dict()
-            self.indicators[LWminmax._name][datafeed._name]['backtrader_indicator'] = LWminmax(datafeed, strategy=self)
-            self.indicators[LWminmax._name][datafeed._name]['backtrader_indicator'].csv = True
-            self.indicators[LWminmax._name][datafeed._name]['output_dataframe'] = pd.DataFrame()
-
-
+            I_InsideIndicator[df_name] = dict()
+            I_InsideIndicator[df_name]['backtrader_indicator']      = InsideIndicator(datafeed, strategy=self)
+            I_InsideIndicator[df_name]['backtrader_indicator'].csv  = True
+            I_InsideIndicator[df_name]['output_dataframe']          = pd.DataFrame()
+            
 
     def next_report(self):
         '''
@@ -161,8 +163,8 @@ def main():
     cerebro.broker.setcash(10000.0)
     cerebro.run()    
     #cerebro.plot(style='candlestick', barup='green', bardown='black')
-
     log.info('*** finished ***')
+
 
 if __name__ == '__main__':
     main()
