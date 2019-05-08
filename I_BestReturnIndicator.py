@@ -7,20 +7,17 @@ import pandas as pd
 import numpy as np
 from backtrader.utils.date import num2date 
 
-def get_indicator_class():
-    return InsideIndicator
 
+class BestReturnIndicator(bt.Indicator):
 
-class InsideIndicator(bt.Indicator):
-    lines = ('inside',)
+    lines = ('percentual_absolute_ranking',)
+    _name = 'BestReturnIndicator'       ##
+    _periods = dict()
 
-    _name = 'I_InsideIndicator'       ##
-
-    #def __init__(self):
     def __init__(self, strategy=None):
 
         if strategy is not None and isinstance(strategy, bt.Strategy):
-            print('InsideIndicator indicator attached to strategy')
+            print(self._name + ' attached to strategy')
             self.strategy = strategy
         else:
             self.log.error('Pls link the indicator to Strategy')
@@ -47,8 +44,16 @@ class InsideIndicator(bt.Indicator):
         self.pdf.set_index('datetime', inplace=True)
         self.strategy.indicators[self._name][self.data._name]['output_dataframe'] = self.pdf ### NEW
 
+    def prenext(self):
+
+        # accesso alla prima candle della serie
+
+        # _periods = json.load()
+        pass
+
 
     def next(self):
+
 
         inside_high       = self.data.high[0] <= self.data.high[- int(self.i)] ### <
         inside_low        = self.data.low[0]  >= self.data.low[- int(self.i)]  ### >
@@ -64,23 +69,3 @@ class InsideIndicator(bt.Indicator):
         #
         if len(self.data) == self.data.buflen():
             self.report_dataframe()     ###
-
-
-class New_InsideIndicator(bt.Indicator):
-    lines =  ('inside',)
-    params = (('period', 1),)
-
-    def __init__(self):
-
-        super(New_InsideIndicator, self).__init__()
-    
-    def next(self):
-
-        inside_high       = self.data.high[0] <= self.data.high[- int(self.p.period)]
-        inside_low        = self.data.low[0]  >= self.data.low[- int(self.p.period)]
-
-        print ('New_InsideIndicator : ins_count --------> ' + str(self.p.period))
-        if inside_high and inside_low:
-            self.inside[0] = 1
-        else: 
-            self.inside[0] = 0

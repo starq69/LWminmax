@@ -16,6 +16,9 @@ import numpy as np
 def isNaN(num):
     return num != num
 '''
+def get_indicator_class():
+    return LWminmaxIndicator
+
 
 class LWminmaxIndicator(bt.Indicator):
 
@@ -30,7 +33,7 @@ class LWminmaxIndicator(bt.Indicator):
         LW_min_inter= dict(marker='v', markersize=16.0, color='black', fillstyle='full'),
     )
 
-    _name = 'LWminmax'      ##
+    _name = 'I_LWminmaxIndicator'      ##
 
     def __init__(self, strategy=None):
 
@@ -52,7 +55,7 @@ class LWminmaxIndicator(bt.Indicator):
         self.test_ref_max= []
         self.test_ref_min= []
 
-        # da rimuovere (per ora serve ad attivare prenext())
+        # da rimuovere (per ora serve ad attivare prenext()) ... ma come ???
         self.down       = bt.And(self.data.low(0) < self.data.low(-self.lookback), self.data.high(0) <= self.data.high(-self.lookback))
 
         #super(LWminmaxIndicator, self).__init__()
@@ -89,7 +92,7 @@ class LWminmaxIndicator(bt.Indicator):
 
         self.pdf.set_index('datetime', inplace=True)
 
-        self.strategy.indicators[self._name][self.data._name]['output_dataframe'] = self.pdf ### NEW
+        self.strategy.indicators[self._name][self.data._name]['output_dataframe'] = self.pdf 
 
 
     def prenext(self):
@@ -345,5 +348,5 @@ class LWminmaxIndicator(bt.Indicator):
 
             self.report_dataframe()     ###
 
-        self.log.info(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' - ' + msg + ', lookback='+str(self.lookback))
+        self.log.info(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' - ' + self.data._name + ' - ' + msg + ', lookback='+str(self.lookback))
 

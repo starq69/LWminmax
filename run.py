@@ -60,13 +60,18 @@ class MyStrategy(bt.Strategy):
 
     _name = 'STRATEGY' # corrisponde alla sezione in app.ini
 
+
     def __init__(self, config=None):
 
         self.log = logging.getLogger (__name__)
         self.log.info('ENTER STRATEGY '+repr(self.__class__))
 
         if config is not None and isinstance(config, configparser.ConfigParser):
-            IND = [_ind.strip() for _ind in config.get(MyStrategy._name, 'ind').split(',')]
+            try:
+                configured_indicators = [_ind.strip() for _ind in config.get(MyStrategy._name, 'ind').split(',') if len(_ind)]
+            except configparser.NoOptionError as e:
+                print('malformed configuration file : add option \'ind\' to section ' + MyStrategy._name)
+                sys.exit(1)
         else:
             print('invalid **kwarg param \'config\' passed to MyStrategy instance')
             sys.exit(1)
@@ -75,35 +80,16 @@ class MyStrategy(bt.Strategy):
         
         self.indicators     = dict() ##
 
-        for i_name in IND:
-            print(i_name)
+        for i_name in configured_indicators:
+
             self.indicators[i_name] = dict()
-            _mod = self.indicators[i_name]['__module__'] = load_adapter('_unused_', i_name) # .. può restituire direttamente l'istanza dell'indicatore?
-            #_ind = _mod.init(*args, **kwargs) ...in questo caso doto ogni modulo di indicatori di una init() che restituisce un'istanza dell'indicatore
+            _mod        = self.indicators[i_name]['__module__'] = load_adapter('_unused_', i_name) # .. può restituire direttamente l'istanza dell'indicatore?
+            ind_class   = self.indicators[i_name]['__class__']  = _mod.get_indicator_class()
 
-        for k, v in self.indicators.items():
-            print(str(type(v)))
-
-
-        I_LWminmax          = self.indicators[LWminmax._name]         = dict()    ##
-        I_InsideIndicator   = self.indicators[InsideIndicator._name]  = dict()    ##
-        
-        #I_LWminmax          = MyStrategy._indicators[LWminmax._name]    = dict()    # # #
-        #I_InsideIndicator   = MyStrategy._indicators[InsideIndicator._name] = dict()
-
-        for _, datafeed in enumerate(self.datas):
-            self.log.info('*** datafeed name : ' + datafeed._name) ## https://www.backtrader.com/blog/posts/2017-04-09-multi-example/multi-example.html
-            df_name = datafeed._name
-            
-            I_LWminmax[df_name] = dict()
-            I_LWminmax[df_name]['backtrader_indicator']         = LWminmax(datafeed, strategy=self)
-            I_LWminmax[df_name]['backtrader_indicator'].csv     = True
-            I_LWminmax[df_name]['output_dataframe']             = pd.DataFrame()
-
-            I_InsideIndicator[df_name] = dict()
-            I_InsideIndicator[df_name]['backtrader_indicator']      = InsideIndicator(datafeed, strategy=self)
-            I_InsideIndicator[df_name]['backtrader_indicator'].csv  = True
-            I_InsideIndicator[df_name]['output_dataframe']          = pd.DataFrame()
+            for _, datafeed in enumerate(self.datas):
+                self.indicators[i_name][datafeed._name] = dict()
+                self.indicators[i_name][datafeed._name]['indicator_instance'] = ind_class(datafeed, strategy=self)
+                self.indicators[i_name][datafeed._name]['output_dataframe']   = pd.DataFrame()
             
 
     def next_report(self):
@@ -112,7 +98,6 @@ class MyStrategy(bt.Strategy):
             msg = ''
             msg += datafeed.datetime.datetime().strftime('%d-%m-%Y') + ' <' + datafeed._name + '>' 
             _max = self.lw_min_max[datafeed._name].lines.LW_max[0]
-            #_max = self.indicators[LWminmax._name][datafeed._name]['backtrader_indicator'].lines.LW_max[0]
             if not isNaN(_max):
                 msg += ', MAX : ' + str(_max)
             _min = self.lw_min_max[datafeed._name].lines.LW_min[0]    
@@ -165,11 +150,25 @@ class MyStrategy(bt.Strategy):
 
         self.log.info('EXIT STRATEGY '+repr(self.__class__) + ', strategy.next loop_count = ' + str(self.loop_count))
 
-        for indicator, obj in self.indicators.items():
-        #for indicator, obj in MyStrategy._indicators.items():
-            for datafeed, i_dict in obj.items():
-                print(str(indicator) + '/' + str(datafeed))
-                print(i_dict['output_dataframe'])               ### NEW
+        for indicator, _dict in self.indicators.items():
+            for item, detail in _dict.items():
+
+                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+
+                try:
+                    print(detail['output_dataframe'])
+                    print(item)
+                except TypeError as e:
+                    print('skipped item') 
+                    pass
+                '''
+                if type(detail) is dict:
+                    print('key : ' + item)
+                    print(detail)
+                else:
+                    print(str(indicator) + '/' + str(item))
+                '''
+                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
 
 
 def main():
@@ -178,16 +177,20 @@ def main():
 
     path = app_config['DATASOURCE']['path']
 
-    ''' se aggiungo nell'app_config gli indicatori debbo passare app_config quando chiamo cerebro.addstrategy(MyStategy) '''
-
     cerebro = bt.Cerebro(stdstats=False) ###
 
-    for (name, fname) in app_config['DATAFEEDS'].items():
-        cerebro.adddata(btfeeds.YahooFinanceCSVData(dataname=path+fname, adjclose=False, decimals=5), name)
-        log.info('Configured DATAFEED : ' + name +'-->'+fname + ' Succesfully added to cerebro')
+    try:
+        securities = [_code.strip() for _code in app_config.get('SECURITIES', 'codes').split(',') if len(_code)]
+    except configparser.NoOptionError as e:
+        print('malformed configuration file : add option \'codes\' to section SECURITIES')
+        sys.exit(1)
+
+    for security in securities:
+        cerebro.adddata(btfeeds.YahooFinanceCSVData(dataname=path+security+'.csv', adjclose=False, decimals=5), security)
+        log.info('Configured DATAFEED : ' + security +'-->' + security + '.csv  Succesfully added to cerebro')
 
     cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
-    #cerebro.addstrategy(MyStrategy)
+
     cerebro.addstrategy(MyStrategy, config=app_config)
 
     cerebro.broker.setcash(10000.0)
