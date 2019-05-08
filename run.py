@@ -5,6 +5,7 @@ backtrader strategy test main module (run.py)
 '''
 from datetime import datetime
 import os, sys
+from loader import load_adapter
 import logging, logging.config, configparser
 from I_LWminmaxIndicator import LWminmaxIndicator as LWminmax  
 from I_InsideIndicator import InsideIndicator
@@ -34,6 +35,7 @@ def setting_up():
 
     try:
         app_config = configparser.ConfigParser() #allow_no_value=True)
+        print('################# ' + str(type(app_config)))
 
         if not app_config.read (cfg_file):          ### Return list of successfully read files
             log.error('missing app configuration file <{}> : ABORT....'.format(cfg_file))
@@ -54,16 +56,40 @@ def setting_up():
 
 class MyStrategy(bt.Strategy):
 
-    def __init__(self):
+    #_indicators = dict()    # # #
+
+    _name = 'STRATEGY' # corrisponde alla sezione in app.ini
+
+    def __init__(self, config=None):
 
         self.log = logging.getLogger (__name__)
         self.log.info('ENTER STRATEGY '+repr(self.__class__))
 
-        self.loop_count = 0
+        if config is not None and isinstance(config, configparser.ConfigParser):
+            IND = [_ind.strip() for _ind in config.get(MyStrategy._name, 'ind').split(',')]
+        else:
+            print('invalid **kwarg param \'config\' passed to MyStrategy instance')
+            sys.exit(1)
 
+        self.loop_count = 0
+        
         self.indicators     = dict() ##
+
+        for i_name in IND:
+            print(i_name)
+            self.indicators[i_name] = dict()
+            _mod = self.indicators[i_name]['__module__'] = load_adapter('_unused_', i_name) # .. può restituire direttamente l'istanza dell'indicatore?
+            #_ind = _mod.init(*args, **kwargs) ...in questo caso doto ogni modulo di indicatori di una init() che restituisce un'istanza dell'indicatore
+
+        for k, v in self.indicators.items():
+            print(str(type(v)))
+
+
         I_LWminmax          = self.indicators[LWminmax._name]         = dict()    ##
         I_InsideIndicator   = self.indicators[InsideIndicator._name]  = dict()    ##
+        
+        #I_LWminmax          = MyStrategy._indicators[LWminmax._name]    = dict()    # # #
+        #I_InsideIndicator   = MyStrategy._indicators[InsideIndicator._name] = dict()
 
         for _, datafeed in enumerate(self.datas):
             self.log.info('*** datafeed name : ' + datafeed._name) ## https://www.backtrader.com/blog/posts/2017-04-09-multi-example/multi-example.html
@@ -140,6 +166,7 @@ class MyStrategy(bt.Strategy):
         self.log.info('EXIT STRATEGY '+repr(self.__class__) + ', strategy.next loop_count = ' + str(self.loop_count))
 
         for indicator, obj in self.indicators.items():
+        #for indicator, obj in MyStrategy._indicators.items():
             for datafeed, i_dict in obj.items():
                 print(str(indicator) + '/' + str(datafeed))
                 print(i_dict['output_dataframe'])               ### NEW
@@ -151,6 +178,8 @@ def main():
 
     path = app_config['DATASOURCE']['path']
 
+    ''' se aggiungo nell'app_config gli indicatori debbo passare app_config quando chiamo cerebro.addstrategy(MyStategy) '''
+
     cerebro = bt.Cerebro(stdstats=False) ###
 
     for (name, fname) in app_config['DATAFEEDS'].items():
@@ -158,7 +187,8 @@ def main():
         log.info('Configured DATAFEED : ' + name +'-->'+fname + ' Succesfully added to cerebro')
 
     cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
-    cerebro.addstrategy(MyStrategy)
+    #cerebro.addstrategy(MyStrategy)
+    cerebro.addstrategy(MyStrategy, config=app_config)
 
     cerebro.broker.setcash(10000.0)
     cerebro.run()    

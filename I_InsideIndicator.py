@@ -23,7 +23,7 @@ class InsideIndicator(bt.Indicator):
             sys.exit(1)
 
         self.i = 1
-        super(InsideIndicator, self).__init__()
+        #super(InsideIndicator, self).__init__()
    
 
     def report_dataframe(self):
