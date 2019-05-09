@@ -7,8 +7,6 @@ from datetime import datetime
 import os, sys
 from loader import load_adapter
 import logging, logging.config, configparser
-from I_LWminmaxIndicator import LWminmaxIndicator as LWminmax  
-from I_InsideIndicator import InsideIndicator
 import backtrader as bt
 import backtrader.feeds as btfeeds
 import pandas as pd
@@ -18,62 +16,27 @@ def isNaN(num):
     return num != num
 
 
-def setting_up():
-
-    base_dir    = os.path.dirname (os.path.realpath(__file__))
-    parent_dir  = os.path.split (base_dir)[0]
-    cfg_file    = parent_dir + '/app.ini'
-    cfg_log     = parent_dir + '/log.ini'
-
-    try:
-        logging.config.fileConfig (cfg_log)
-        log = logging.getLogger (__name__)
-
-    except Exception as e:
-        print ('EXCEPTION during logging setup -> system stopped : {}'.format(e))
-        sys.exit(1)
-
-    try:
-        app_config = configparser.ConfigParser() #allow_no_value=True)
-        app_config.optionxform = str    # non converte i nomi opzione in lowercase (https://docs.python.org/2/library/configparser.html#ConfigParser.RawConfigParser.optionxform)
-
-        if not app_config.read (cfg_file):          ### Return list of successfully read files
-            log.error('missing app configuration file <{}> : ABORT....'.format(cfg_file))
-            sys.exit(1)
-
-        log.info('***********************')
-        log.info('*** session started ***')
-        log.info('*** session configuration file <{}> loaded'.format(cfg_file))
-        log.info('***********************')
-
-    except configparser.Error as e:
-        log.error ('INTERNAL ERROR : {}'.format (e))
-        log.error ('ABORT')
-        sys.exit(1)
-
-    return log, app_config
+def get_strategy_class():
+    return S_Datapoint_Analisys
 
 
-class MyStrategy(bt.Strategy):
+class S_Datapoint_Analisys(bt.Strategy):
 
-    #_indicators = dict()    # # #
-
-    _name = 'STRATEGY' # corrisponde alla sezione in app.ini
-
+    _name = 's_datapoint_analisys' # relativa option nella sezione STRATEGIES del .ini
 
     def __init__(self, config=None):
 
         self.log = logging.getLogger (__name__)
-        self.log.info('ENTER STRATEGY '+repr(self.__class__))
+        self.log.info('ENTER STRATEGY ' + repr(self.__class__))
 
         if config is not None and isinstance(config, configparser.ConfigParser):
             try:
-                configured_indicators = [_ind.strip() for _ind in config.get(MyStrategy._name, 'ind').split(',') if len(_ind)]
+                configured_indicators = [_ind.strip() for _ind in config.get('STRATEGIES', S_Datapoint_Analisys._name).split(',') if len(_ind)]
             except configparser.NoOptionError as e:
-                print('malformed configuration file : add option \'ind\' to section ' + MyStrategy._name)
+                print('error : {}'.format(e))
                 sys.exit(1)
         else:
-            print('invalid **kwarg param \'config\' passed to MyStrategy instance')
+            print('invalid **kwarg params passed to <' + repr(self.__class__) + '> instance')
             sys.exit(1)
 
         self.loop_count = 0
@@ -154,73 +117,10 @@ class MyStrategy(bt.Strategy):
             for item, detail in _dict.items():
 
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-
                 try:
                     print(detail['output_dataframe'])
                     print(item)
                 except TypeError as e:
                     print('skipped item') 
                     pass
-                '''
-                if type(detail) is dict:
-                    print('key : ' + item)
-                    print(detail)
-                else:
-                    print(str(indicator) + '/' + str(item))
-                '''
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-
-
-def main():
-
-    log, app_config = setting_up()
-    path            = app_config['DATASOURCE']['path']
-    cerebro         = bt.Cerebro(stdstats=False) ###
-
-    st_mod  = list()    # lista moduli con le strategie
-
-    # #
-    try:
-        strategies = [ss for ss in app_config.options('STRATEGIES') if len(ss)]
-        print(strategies)
-    except configparser.Error as e:
-        log.error ('During load strategies from config file :INTERNAL ERROR : {}'.format (e))
-        sys.exit(1)
-
-    else:
-        if not strategies:
-            log.error('No strategies definend in app.ini pls specify at list one in section STRATEGIES')
-            sys.exit(1)
-        else:
-            for st in strategies:
-                try:
-                    st_mod.append(load_adapter('_unused_', st)) # ev. prefix gestito 's_'.join(st)
-                except Exception as e:
-                    log.error('Exception : {}'.format(e))
-                    sys.exit()
-                else:
-                    log.info('strategy module <' + st + '> succesfully added to cerebro')
-
-    try:
-        securities = [_code.strip() for _code in app_config.get('SECURITIES', 'codes').split(',') if len(_code)]
-    except configparser.NoOptionError as e:
-        print('malformed configuration file : add option \'codes\' to section SECURITIES')
-        sys.exit(1)
-
-    for security in securities:
-        cerebro.adddata(btfeeds.YahooFinanceCSVData(dataname=path+security+'.csv', adjclose=False, decimals=5), security)
-        log.info('Configured DATAFEED : ' + security +'-->' + security + '.csv  Succesfully added to cerebro')
-
-    #cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
-    cerebro.broker.setcash(10000.0)
-    
-    for st in st_mod:
-        cerebro.addstrategy(st.get_strategy_class(), config=app_config)
-        cerebro.run()    
-        #cerebro.plot(style='candlestick', barup='green', bardown='black')
-
-    log.info('*** finished ***')
-
-
-if __name__ == '__main__':
-    main()
