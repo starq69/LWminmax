@@ -5,7 +5,7 @@ backtrader strategy test main module (run.py)
 '''
 from datetime import datetime
 import os, sys
-from loader import load_adapter
+from loader import load_module
 import logging, logging.config, configparser
 import backtrader as bt
 import backtrader.feeds as btfeeds
@@ -22,16 +22,16 @@ def get_strategy_class():
 
 class S_Datapoint_Analisys(bt.Strategy):
 
-    _name = 's_datapoint_analisys' # relativa option nella sezione STRATEGIES del .ini
+    def __init__(self, config=None, name=None):
 
-    def __init__(self, config=None):
+        self.name = name
 
         self.log = logging.getLogger (__name__)
-        self.log.info('ENTER STRATEGY ' + repr(self.__class__))
+        self.log.info('ENTER STRATEGY <' + self.name + '> ' + repr(self.__class__))
 
         if config is not None and isinstance(config, configparser.ConfigParser):
             try:
-                configured_indicators = [_ind.strip() for _ind in config.get('STRATEGIES', S_Datapoint_Analisys._name).split(',') if len(_ind)]
+                configured_indicators = [_ind.strip() for _ind in config.get('STRATEGIES', name).split(',') if len(_ind)]
             except configparser.NoOptionError as e:
                 print('error : {}'.format(e))
                 sys.exit(1)
@@ -46,7 +46,7 @@ class S_Datapoint_Analisys(bt.Strategy):
         for i_name in configured_indicators:
 
             self.indicators[i_name] = dict()
-            _mod        = self.indicators[i_name]['__module__'] = load_adapter('_unused_', i_name) # .. può restituire direttamente l'istanza dell'indicatore?
+            _mod        = self.indicators[i_name]['__module__'] = load_module(i_name) # .. può restituire direttamente l'istanza dell'indicatore?
             ind_class   = self.indicators[i_name]['__class__']  = _mod.get_indicator_class()
 
             for _, datafeed in enumerate(self.datas):
@@ -111,7 +111,7 @@ class S_Datapoint_Analisys(bt.Strategy):
         but taking into account that appending values to a DataFrame is a very expensive operation, you may prefer to do it at once during Strategy.stop
         '''
 
-        self.log.info('EXIT STRATEGY '+repr(self.__class__) + ', strategy.next loop_count = ' + str(self.loop_count))
+        self.log.info('EXIT STRATEGY <' + self.name + '> ' + repr(self.__class__) + ', strategy.next loop_count = ' + str(self.loop_count))
 
         for indicator, _dict in self.indicators.items():
             for item, detail in _dict.items():

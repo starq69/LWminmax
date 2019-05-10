@@ -1,19 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: iso-8859-15 -*-
 
+''' nuovo modulo che sustituisce i precedenti '''
+
 import logging
-from importFromURI import importModule 
+import importlib
 
-###@starq69: MVC
+_adapters   = {}
 
-__all__ = ['load_adapter']
 
-_adapters = {}
-
-def load_adapter(conf, module_name):
-    '''
-    conf : non utilizzato
-    '''
+def load_module(module_name):
+    
     log = logging.getLogger(__name__)
 
     module = module_name.strip()
@@ -21,10 +18,10 @@ def load_adapter(conf, module_name):
 
     if module not in _adapters:
         try:
-            _adapters[module] = importModule(module)
-
-        except Exception as e:
+            _adapters[module] = importlib.import_module(module)
+        except ImportError as e:
             raise e ### fail to load model
+        else:
+            log.debug('module <{}> succesfully imported'.format(module))
     
     return _adapters[module]
-
