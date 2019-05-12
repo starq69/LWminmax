@@ -10,6 +10,17 @@ import logging, logging.config, configparser
 import backtrader as bt
 import backtrader.feeds as btfeeds
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+
+# tnks to Wes McKinney (https://wesmckinney.com/blog/python-parquet-update/)
+#
+def write_to_parquet(df, out_path, compression='SNAPPY'):
+    arrow_table = pa.Table.from_pandas(df)
+    if compression == 'UNCOMPRESSED':
+        compression = None
+    pq.write_table(arrow_table, out_path, use_dictionary=False,
+                   compression=compression)
 
 
 def isNaN(num):
@@ -24,7 +35,7 @@ class S_Datapoint_Analisys(bt.Strategy):
 
     def __init__(self, config=None, name=None):
 
-        self.name = name
+        self.name = name    # controllare se None...
 
         self.log = logging.getLogger (__name__)
         self.log.info('ENTER STRATEGY <' + self.name + '> ' + repr(self.__class__))
@@ -118,8 +129,12 @@ class S_Datapoint_Analisys(bt.Strategy):
 
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
                 try:
-                    print(detail['output_dataframe'])
-                    print(item)
+                    print(str(self.name) + ' /// ' + str(indicator) + ' /// ' + str(item))
+                    # salva il dataframe in formato parquet
+                    #
+                    #print(detail['output_dataframe'])
+                    write_to_parquet (detail['output_dataframe'], '/home/starq/tmp/backtrader_output/' + self.name + '_' + str(indicator) + '_' + str(item) + '.parquet') 
+                    #print(item)
                 except TypeError as e:
                     print('skipped item') 
                     pass
