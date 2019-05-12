@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os, sys, re
+import subprocess
+import datetime
 from loader import load_module
 import logging, logging.config, configparser
 import backtrader as bt
@@ -101,19 +103,7 @@ def import_strategies(app_config):
     return strategies, strategy_classes
 
 
-def check_securities(app_config):
-
-    try:
-        securities = [ss.strip() for ss in app_config.get('DATAFEEDS', 'securities').split(',') if len(ss)]
-    except configparser.NoOptionError as e:
-        raise e
-    if not len(securities):
-        raise NoSecurityFound('No securities found on configuration!')
-
-    return securities
-
-
-def check_securities_ex(app_config, syncdb):
+def check_securities(app_config, syncdb):
 
     try:
         securities = [ss.strip() for ss in app_config.get('DATAFEEDS', 'securities').split(',') if len(ss)]
@@ -123,9 +113,13 @@ def check_securities_ex(app_config, syncdb):
         raise NoSecurityFound('No securities found on configuration!')
 
     # select from syncdb
-    securities = syncdb.load_securities(securities)
-    return securities
+    #
+    return syncdb.load_securities(securities) 
 
+'''
+def update_security_cache(security_id, fromdate, todate, syncdb):
+    syncdb.insert_security(security_id, fromdate, todate)
+'''
 
 def main():
 
@@ -138,17 +132,44 @@ def main():
 
         strategies, strategy_classes = import_strategies (app_config)
 
-        #securities = check_securities (app_config)
-        securities = check_securities_ex (app_config, syncdb)
+        securities = check_securities (app_config, syncdb)
 
-        print ('------------> securities are : {}'.format(securities))
-        # # #
-        for security in securities:
-            cerebro.adddata (btfeeds.YahooFinanceCSVData(dataname=path+security+'.csv', adjclose=False, decimals=5), security)
-            log.info('Configured DATAFEED : ' + security +'-->' + security + '.csv  Succesfully added to cerebro')
+        # load_datafeeds(securities)
+        #
+        for security_id, _struct in securities.items():
+            default_fromdate = '2018-01-01' # da config.
+            default_todate   = '2018-12-31' # ...magari = oggi ?
+            datafile         = '../local_storage/yahoo_csv_cache/'+security_id+'.csv'   #+#
 
-    except Exception as e:
+            if _struct is None:
+
+                print('security <' +security_id + '> is NOT prensent on syncdb')
+                ''' https://community.backtrader.com/topic/499/saving-datafeeds-to-csv/2 '''
+                subprocess.call(['../yahoodownload.py',
+                                 '--ticker', security_id, \
+                                 '--fromdate', default_fromdate, \
+                                 '--todate', default_todate, \
+                                 '--outfile', datafile])            #+#
+                log.info('security <' + security_id + '> download complete')
+                #
+                # update syncdb
+                #
+                syncdb.insert_security(security_id, default_fromdate, default_todate)
+                
+            cerebro.adddata (btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
+                                                              fromdate=datetime.datetime(2016, 1, 1),
+                                                              todate=datetime.datetime(2018, 12, 31),
+                                                              adjclose=False, 
+                                                              decimals=5), security_id)
+                
+            log.info('datafeed <' + security_id +'> succesfully added to cerebro')
+
+    except Exception as e: # va in fondo...
         log.exception(e)
+        try:
+            syncdb.close()
+        except Exception:
+            pass
         sys.exit(1)
 
 
