@@ -50,7 +50,7 @@ def setting_up():
         app_config.optionxform = str    # non converte i nomi opzione in lowercase (https://docs.python.org/2/library/configparser.html#ConfigParser.RawConfigParser.optionxform)
 
         if not app_config.read (cfg_file):
-            log.error('missing app configuration file <{}> : ABORT....'.format(cfg_file))
+            log.exception('missing app configuration file <{}> : ABORT....'.format(cfg_file))
             sys.exit(1)
 
         log.info('*** SESSION STARTED ***')
@@ -59,12 +59,12 @@ def setting_up():
         syncdb_instance = syncdb(db_dir=syncdb_dir ,db_file=syncdb_file) 
 
     except configparser.Error as e:
-        log.error ('INTERNAL ERROR : <{}>'.format (e))
+        log.exception ('INTERNAL ERROR : <{}>'.format (e))
         sys.exit(1)
         #raise e !!
 
     except Exception as e:
-        log.error ('INTERNAL ERROR : <{}>'.format (e))
+        log.exception ('INTERNAL ERROR : <{}>'.format (e))
         sys.exit(1) 
         #raise e !!
 
@@ -115,10 +115,6 @@ def check_securities(app_config, syncdb):
     #
     return syncdb.load_securities(securities) 
 
-'''
-def update_security_cache(security_id, fromdate, todate, syncdb):
-    syncdb.insert_security(security_id, fromdate, todate)
-'''
 
 def main():
 
@@ -127,11 +123,10 @@ def main():
     path            = app_config['DATASOURCE']['path']
     cerebro         = bt.Cerebro(stdstats=False) 
 
-    try: # estendere fino in fondo
-
-        strategies, strategy_classes = import_strategies (app_config)
-
-        securities = check_securities (app_config, syncdb)
+    try: 
+        strategies, \
+        strategy_classes = import_strategies (app_config)
+        securities       = check_securities (app_config, syncdb) # hyp.: syncdb.check_securities(app_config) ?
 
         # load_datafeeds(securities)
         #
@@ -142,18 +137,9 @@ def main():
             datafile         = '../local_storage/yahoo_csv_cache/'+security_id+'_'+default_fromdate+'_'+default_todate+'.csv'   #+#
 
             # attenzione :
-            # se si richiede un periodo diverso (più esteso) per una security già presente in tabella 
-            # non c'è aggiornamento
-            # quindi potrei integrare la if qui sotto nella syncdb.insert_security passando anche _struct
-            # rinominando il metodo in update_security()
-            # anche perchè l'update del record si può fare sempre dal momento che in generale ci si aspetta che ad ogni invocazione
+            # l'update del record si può fare sempre dal momento che in generale ci si aspetta che ad ogni invocazione
             # per lo meno _struct.todate cambi rispetto al valore presente sul record
             #
-            #if _struct is None or not os.path.isfile(datafile):
-                #
-                # download csv datafeed + upsert syncdb.securities
-                #
-                #syncdb.insert_security(_struct, security_id, default_fromdate, default_todate, datafile=datafile)
             syncdb.insert_security(_struct, security_id, default_fromdate, default_todate, datafile=datafile)
                 
             data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#

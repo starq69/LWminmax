@@ -40,7 +40,7 @@ class syncdb():
 
     def create_default_schema(self):
 
-        self.log.info ('create_default_schema() ....')
+        self.log.debug ('create_default_schema() ....')
         schema_file = self.db_dir + 'default_syncdb_schema.sql'
         try:
             with open(schema_file, 'rt') as f:
@@ -95,25 +95,18 @@ class syncdb():
     def insert_security(self, _struct, security_id, fromdate, todate, datafile=None):
         #
         # rendo transazionale : download + insert/update
-        #
         # https://community.backtrader.com/topic/499/saving-datafeeds-to-csv/2
         #
-        # integrare qui quanto descritto in main() --> ,struct=struct)
-        # n.b.
-        # if struct is not None è equivalente a dire che esiste il record in syncdb ed abbiamo i relativi valori (vedi load_securities)
-
-        #print('datafile = ' + datafile)
         file_cached, file_fromdate, file_todate = self.select_file(_struct, f=datafile)
 
         if file_cached:
-            print('file is cached!')
+            self.log.debug('file <{}> is cached!'.format(datafile))
             if _struct is None: # se abbiamo perso il record relativo al file...
-                # insert (file_fromdate, file_todate)
-                print('record NON presente: {}'.format(security_id))
+                self.log.debug('missing record <{}>'.format(security_id))
                 sql=f"insert into securities (code, start_date, end_date) values (:security_id , :fromdate, :todate)"
                 self.conn.execute(sql, {'security_id':security_id, 'fromdate':file_fromdate, 'todate':file_todate})
                 self.conn.commit()
-                print('record inserito')
+                self.log.debug('record inserito')
             return
         else:
             # download
@@ -137,53 +130,8 @@ class syncdb():
                 sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
                 self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
                 self.conn.commit()
-                pass
 
         return
-
-        # OLD
-        if _struct is None: # or not os.path.isfile(datafile):
-       
-            # download
-            #
-            c=subprocess.call(['../yahoodownload.py',
-                             '--ticker', security_id, \
-                             '--fromdate', fromdate, \
-                             '--todate', todate, \
-                             '--outfile', datafile])            #+#
-            if c != 0:
-                raise DownloadFailException
-            self.log.info('security <' + security_id + '> download complete('+str(c)+')')
-       
-            '''
-            try:
-                sql=f"insert into securities (code, start_date, end_date) values (:security_id , :fromdate, :todate)"
-                self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
-                self.conn.commit()
-            except sqlite3.IntegrityError as e:
-                sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
-                self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
-                self.conn.commit()
-            except sqlite3.OperationalError as e:
-                raise e
-            ''' 
-            # insert
-            #
-            try:    # upsert (one record)
-                sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
-                self.conn.execute(sql, {'fromdate':fromdate, 'todate':todate, 'security_id':security_id})
-                sql=f"insert into securities (code, start_date, end_date) select :code, :start_date, :end_date where (Select Changes() = 0)" 
-                self.conn.execute(sql, {'code':security_id, 'start_date':fromdate, 'end_date':todate})
-                self.conn.commit()
-            except sqlite3.OperationalError as e:
-                raise e
-            self.log.info('security <' + security_id + '> succesfully update on syncdb')
-
-        elif not self.select_file(_struct, f=datafile): # non esiste il file con fromdate<=struct.fromdate && todate>=struct.todate
-            # download
-            pass
-            # update
-            
 
 
     def close(self):
