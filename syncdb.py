@@ -74,15 +74,25 @@ class syncdb():
                 _securities[code]['end_date']   = end_date
                 #not_found.remove(code)
 
-            print(str(_securities))
-
         except Exception as e:
             raise e
 
         return _securities 
 
 
-    def insert_security(self, security_id, fromdate, todate, datafile=None):
+    def select_file(self, _struct, f=None):
+        # TOBE
+        # verifica se f.fromdate <= _struct[fromdate] and f.todate>=_struct[todate]
+        if not os.path.isfile(f):
+            return False, None, None
+        else:
+            # TBD
+            file_fromdate = '2017-06-01' # da estrarre da f
+            file_todate = '2017-12-31' # da estrarre da f
+            return True, file_fromdate, file_todate
+
+
+    def insert_security(self, _struct, security_id, fromdate, todate, datafile=None):
         #
         # rendo transazionale : download + insert/update
         #
@@ -91,39 +101,89 @@ class syncdb():
         # integrare qui quanto descritto in main() --> ,struct=struct)
         # n.b.
         # if struct is not None è equivalente a dire che esiste il record in syncdb ed abbiamo i relativi valori (vedi load_securities)
-        
-        c=subprocess.call(['../yahoodownload.py',
-                         '--ticker', security_id, \
-                         '--fromdate', fromdate, \
-                         '--todate', todate, \
-                         '--outfile', datafile])            #+#
-        if c != 0:
-            raise DownloadFailException
 
-        self.log.info('security <' + security_id + '> download complete('+str(c)+')')
+        #print('datafile = ' + datafile)
+        file_cached, file_fromdate, file_todate = self.select_file(_struct, f=datafile)
+
+        if file_cached:
+            print('file is cached!')
+            if _struct is None: # se abbiamo perso il record relativo al file...
+                # insert (file_fromdate, file_todate)
+                print('record NON presente: {}'.format(security_id))
+                sql=f"insert into securities (code, start_date, end_date) values (:security_id , :fromdate, :todate)"
+                self.conn.execute(sql, {'security_id':security_id, 'fromdate':file_fromdate, 'todate':file_todate})
+                self.conn.commit()
+                print('record inserito')
+            return
+        else:
+            # download
+            #
+            c=subprocess.call(['../yahoodownload.py',
+                             '--ticker', security_id, \
+                             '--fromdate', fromdate, \
+                             '--todate', todate, \
+                             '--outfile', datafile])            #+#
+            if c != 0:
+                raise DownloadFailException
+            self.log.info('security <' + security_id + '> download complete('+str(c)+')')
+
+            if _struct is None:
+                # insert
+                sql=f"insert into securities (code, start_date, end_date) values (:security_id , :fromdate, :todate)"
+                self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
+                self.conn.commit()
+            else:
+                #update
+                sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
+                self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
+                self.conn.commit()
+                pass
+
+        return
+
+        # OLD
+        if _struct is None: # or not os.path.isfile(datafile):
        
-        '''
-        try:
-            sql=f"insert into securities (code, start_date, end_date) values (:security_id , :fromdate, :todate)"
-            self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
-            self.conn.commit()
-        except sqlite3.IntegrityError as e:
-            sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
-            self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
-            self.conn.commit()
-        except sqlite3.OperationalError as e:
-            raise e
-        '''    
-        try:    # upsert (one record)
-            sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
-            self.conn.execute(sql, {'fromdate':fromdate, 'todate':todate, 'security_id':security_id})
-            sql=f"insert into securities (code, start_date, end_date) select :code, :start_date, :end_date where (Select Changes() = 0)" 
-            self.conn.execute(sql, {'code':security_id, 'start_date':fromdate, 'end_date':todate})
-            self.conn.commit()
-        except sqlite3.OperationalError as e:
-            raise e
+            # download
+            #
+            c=subprocess.call(['../yahoodownload.py',
+                             '--ticker', security_id, \
+                             '--fromdate', fromdate, \
+                             '--todate', todate, \
+                             '--outfile', datafile])            #+#
+            if c != 0:
+                raise DownloadFailException
+            self.log.info('security <' + security_id + '> download complete('+str(c)+')')
+       
+            '''
+            try:
+                sql=f"insert into securities (code, start_date, end_date) values (:security_id , :fromdate, :todate)"
+                self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
+                self.conn.commit()
+            except sqlite3.IntegrityError as e:
+                sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
+                self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
+                self.conn.commit()
+            except sqlite3.OperationalError as e:
+                raise e
+            ''' 
+            # insert
+            #
+            try:    # upsert (one record)
+                sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
+                self.conn.execute(sql, {'fromdate':fromdate, 'todate':todate, 'security_id':security_id})
+                sql=f"insert into securities (code, start_date, end_date) select :code, :start_date, :end_date where (Select Changes() = 0)" 
+                self.conn.execute(sql, {'code':security_id, 'start_date':fromdate, 'end_date':todate})
+                self.conn.commit()
+            except sqlite3.OperationalError as e:
+                raise e
+            self.log.info('security <' + security_id + '> succesfully update on syncdb')
 
-        self.log.info('security <' + security_id + '> succesfully update on syncdb')
+        elif not self.select_file(_struct, f=datafile): # non esiste il file con fromdate<=struct.fromdate && todate>=struct.todate
+            # download
+            pass
+            # update
+            
 
 
     def close(self):

@@ -136,11 +136,10 @@ def main():
         # load_datafeeds(securities)
         #
         for security_id, _struct in securities.items():
-            #
-            #
+
             default_fromdate = '2018-06-01' # da config.
             default_todate   = '2018-12-31' # ...magari = oggi ?
-            datafile         = '../local_storage/yahoo_csv_cache/'+security_id+'.csv'   #+#
+            datafile         = '../local_storage/yahoo_csv_cache/'+security_id+'_'+default_fromdate+'_'+default_todate+'.csv'   #+#
 
             # attenzione :
             # se si richiede un periodo diverso (più esteso) per una security già presente in tabella 
@@ -150,11 +149,12 @@ def main():
             # anche perchè l'update del record si può fare sempre dal momento che in generale ci si aspetta che ad ogni invocazione
             # per lo meno _struct.todate cambi rispetto al valore presente sul record
             #
-            if _struct is None or not os.path.isfile(datafile):
+            #if _struct is None or not os.path.isfile(datafile):
                 #
                 # download csv datafeed + upsert syncdb.securities
                 #
-                syncdb.insert_security(security_id, default_fromdate, default_todate, datafile=datafile)
+                #syncdb.insert_security(_struct, security_id, default_fromdate, default_todate, datafile=datafile)
+            syncdb.insert_security(_struct, security_id, default_fromdate, default_todate, datafile=datafile)
                 
             data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
                                                     fromdate=datetime.datetime(2016, 1, 1),
