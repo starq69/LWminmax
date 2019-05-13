@@ -87,6 +87,10 @@ class syncdb():
         # rendo transazionale : download + insert/update
         #
         # https://community.backtrader.com/topic/499/saving-datafeeds-to-csv/2
+        #
+        # integrare qui quanto descritto in main() --> ,struct=struct)
+        # n.b.
+        # if struct is not None è equivalente a dire che esiste il record in syncdb ed abbiamo i relativi valori (vedi load_securities)
         
         c=subprocess.call(['../yahoodownload.py',
                          '--ticker', security_id, \
@@ -98,7 +102,7 @@ class syncdb():
 
         self.log.info('security <' + security_id + '> download complete('+str(c)+')')
        
-        # TBD : potrei fare if select then update else insert
+        '''
         try:
             sql=f"insert into securities (code, start_date, end_date) values (:security_id , :fromdate, :todate)"
             self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
@@ -109,8 +113,17 @@ class syncdb():
             self.conn.commit()
         except sqlite3.OperationalError as e:
             raise e
-            
-        self.log.info('security <' + security_id + '> succesfully added to syncdb')
+        '''    
+        try:    # upsert (one record)
+            sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
+            self.conn.execute(sql, {'fromdate':fromdate, 'todate':todate, 'security_id':security_id})
+            sql=f"insert into securities (code, start_date, end_date) select :code, :start_date, :end_date where (Select Changes() = 0)" 
+            self.conn.execute(sql, {'code':security_id, 'start_date':fromdate, 'end_date':todate})
+            self.conn.commit()
+        except sqlite3.OperationalError as e:
+            raise e
+
+        self.log.info('security <' + security_id + '> succesfully update on syncdb')
 
 
     def close(self):

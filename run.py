@@ -136,13 +136,23 @@ def main():
         # load_datafeeds(securities)
         #
         for security_id, _struct in securities.items():
-            default_fromdate = '2018-01-01' # da config.
+            #
+            #
+            default_fromdate = '2018-06-01' # da config.
             default_todate   = '2018-12-31' # ...magari = oggi ?
             datafile         = '../local_storage/yahoo_csv_cache/'+security_id+'.csv'   #+#
 
+            # attenzione :
+            # se si richiede un periodo diverso (più esteso) per una security già presente in tabella 
+            # non c'è aggiornamento
+            # quindi potrei integrare la if qui sotto nella syncdb.insert_security passando anche _struct
+            # rinominando il metodo in update_security()
+            # anche perchè l'update del record si può fare sempre dal momento che in generale ci si aspetta che ad ogni invocazione
+            # per lo meno _struct.todate cambi rispetto al valore presente sul record
+            #
             if _struct is None or not os.path.isfile(datafile):
                 #
-                # update syncdb/storage
+                # download csv datafeed + upsert syncdb.securities
                 #
                 syncdb.insert_security(security_id, default_fromdate, default_todate, datafile=datafile)
                 

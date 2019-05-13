@@ -95,9 +95,10 @@ class S_Datapoint_Analisys(bt.Strategy):
         pass
 
     def next(self):
+
+        self.loop_count += 1
         ### print max/min for log analisys purpose
         #
-        self.loop_count += 1
         #self.next_report()
 
         '''
