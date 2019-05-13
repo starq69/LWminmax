@@ -42,7 +42,7 @@ def setting_up():
         log = logging.getLogger (__name__)
 
     except Exception as e:
-        print ('EXCEPTION during logging setup -> system stopped : {}'.format(e))
+        log.exception('EXCEPTION during logging setup -> system stopped : {}'.format(e))
         sys.exit(1)
 
     try:
@@ -61,12 +61,12 @@ def setting_up():
     except configparser.Error as e:
         log.error ('INTERNAL ERROR : <{}>'.format (e))
         sys.exit(1)
+        #raise e
 
     except Exception as e:
-        # db error ....
-        #syncdb_instance.close()
         log.error ('INTERNAL ERROR : <{}>'.format (e))
         sys.exit(1) 
+        #raise e
 
 
     return log, app_config, syncdb_instance
@@ -156,36 +156,38 @@ def main():
                 #
                 syncdb.insert_security(security_id, default_fromdate, default_todate)
                 
-            cerebro.adddata (btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
-                                                              fromdate=datetime.datetime(2016, 1, 1),
-                                                              todate=datetime.datetime(2018, 12, 31),
-                                                              adjclose=False, 
-                                                              decimals=5), security_id)
-                
-            log.info('datafeed <' + security_id +'> succesfully added to cerebro')
+            if not os.path.isfile(datafile): # syncdb e ../local_storage/yahoo_csv_cache/ disallineati
+                log.info('security <' + security_id + '> file NOT found <' + datafile + '>')
+            else:
+                data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
+                                                    fromdate=datetime.datetime(2016, 1, 1),
+                                                    todate=datetime.datetime(2018, 12, 31),
+                                                    adjclose=False, 
+                                                    decimals=5)
 
-    except Exception as e: # va in fondo...
+                cerebro.adddata(data, security_id)    
+                log.info('datafeed <' + security_id +'> succesfully added to cerebro')
+
+        #cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
+        cerebro.broker.setcash(10000.0)
+        
+        for strategy in strategies:
+            strategy_id = remove_postfix(strategy)
+            cerebro.addstrategy(strategy_classes[strategy_id], config=app_config, name=strategy)
+            #cerebro.run()    
+            #cerebro.plot(style='candlestick', barup='green', bardown='black')
+
+        cerebro.run()
+        syncdb.close()
+        log.info('*** finished ***')
+
+    except Exception as e: #BacktraderError as e ?
         log.exception(e)
         try:
             syncdb.close()
         except Exception:
             pass
         sys.exit(1)
-
-
-
-    #cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
-    cerebro.broker.setcash(10000.0)
-    
-    for strategy in strategies:
-        strategy_id = remove_postfix(strategy)
-        cerebro.addstrategy(strategy_classes[strategy_id], config=app_config, name=strategy)
-        #cerebro.run()    
-        #cerebro.plot(style='candlestick', barup='green', bardown='black')
-
-    cerebro.run()
-    syncdb.close()
-    log.info('*** finished ***')
 
 
 if __name__ == '__main__':
