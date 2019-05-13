@@ -61,13 +61,12 @@ def setting_up():
     except configparser.Error as e:
         log.error ('INTERNAL ERROR : <{}>'.format (e))
         sys.exit(1)
-        #raise e
+        #raise e !!
 
     except Exception as e:
         log.error ('INTERNAL ERROR : <{}>'.format (e))
         sys.exit(1) 
-        #raise e
-
+        #raise e !!
 
     return log, app_config, syncdb_instance
 
@@ -112,7 +111,7 @@ def check_securities(app_config, syncdb):
     if not len(securities):
         raise NoSecurityFound('No securities found on configuration!')
 
-    # select from syncdb
+    # select from syncdb.securities
     #
     return syncdb.load_securities(securities) 
 
@@ -141,32 +140,21 @@ def main():
             default_todate   = '2018-12-31' # ...magari = oggi ?
             datafile         = '../local_storage/yahoo_csv_cache/'+security_id+'.csv'   #+#
 
-            if _struct is None:
-
-                print('security <' +security_id + '> is NOT prensent on syncdb')
-                ''' https://community.backtrader.com/topic/499/saving-datafeeds-to-csv/2 '''
-                subprocess.call(['../yahoodownload.py',
-                                 '--ticker', security_id, \
-                                 '--fromdate', default_fromdate, \
-                                 '--todate', default_todate, \
-                                 '--outfile', datafile])            #+#
-                log.info('security <' + security_id + '> download complete')
+            if _struct is None or not os.path.isfile(datafile):
                 #
-                # update syncdb
+                # update syncdb/storage
                 #
-                syncdb.insert_security(security_id, default_fromdate, default_todate)
+                syncdb.insert_security(security_id, default_fromdate, default_todate, datafile=datafile)
                 
-            if not os.path.isfile(datafile): # syncdb e ../local_storage/yahoo_csv_cache/ disallineati
-                log.info('security <' + security_id + '> file NOT found <' + datafile + '>')
-            else:
-                data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
+            data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
                                                     fromdate=datetime.datetime(2016, 1, 1),
                                                     todate=datetime.datetime(2018, 12, 31),
                                                     adjclose=False, 
                                                     decimals=5)
 
-                cerebro.adddata(data, security_id)    
-                log.info('datafeed <' + security_id +'> succesfully added to cerebro')
+            cerebro.adddata(data, security_id)    
+            log.info('datafeed <' + security_id +'> succesfully added to cerebro')
+
 
         #cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
         cerebro.broker.setcash(10000.0)

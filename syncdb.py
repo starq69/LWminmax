@@ -3,6 +3,10 @@
 
 import os, sqlite3
 import logging, logging.config, configparser
+import subprocess
+
+class DownloadFailException(Exception):
+    pass
 
 
 class syncdb():
@@ -78,15 +82,35 @@ class syncdb():
         return _securities 
 
 
-    def insert_security(self, security_id, fromdate, todate):
+    def insert_security(self, security_id, fromdate, todate, datafile=None):
+        #
+        # rendo transazionale : download + insert/update
+        #
+        # https://community.backtrader.com/topic/499/saving-datafeeds-to-csv/2
+        
+        c=subprocess.call(['../yahoodownload.py',
+                         '--ticker', security_id, \
+                         '--fromdate', fromdate, \
+                         '--todate', todate, \
+                         '--outfile', datafile])            #+#
+        if c != 0:
+            raise DownloadFailException
+
+        self.log.info('security <' + security_id + '> download complete('+str(c)+')')
+       
+        # TBD : potrei fare if select then update else insert
         try:
-            insert=f"insert into securities (code, start_date, end_date) values (:security_id , :fromdate, :todate)"
-            self.conn.execute(insert, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
+            sql=f"insert into securities (code, start_date, end_date) values (:security_id , :fromdate, :todate)"
+            self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
+            self.conn.commit()
+        except sqlite3.IntegrityError as e:
+            sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
+            self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
             self.conn.commit()
         except sqlite3.OperationalError as e:
             raise e
-        else:
-            self.log.info('security <' + security_id + '> succesfully added to syncdb')
+            
+        self.log.info('security <' + security_id + '> succesfully added to syncdb')
 
 
     def close(self):
