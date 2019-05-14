@@ -40,10 +40,9 @@ class LWminmaxIndicator(bt.Indicator):
         self.log        = logging.getLogger (__name__)
 
         if strategy is not None and isinstance(strategy, bt.Strategy):
-            print('LWminmax indicator attached to strategy')
             self.strategy = strategy
         else:
-            self.log.error('Pls link the indicator to Strategy')
+            self.log.error('something goes wrong during {} init : pls check parameters')
             sys.exit(1)
 
         self.prev       = self.min_max_inter_flag = 0

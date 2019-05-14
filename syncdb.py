@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, sqlite3
+import os, sys, sqlite3
 import logging, logging.config, configparser
 import subprocess
 
@@ -92,7 +92,7 @@ class syncdb():
             return True, file_fromdate, file_todate
 
 
-    def insert_security(self, _struct, security_id, fromdate, todate, datafile=None):
+    def insert_security(self, _struct, security_id, fromdate, todate, datafile=None):   #OLD
         #
         # rendo transazionale : download + insert/update
         # https://community.backtrader.com/topic/499/saving-datafeeds-to-csv/2
@@ -132,6 +132,39 @@ class syncdb():
                 self.conn.commit()
 
         return
+
+
+    def insert_security_ex(self, _struct, security_id, fromdate, todate, datafile=None):
+
+        def upsert(security_id, fromdate, todate):
+            sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
+            self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
+            sql=f"insert into securities (code, start_date, end_date) select :security_id, :fromdate, :todate where (select Changes() = 0)"
+            self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
+            self.conn.commit()
+
+        # se decido di usare syncdb.securities per validare security_id (precarico tutte le security)
+        # ripristino la if qui sotto 
+        #
+        #if _struct is not None:
+        file_cached, file_fromdate, file_todate = self.select_file(_struct, f=datafile)
+        if file_cached:
+            upsert(security_id, fromdate, todate)
+            return
+        else:
+            c=subprocess.call(['../yahoodownload.py',
+                             '--ticker', security_id, \
+                             '--fromdate', fromdate, \
+                             '--todate', todate, \
+                             '--outfile', datafile])            #+#
+            if c != 0:
+                raise DownloadFailException('fail to load data for security {}'.format(security_id))
+            else:
+                upsert(security_id, fromdate, todate)
+                return
+        #else:
+        #    self.log.warning('ERROR : unknow security <{}>'.format(security_id))
+        #    sys.exit(1)
 
 
     def close(self):

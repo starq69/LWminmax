@@ -20,10 +20,10 @@ class InsideIndicator(bt.Indicator):
     def __init__(self, strategy=None):
 
         if strategy is not None and isinstance(strategy, bt.Strategy):
-            print('InsideIndicator indicator attached to strategy')
+            #print('InsideIndicator indicator attached to strategy')
             self.strategy = strategy
         else:
-            self.log.error('Pls link the indicator to Strategy')
+            self.log.error('something goes wrong during {} init : pls check parameters')
             sys.exit(1)
 
         self.i = 1

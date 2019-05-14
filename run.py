@@ -41,8 +41,11 @@ def setting_up():
         logging.config.fileConfig (cfg_log)
         log = logging.getLogger (__name__)
 
-    except Exception as e:
-        log.exception('EXCEPTION during logging setup -> system stopped : {}'.format(e))
+    except KeyError as e:
+        print('EXCEPTION during logging setup on key {}'.format(e))
+        sys.exit(1)
+    except configparser.DuplicateOptionError as e:
+        print('EXCEPTION during logging setup : {}'.format(e))
         sys.exit(1)
 
     try:
@@ -92,10 +95,10 @@ def import_strategies(app_config):
                     if strategy_id not in strategy_modules:
                         strategy_modules[strategy_id] = load_module(strategy_id) 
                         strategy_classes[strategy_id] = strategy_modules[strategy_id].get_strategy_class()
-                        log.info(str(strategy_modules[strategy_id]) + ' for strategy <' + strategy + '> succesfully added to cerebro')
+                        log.debug('module {} for strategy <{}> succesfully added to cerebro'.format(str(strategy_modules[strategy_id]),strategy))
                     else:
                         # TEST : strategy_classes che valore ha qui ?
-                        log.info(str(strategy_modules[strategy_id]) + ' for strategy <' + strategy + '> already loaded')
+                        log.debug('module {} for strategy <{}> already loaded'.format(str(strategy_modules[strategy_id]),strategy))
                 except Exception as e:
                     raise e
 
@@ -134,13 +137,14 @@ def main():
 
             default_fromdate = '2018-06-01' # da config.
             default_todate   = '2018-12-31' # ...magari = oggi ?
-            datafile         = '../local_storage/yahoo_csv_cache/'+security_id+'_'+default_fromdate+'_'+default_todate+'.csv'   #+#
+            #datafile         = '../local_storage/yahoo_csv_cache/'+security_id+'_'+default_fromdate+'_'+default_todate+'.csv'   #+#
+            datafile         = path+security_id+'_'+default_fromdate+'_'+default_todate+'.csv'   #+#
 
             # attenzione :
             # l'update del record si può fare sempre dal momento che in generale ci si aspetta che ad ogni invocazione
             # per lo meno _struct.todate cambi rispetto al valore presente sul record
             #
-            syncdb.insert_security(_struct, security_id, default_fromdate, default_todate, datafile=datafile)
+            syncdb.insert_security_ex(_struct, security_id, default_fromdate, default_todate, datafile=datafile)
                 
             data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
                                                     fromdate=datetime.datetime(2016, 1, 1),
@@ -149,7 +153,7 @@ def main():
                                                     decimals=5)
 
             cerebro.adddata(data, security_id)    
-            log.info('datafeed <' + security_id +'> succesfully added to cerebro')
+            log.info('datafeed <{}> succesfully added to cerebro'.format(security_id))
 
 
         #cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
