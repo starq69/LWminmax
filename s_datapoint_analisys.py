@@ -122,8 +122,7 @@ class S_Datapoint_Analisys(bt.Strategy):
         ...As for writing the values to a DataFrame, you may pass a DataFrame as a named argument to the indicator and add the values, 
         but taking into account that appending values to a DataFrame is a very expensive operation, you may prefer to do it at once during Strategy.stop
         '''
-
-        self.log.info('EXIT STRATEGY <' + self.name + '> ' + repr(self.__class__) + ', strategy.next loop_count = ' + str(self.loop_count))
+        self.log.info('EXIT STRATEGY <{}> {}, strategy.next loop_count = {}'.format(self.name, repr(self.__class__), str(self.loop_count)))
 
         for indicator, _dict in self.indicators.items():
             for item, detail in _dict.items():

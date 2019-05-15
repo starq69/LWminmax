@@ -30,6 +30,16 @@ def remove_postfix(s):
 
 def setting_up():
 
+    def strict_mode(app_config):
+        try:
+            strict_mode = app_config.getboolean('OPTIONS', 'strict')
+            print ('strict mode is {}'.format(strict_mode))
+            return strict_mode
+        except Exception as e:
+            log.warning('invalid strict mode specified : {} Now is set to False'.format(e))
+            return False # 
+
+
     base_dir    = os.path.dirname (os.path.realpath(__file__))
     parent_dir  = os.path.split (base_dir)[0]
     cfg_file    = parent_dir + '/app.ini'
@@ -59,7 +69,9 @@ def setting_up():
         log.info('*** SESSION STARTED ***')
         log.info('configuration file <{}> LOADED'.format(cfg_file))
 
-        syncdb_instance = syncdb(db_dir=syncdb_dir ,db_file=syncdb_file) 
+        strict = strict_mode(app_config)
+
+        syncdb_instance = syncdb(db_dir=syncdb_dir ,db_file=syncdb_file, strict=strict) 
 
     except configparser.Error as e:
         log.exception ('INTERNAL ERROR : <{}>'.format (e))
@@ -105,14 +117,14 @@ def import_strategies(app_config):
     return strategies, strategy_classes
 
 
-def check_securities(app_config, syncdb):
+def load_securities(app_config, syncdb):
 
     try:
         securities = [ss.strip() for ss in app_config.get('DATAFEEDS', 'securities').split(',') if len(ss)]
     except configparser.NoOptionError as e:
         raise e
     if not len(securities):
-        raise NoSecurityFound('No securities found on configuration!')
+        raise NoSecurityFound('Empty security list found on configuration!')
 
     # select from syncdb.securities
     #
@@ -129,7 +141,7 @@ def main():
     try: 
         strategies, \
         strategy_classes = import_strategies (app_config)
-        securities       = check_securities (app_config, syncdb) # hyp.: syncdb.check_securities(app_config) ?
+        securities       = load_securities (app_config, syncdb) # hyp.: syncdb.load_securities(app_config) ? OK TODO 
 
         # load_datafeeds(securities)
         #
@@ -144,16 +156,16 @@ def main():
             # l'update del record si può fare sempre dal momento che in generale ci si aspetta che ad ogni invocazione
             # per lo meno _struct.todate cambi rispetto al valore presente sul record
             #
-            syncdb.insert_security_ex(_struct, security_id, default_fromdate, default_todate, datafile=datafile)
+            if syncdb.insert_security_ex(_struct, security_id, default_fromdate, default_todate, datafile=datafile):
                 
-            data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
-                                                    fromdate=datetime.datetime(2016, 1, 1),
-                                                    todate=datetime.datetime(2018, 12, 31),
-                                                    adjclose=False, 
-                                                    decimals=5)
+                data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
+                                                        fromdate=datetime.datetime(2016, 1, 1),
+                                                        todate=datetime.datetime(2018, 12, 31),
+                                                        adjclose=False, 
+                                                        decimals=5)
 
-            cerebro.adddata(data, security_id)    
-            log.info('datafeed <{}> succesfully added to cerebro'.format(security_id))
+                cerebro.adddata(data, security_id)    
+                log.info('datafeed <{}> succesfully added to cerebro'.format(security_id))
 
 
         #cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")

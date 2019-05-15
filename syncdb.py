@@ -11,9 +11,11 @@ class DownloadFailException(Exception):
 
 class syncdb():
 
-    def __init__(self, db_dir=None, db_file=None):
+    def __init__(self, db_dir=None, db_file=None, strict=False):
 
         self.log = logging.getLogger (__name__)
+
+        self.strict = strict
 
         if db_dir and db_file: 
             self.db_dir  = db_dir.strip()
@@ -48,12 +50,12 @@ class syncdb():
                 self.conn.executescript(schema)
         
         except FileNotFoundError as e: # [Errno 2] No such schema 
-            self.conn.close()
+            self.conn.close()   # TODO TEST
             #raise NoSqlFileFound   (custom exception TBD)
             raise e
 
         except Exception as e: # TBD errori sql nello script
-            self.conn.close()
+            self.conn.close()   # TODO TEST
             raise e
 
 
@@ -87,8 +89,8 @@ class syncdb():
             return False, None, None
         else:
             # TBD
-            file_fromdate = '2017-06-01' # da estrarre da f
-            file_todate = '2017-12-31' # da estrarre da f
+            file_fromdate = '2017-06-01' # da estrarre da f (f.fromdate)    TODO
+            file_todate = '2017-12-31' # da estrarre da f (f.todate)        TODO
             return True, file_fromdate, file_todate
 
 
@@ -136,17 +138,65 @@ class syncdb():
 
     def insert_security_ex(self, _struct, security_id, fromdate, todate, datafile=None):
 
-        def upsert(security_id, fromdate, todate):
+        def _upsert(security_id, fromdate, todate):
             sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
             self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
             sql=f"insert into securities (code, start_date, end_date) select :security_id, :fromdate, :todate where (select Changes() = 0)"
             self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
             self.conn.commit()
 
-        # se decido di usare syncdb.securities per validare security_id (precarico tutte le security)
-        # ripristino la if qui sotto 
-        #
-        #if _struct is not None:
+        def _update(security_id, fromdate, todate):
+            sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
+            self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
+            self.conn.commit()
+
+
+        # in modalità 'strict' security_id deve esistere su syncdb.securities 
+        # 
+        if self.strict :
+           if _struct is not None:
+               # block (update)
+               file_cached, file_fromdate, file_todate = self.select_file(_struct, f=datafile)
+               if file_cached:
+                   _update(security_id, fromdate, todate)
+                   return True
+               else:
+                   c=subprocess.call(['../yahoodownload.py',
+                                    '--ticker', security_id, \
+                                    '--fromdate', fromdate, \
+                                    '--todate', todate, \
+                                    '--outfile', datafile])            #+#
+                   if c != 0:
+                       self.log.warning('FAIL to download data for security {}'.format(security_id))
+                       return False
+                   else:
+                       _upsert(security_id, fromdate, todate)
+                       return True
+           else:
+               self.log.warning('WARNING : unknow security <{}>'.format(security_id))
+               return False
+        else:
+            # block (upsert)
+            file_cached, file_fromdate, file_todate = self.select_file(_struct, f=datafile)
+            if file_cached:
+                _upsert(security_id, fromdate, todate)
+                return True
+            else:
+                c=subprocess.call(['../yahoodownload.py',
+                                 '--ticker', security_id, \
+                                 '--fromdate', fromdate, \
+                                 '--todate', todate, \
+                                 '--outfile', datafile])            #+#
+                if c != 0:
+                    #raise DownloadFailException('fail to download data for security {}'.format(security_id))
+                    self.log.warning('FAIL to download data for security {}'.format(security_id))
+                    return False
+                else:
+                    _upsert(security_id, fromdate, todate)
+                    return True
+
+        '''
+        # block
         file_cached, file_fromdate, file_todate = self.select_file(_struct, f=datafile)
         if file_cached:
             upsert(security_id, fromdate, todate)
@@ -158,14 +208,14 @@ class syncdb():
                              '--todate', todate, \
                              '--outfile', datafile])            #+#
             if c != 0:
-                raise DownloadFailException('fail to load data for security {}'.format(security_id))
+                raise DownloadFailException('fail to download data for security {}'.format(security_id))
             else:
                 upsert(security_id, fromdate, todate)
                 return
         #else:
         #    self.log.warning('ERROR : unknow security <{}>'.format(security_id))
         #    sys.exit(1)
-
+        '''
 
     def close(self):
         try:
