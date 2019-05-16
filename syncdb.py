@@ -1,12 +1,39 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, sys, sqlite3
+import os, sys 
+import fnmatch
+import sqlite3
+from datetime import datetime
 import logging, logging.config, configparser
 import subprocess
 
 class DownloadFailException(Exception):
     pass
+
+
+def get_file_items (path, pattern=None, sort=True, fullnames=True):
+
+    if not pattern: pattern = '*'
+    _items = []
+
+    if type (pattern) is list:
+
+        for p in pattern:
+            if fullnames:
+                _items += [f.path for f in os.scandir(path) if f.is_file() and fnmatch.fnmatch(f.name, p)]
+            else:
+                _items += [f.name for f in os.scandir(path) if f.is_file() and fnmatch.fnmatch(f.name, p)]
+    else:
+        if fullnames:
+            _items = [f.path for f in os.scandir(path) if f.is_file() and fnmatch.fnmatch(f.name, pattern)]
+        else:
+            _items = [f.name for f in os.scandir(path) if f.is_file() and fnmatch.fnmatch(f.name, pattern)]
+
+    if sort:
+        _items=sorted(_items)
+
+    return _items
 
 
 class syncdb():
@@ -16,6 +43,7 @@ class syncdb():
         self.log = logging.getLogger (__name__)
 
         self.strict = strict
+        self.db_dir = db_dir
 
         if db_dir and db_file: 
             self.db_dir  = db_dir.strip()
@@ -82,16 +110,41 @@ class syncdb():
         return _securities 
 
 
-    def select_file(self, _struct, f=None):
-        # TOBE
-        # verifica se f.fromdate <= _struct[fromdate] and f.todate>=_struct[todate]
-        if not os.path.isfile(f):
-            return False, None, None
+    def select_file(self, security_id, fromdate, todate, path=None): # add FORMAT param TODO
+        #
+        # rivedere i valori che restituisce #TODO
+        #
+        FORMAT = '%Y-%m-%d'
+        f = path.strip() + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+        self.log.debug('il file cercato è {}'.format(f))
+
+        try:
+            _, fname    = os.path.split(f)
+        except Exception as e:
+            print('exception in select_file() : ' + str(e))
+            
+        if os.path.isfile(f):   # perfect match (from/to date)
+            print('PERFECT FILE MATCH')
+            return True, str(fromdate), str(todate) # TODO : ma sono già stringhe ???
         else:
-            # TBD
-            file_fromdate = '2017-06-01' # da estrarre da f (f.fromdate)    TODO
-            file_todate = '2017-12-31' # da estrarre da f (f.todate)        TODO
-            return True, file_fromdate, file_todate
+            # cerca il/i file del tipo <security_id>.<from>.<to>.csv e verifica la copertura dei periodi
+            #
+            print('segue get_file_items()')
+            flist = get_file_items(path, security_id+'.'+'*.csv', fullnames=False)
+            print(str(flist))
+            for fname in flist:
+                _parts = fname.split('.')
+                file_fromdate = _parts[1]
+                file_todate   = _parts[2]
+                dt_file_fromdate = datetime.strptime(file_fromdate, FORMAT).date()
+                dt_file_todate   = datetime.strptime(file_todate, FORMAT).date()
+                if dt_file_fromdate <= fromdate and dt_file_todate >= todate:
+                    self.log.debug('{} cover the asked analisys period'.format(fname))
+                    return True, file_fromdate, file_todate
+                else:
+                    print('{} do NOT cover the asked period'.format(fname))
+
+            return False, None, None
 
 
     def insert_security(self, _struct, security_id, fromdate, todate, datafile=None):   #OLD
@@ -136,7 +189,7 @@ class syncdb():
         return
 
 
-    def insert_security_ex(self, _struct, security_id, fromdate, todate, datafile=None):
+    def insert_security_ex(self, _struct, security_id, fromdate, todate, path):
 
         def _upsert(security_id, fromdate, todate):
             sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
@@ -156,36 +209,40 @@ class syncdb():
         if self.strict :
            if _struct is not None:
                # block (update)
-               file_cached, file_fromdate, file_todate = self.select_file(_struct, f=datafile)
+               file_cached, file_fromdate, file_todate = self.select_file(security_id, fromdate, todate, path)  ### TODO modificare select_file()
                if file_cached:
-                   _update(security_id, fromdate, todate)
-                   return True
+                   _update(security_id, fromdate, todate) # ..... TODO TEST
+                   return True, file_fromdate, file_todate
                else:
+                   datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+                   self.log.debug('SEGUE download sul file <{}>'.format(datafile))
                    c=subprocess.call(['../yahoodownload.py',
                                     '--ticker', security_id, \
-                                    '--fromdate', fromdate, \
-                                    '--todate', todate, \
+                                    '--fromdate', str(fromdate), \
+                                    '--todate', str(todate), \
                                     '--outfile', datafile])            #+#
                    if c != 0:
                        self.log.warning('FAIL to download data for security {}'.format(security_id))
                        return False
                    else:
                        _upsert(security_id, fromdate, todate)
-                       return True
+                       return True, str(fromdate), str(todate)
            else:
                self.log.warning('WARNING : unknow security <{}>'.format(security_id))
                return False
         else:
             # block (upsert)
-            file_cached, file_fromdate, file_todate = self.select_file(_struct, f=datafile)
+            file_cached, file_fromdate, file_todate = self.select_file(security_id, fromdate, todate, path)
             if file_cached:
                 _upsert(security_id, fromdate, todate)
-                return True
+                return True, file_fromdate, file_todate
             else:
+                datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+                self.log.debug('SEGUE download sul file <{}>'.format(datafile))
                 c=subprocess.call(['../yahoodownload.py',
                                  '--ticker', security_id, \
-                                 '--fromdate', fromdate, \
-                                 '--todate', todate, \
+                                 '--fromdate', str(fromdate), \
+                                 '--todate', str(todate), \
                                  '--outfile', datafile])            #+#
                 if c != 0:
                     #raise DownloadFailException('fail to download data for security {}'.format(security_id))
@@ -193,29 +250,8 @@ class syncdb():
                     return False
                 else:
                     _upsert(security_id, fromdate, todate)
-                    return True
+                    return True, str(fromdate), str(todate)
 
-        '''
-        # block
-        file_cached, file_fromdate, file_todate = self.select_file(_struct, f=datafile)
-        if file_cached:
-            upsert(security_id, fromdate, todate)
-            return
-        else:
-            c=subprocess.call(['../yahoodownload.py',
-                             '--ticker', security_id, \
-                             '--fromdate', fromdate, \
-                             '--todate', todate, \
-                             '--outfile', datafile])            #+#
-            if c != 0:
-                raise DownloadFailException('fail to download data for security {}'.format(security_id))
-            else:
-                upsert(security_id, fromdate, todate)
-                return
-        #else:
-        #    self.log.warning('ERROR : unknow security <{}>'.format(security_id))
-        #    sys.exit(1)
-        '''
 
     def close(self):
         try:

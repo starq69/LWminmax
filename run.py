@@ -133,6 +133,10 @@ def load_securities(app_config, syncdb):
 
 def main():
 
+    today           = datetime.date.today() 
+    asked_todate    = today - datetime.timedelta(days=1) # se nn specificato in config. TODO
+    print('asked_todate : ' + str(asked_todate))
+
     log, app_config, syncdb = setting_up()
 
     path            = app_config['DATASOURCE']['path']
@@ -147,20 +151,20 @@ def main():
         #
         for security_id, _struct in securities.items():
 
-            default_fromdate = '2018-06-01' # da config.
-            default_todate   = '2018-12-31' # ...magari = oggi ?
-            #datafile         = '../local_storage/yahoo_csv_cache/'+security_id+'_'+default_fromdate+'_'+default_todate+'.csv'   #+#
-            datafile         = path+security_id+'_'+default_fromdate+'_'+default_todate+'.csv'   #+#
+            default_fromdate = '2018-06-01' # da config. # TODO
+            default_fromdate = datetime.datetime.strptime(default_fromdate, '%Y-%m-%d') #.date()
 
             # attenzione :
             # l'update del record si può fare sempre dal momento che in generale ci si aspetta che ad ogni invocazione
             # per lo meno _struct.todate cambi rispetto al valore presente sul record
             #
-            if syncdb.insert_security_ex(_struct, security_id, default_fromdate, default_todate, datafile=datafile):
-                
+            file_found, _fromdate, _todate = syncdb.insert_security_ex(_struct, security_id, default_fromdate.date(), asked_todate, path) # ora passo path (ma è specifico di syncdb..)
+            if file_found:    
+                datafile = path + security_id + '.' + str(_fromdate) + '.' + str(_todate) + '.csv' 
                 data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
-                                                        fromdate=datetime.datetime(2016, 1, 1),
-                                                        todate=datetime.datetime(2018, 12, 31),
+                                                        #fromdate=datetime.datetime.strptime(_fromdate, '%Y-%m-%d'),
+                                                        fromdate=default_fromdate,
+                                                        todate=asked_todate, 
                                                         adjclose=False, 
                                                         decimals=5)
 
