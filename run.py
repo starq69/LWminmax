@@ -134,7 +134,8 @@ def load_securities(app_config, syncdb):
 def main():
 
     today           = datetime.date.today() 
-    asked_todate    = today - datetime.timedelta(days=1) # se nn specificato in config. TODO
+    # today escluso :
+    asked_todate    = today # non serve : - datetime.timedelta(days=1) # se nn specificato in config. TODO
     print('asked_todate : ' + str(asked_todate))
 
     log, app_config, syncdb = setting_up()
@@ -146,6 +147,7 @@ def main():
         strategies, \
         strategy_classes = import_strategies (app_config)
         securities       = load_securities (app_config, syncdb) # hyp.: syncdb.load_securities(app_config) ? OK TODO 
+        found            = False
 
         # load_datafeeds(securities)
         #
@@ -158,7 +160,7 @@ def main():
             # l'update del record si può fare sempre dal momento che in generale ci si aspetta che ad ogni invocazione
             # per lo meno _struct.todate cambi rispetto al valore presente sul record
             #
-            file_found, _fromdate, _todate = syncdb.insert_security_ex(_struct, security_id, default_fromdate.date(), asked_todate, path) # ora passo path (ma è specifico di syncdb..)
+            file_found, _fromdate, _todate = syncdb.select_security_datafeed(_struct, security_id, default_fromdate.date(), asked_todate, path) # ora passo path (ma è specifico di syncdb..)
             if file_found:    
                 datafile = path + security_id + '.' + str(_fromdate) + '.' + str(_todate) + '.csv' 
                 data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
@@ -170,20 +172,22 @@ def main():
 
                 cerebro.adddata(data, security_id)    
                 log.info('datafeed <{}> succesfully added to cerebro'.format(security_id))
+                found = True
 
+        if found:
+            #cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
+            cerebro.broker.setcash(10000.0)
+            
+            for strategy in strategies:
+                strategy_id = remove_postfix(strategy)
+                cerebro.addstrategy(strategy_classes[strategy_id], config=app_config, name=strategy)
 
-        #cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
-        cerebro.broker.setcash(10000.0)
-        
-        for strategy in strategies:
-            strategy_id = remove_postfix(strategy)
-            cerebro.addstrategy(strategy_classes[strategy_id], config=app_config, name=strategy)
-            #cerebro.run()    
+            cerebro.run()
             #cerebro.plot(style='candlestick', barup='green', bardown='black')
-
-        cerebro.run()
-        syncdb.close()
-        log.info('*** finished ***')
+            syncdb.close()
+        else:
+            log.info('~ No security found ~')
+            log.info('*** finished ***')
 
     except Exception as e: #BacktraderError as e ?
         log.exception(e)
