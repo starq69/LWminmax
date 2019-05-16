@@ -4,7 +4,7 @@
 import os, sys 
 import fnmatch
 import sqlite3
-from datetime import datetime
+import datetime
 import logging, logging.config, configparser
 import subprocess
 
@@ -122,6 +122,9 @@ class syncdb():
         # out:
         # bool, string or None, string or None
         #
+        # NB. TODO
+        # il par. todate non verrà più incrementato di 1 gg e NON ci sono impatti qui
+
         FORMAT = '%Y-%m-%d'
         f = path.strip() + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
         self.log.debug('il file cercato è {}'.format(f))
@@ -145,8 +148,8 @@ class syncdb():
                 _parts = fname.split('.')
                 file_fromdate = _parts[1]
                 file_todate   = _parts[2]
-                dt_file_fromdate = datetime.strptime(file_fromdate, FORMAT).date()
-                dt_file_todate   = datetime.strptime(file_todate, FORMAT).date()
+                dt_file_fromdate = datetime.datetime.strptime(file_fromdate, FORMAT).date()
+                dt_file_todate   = datetime.datetime.strptime(file_todate, FORMAT).date()
                 if dt_file_fromdate <= fromdate and dt_file_todate >= todate:
                     self.log.debug('<{}> cover the asked analisys period'.format(fname))
                     return True, file_fromdate, file_todate
@@ -166,7 +169,13 @@ class syncdb():
         #
         # out:
         # bool, string or None, string or None
+        # bool, datetime.date or None, ..
 
+        # TODO
+        # ATTENZIONE :
+        # todate è incrementato di un gg. e non va bene nell'update/upsert (risulta avanti di 1 gg risp. al file)
+        # todate (effettivo) deve essere incrementato di un gg. soltato quando è utilizzato come par. --todate nella subprocess.call
+        # CORREGGERE di conseguenza (vedi anche main())
 
         def _upsert(security_id, fromdate, todate):
             sql=f"update securities set start_date=:fromdate, end_date=:todate where code=:security_id"
@@ -183,29 +192,35 @@ class syncdb():
         #print('syncdb.select_security_datafeed() type of fromdate/todate are : {} {}'.format(type(fromdate), type(todate)))
         #print('syncd.select_security_datafeed() _struct/security_id/path : {} {} {}'.format(type(_struct), type(security_id), type(path)))
 
+        FORMAT = '%Y-%m-%d' # TODO
+
         # in modalità 'strict' security_id deve esistere su syncdb.securities 
         # 
         if self.strict :
            if _struct is not None:
                # (update)
-               file_cached, file_fromdate, file_todate = self.select_file(security_id, fromdate, todate, path)  ### TODO modificare select_file()
+               file_cached, file_fromdate, file_todate = self.select_file(security_id, fromdate, todate, path)  
                if file_cached:
                    _update(security_id, fromdate, todate) # ..... TODO TEST
-                   return True, file_fromdate, file_todate
+                   #return True, file_fromdate, file_todate
+                   return True, datetime.datetime.strptime(file_fromdate, FORMAT).date(), datetime.datetime.strptime(file_todate, FORMAT).date()
                else:
+                   #datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate - datetime.timedelta(days=1)) + '.csv'
                    datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
                    self.log.debug('SEGUE download sul file <{}>'.format(datafile))
                    c=subprocess.call(['../yahoodownload.py',
                                     '--ticker', security_id, \
                                     '--fromdate', str(fromdate), \
-                                    '--todate', str(todate), \
+                                    #'--todate', str(todate), \
+                                    '--todate', str(todate + datetime.timedelta(days=1)), \
                                     '--outfile', datafile])            #+#
                    if c != 0:
                        self.log.warning('FAIL to download data for security {}'.format(security_id))
                        return False, None, None
                    else:
                        _upsert(security_id, fromdate, todate)
-                       return True, str(fromdate), str(todate)
+                       #return True, str(fromdate), str(todate)
+                       return True, fromdate, todate
            else:
                self.log.warning('WARNING : unknow security <{}>'.format(security_id))
                return False, None, None
@@ -214,21 +229,25 @@ class syncdb():
             file_cached, file_fromdate, file_todate = self.select_file(security_id, fromdate, todate, path)
             if file_cached:
                 _upsert(security_id, fromdate, todate)
-                return True, file_fromdate, file_todate
+                #return True, file_fromdate, file_todate
+                return True, datetime.datetime.strptime(file_fromdate, FORMAT).date(), datetime.datetime.strptime(file_todate, FORMAT).date()
             else:
+                #datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate - datetime.timedelta(days=1)) + '.csv'
                 datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
                 self.log.debug('SEGUE download sul file <{}>'.format(datafile))
                 c=subprocess.call(['../yahoodownload.py',
                                  '--ticker', security_id, \
                                  '--fromdate', str(fromdate), \
-                                 '--todate', str(todate), \
+                                 #'--todate', str(todate), \
+                                 '--todate', str(todate + datetime.timedelta(days=1)), \
                                  '--outfile', datafile])            #+#
                 if c != 0:
                     self.log.warning('FAIL to download data for security {}'.format(security_id)) # ex DownloadFailException
                     return False, None, None
                 else:
                     _upsert(security_id, fromdate, todate)
-                    return True, str(fromdate), str(todate)
+                    #return True, str(fromdate), str(todate)
+                    return True, fromdate, todate
 
 
     def close(self):

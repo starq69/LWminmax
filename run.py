@@ -135,7 +135,8 @@ def main():
 
     today           = datetime.date.today() 
     # today escluso :
-    asked_todate    = today # non serve : - datetime.timedelta(days=1) # se nn specificato in config. TODO
+    #asked_todate    = today # TODO : RIPRISTINARE today - datetime.timedelta(days=1) # se nn specificato in config. TODO
+    asked_todate    = today - datetime.timedelta(days=1) # se nn specificato in config. TODO
     print('asked_todate : ' + str(asked_todate))
 
     log, app_config, syncdb = setting_up()
@@ -146,7 +147,7 @@ def main():
     try: 
         strategies, \
         strategy_classes = import_strategies (app_config)
-        securities       = load_securities (app_config, syncdb) # hyp.: syncdb.load_securities(app_config) ? OK TODO 
+        securities       = load_securities (app_config, syncdb) # hyp.: syncdb.load_securities(app_config) ? (no) TODO 
         found            = False
 
         # load_datafeeds(securities)
@@ -160,13 +161,16 @@ def main():
             # l'update del record si può fare sempre dal momento che in generale ci si aspetta che ad ogni invocazione
             # per lo meno _struct.todate cambi rispetto al valore presente sul record
             #
-            file_found, _fromdate, _todate = syncdb.select_security_datafeed(_struct, security_id, default_fromdate.date(), asked_todate, path) # ora passo path (ma è specifico di syncdb..)
+            # TODO : il par. path è un attr. di syncdb .. ?
+            file_found, _fromdate, _todate = syncdb.select_security_datafeed(_struct, security_id, default_fromdate.date(), asked_todate, path) 
             if file_found:    
+                #datafile = path + security_id + '.' + str(_fromdate) + '.' + str(_todate - datetime.timedelta(days=1)) + '.csv' 
                 datafile = path + security_id + '.' + str(_fromdate) + '.' + str(_todate) + '.csv' 
                 data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
                                                         #fromdate=datetime.datetime.strptime(_fromdate, '%Y-%m-%d'),
                                                         fromdate=default_fromdate,
-                                                        todate=asked_todate, 
+                                                        #todate=asked_todate, # TODO incrementare di 1 gg se asked_todate = today - detatime.timedelta(days=1)
+                                                        todate=asked_todate + datetime.timedelta(days=1), 
                                                         adjclose=False, 
                                                         decimals=5)
 
