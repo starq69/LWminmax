@@ -53,11 +53,12 @@ class syncdb():
             db_is_new    = not os.path.exists(db_filename)
 
             try:
-                self.conn = sqlite3.connect(db_filename)
+                #self.conn = sqlite3.connect(db_filename) # OLD
 
                 if db_is_new:
                     self.create_default_schema()
                 else:
+                    self.conn = sqlite3.connect(db_filename) # NEW
                     self.log.info('syncdb <' + db_filename + '> CONNECTED')
 
                 #self.conn.close()
@@ -65,14 +66,14 @@ class syncdb():
             except sqlite3.OperationalError as e:
                 raise e
         else:
-            self.log.exception('invalid syncdb name! --> ABEND')
+            self.log.exception('invalid syncdb file name : <{}>'.format(self.db_dir + self.db_file))
             sys.exit(1)
 
 
     def create_default_schema(self):
 
-        self.log.debug ('create_default_schema() ....')
         schema_file = self.db_dir + 'default_syncdb_schema.sql'
+        self.log.info('syncdb NOT FOUND : create default schema <{}>'.format(schema_file))
         try:
             with open(schema_file, 'rt') as f:
                 schema = f.read()
@@ -168,8 +169,7 @@ class syncdb():
         # path              : string
         #
         # out:
-        # bool, string or None, string or None
-        # bool, datetime.date or None, ..
+        # bool, datetime.date or None, datetime.date or None 
 
         # TODO
         # ATTENZIONE :

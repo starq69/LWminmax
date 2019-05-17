@@ -64,38 +64,38 @@ class LWminmaxIndicator(bt.Indicator):
         '''
         invocata nella next() sull'ultimo datapoint
         '''
-        self.pdf = pd.DataFrame() # può essere locale
+        pdf = pd.DataFrame() 
         _len = len(self.data)
 
-        #self.pdf['float_dt']        = self.data.datetime.get(size=_len) ## KEY
+        #pdf['float_dt']        = self.data.datetime.get(size=_len) ## KEY
         # # https://community.backtrader.com/topic/1151/datetime-format-internally/3
 
-        self.pdf['datetime']        = [self.data.num2date(_internal_date).strftime('%d-%m-%Y') for _internal_date in self.data.datetime.get(size=_len)]
+        pdf['datetime']        = [self.data.num2date(_internal_date).strftime('%d-%m-%Y') for _internal_date in self.data.datetime.get(size=_len)]
 
-        self.pdf['LW_max']          = self.LW_max.get(size=_len)
-        #self.pdf['LW_max']          = self.pdf['LW_max'].apply(pd.to_numeric, downcast='float') 
-        self.pdf['LW_max']          = self.pdf['LW_max'].replace(np.nan,0).apply(pd.to_numeric, downcast='float') 
+        pdf['LW_max']          = self.LW_max.get(size=_len)
+        #pdf['LW_max']          = pdf['LW_max'].apply(pd.to_numeric, downcast='float') 
+        pdf['LW_max']          = pdf['LW_max'].replace(np.nan,0).apply(pd.to_numeric, downcast='float') 
 
-        self.pdf['LW_min']          = self.LW_min.get(size=_len)
-        self.pdf['LW_min']          = self.pdf['LW_min'].replace(np.nan, 0).apply(pd.to_numeric, downcast='float') 
+        pdf['LW_min']          = self.LW_min.get(size=_len)
+        pdf['LW_min']          = pdf['LW_min'].replace(np.nan, 0).apply(pd.to_numeric, downcast='float') 
 
-        self.pdf['LW_max_inter']    = self.LW_max_inter.get(size=_len)
-        self.pdf['LW_max_inter']    = self.pdf['LW_max_inter'].replace(np.nan, 0).apply(pd.to_numeric, downcast='float') 
+        pdf['LW_max_inter']    = self.LW_max_inter.get(size=_len)
+        pdf['LW_max_inter']    = pdf['LW_max_inter'].replace(np.nan, 0).apply(pd.to_numeric, downcast='float') 
 
-        self.pdf['LW_min_inter']    = self.LW_min_inter.get(size=_len)
-        self.pdf['LW_min_inter']    = self.pdf['LW_min_inter'].replace(np.nan, 0).apply(pd.to_numeric, downcast='float') 
+        pdf['LW_min_inter']    = self.LW_min_inter.get(size=_len)
+        pdf['LW_min_inter']    = pdf['LW_min_inter'].replace(np.nan, 0).apply(pd.to_numeric, downcast='float') 
 
         # per convertire a int debbo prima sostituire NaN con 0
-        self.pdf['inside']          = self.inside.get(size=_len)
-        self.pdf['inside']          = self.pdf['inside'].replace(np.nan, 0).astype('int16', errors='ignore')
+        pdf['inside']          = self.inside.get(size=_len)
+        pdf['inside']          = pdf['inside'].replace(np.nan, 0).astype('int16', errors='ignore')
 
-        self.pdf.set_index('datetime', inplace=True)
+        pdf.set_index('datetime', inplace=True)
 
-        self.strategy.indicators[self._name][self.data._name]['output_dataframe'] = self.pdf 
+        self.strategy.indicators[self._name][self.data._name]['output_dataframe'] = pdf 
 
 
     def prenext(self):
-        self.log.info(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' PRENEXT --> low: ' + repr(self.data.low[0]) + ', high:' + repr(self.data.high[0]))
+        self.log.info(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' - ' + self.data._name + ' - PRENEXT --> low: ' + repr(self.data.low[0]) + ', high:' + repr(self.data.high[0]))
 
 
     def eval_outside(self, msg):
@@ -274,7 +274,7 @@ class LWminmaxIndicator(bt.Indicator):
     def next(self):
 
         msg = ''
-        #self.log.info(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' low: ' + repr(self.data.low[0]) + ', high:' + repr(self.data.high[0]))
+        #self.log.debug(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' low: ' + repr(self.data.low[0]) + ', high:' + repr(self.data.high[0]))
 
         if not self._inside(self.lookback):
             if not self._outside(self.lookback): 
@@ -347,5 +347,5 @@ class LWminmaxIndicator(bt.Indicator):
 
             self.report_dataframe()     ###
 
-        self.log.info(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' - ' + self.data._name + ' - ' + msg + ', lookback='+str(self.lookback))
+        self.log.debug(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' - ' + self.data._name + ' - ' + msg + ', lookback='+str(self.lookback))
 

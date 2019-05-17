@@ -24,7 +24,6 @@ def remove_postfix(s):
         _id = re.match(r"(.*)_\d+$", s).group(1)
     except AttributeError as e:
         _id = s
-
     return _id
 
 
@@ -33,7 +32,7 @@ def setting_up():
     def strict_mode(app_config):
         try:
             strict_mode = app_config.getboolean('OPTIONS', 'strict')
-            print ('strict mode is {}'.format(strict_mode))
+            log.info('strict mode is {}'.format(strict_mode))
             return strict_mode
         except Exception as e:
             log.warning('invalid strict mode specified : {} Now is set to False'.format(e))
@@ -44,8 +43,12 @@ def setting_up():
     parent_dir  = os.path.split (base_dir)[0]
     cfg_file    = parent_dir + '/app.ini'
     cfg_log     = parent_dir + '/log.ini'
-    syncdb_dir  = parent_dir + '/local_storage/'
-    syncdb_file = 'syncdb_default.db'
+    try:
+        syncdb_dir = app_config.get('STORAGE', 'syncdb')
+    except Exception as e:
+        syncdb_dir  = parent_dir + '/local_storage/'
+
+    syncdb_file = 'syncdb_test.db' # TODO TODO TODO concatenare eventuale version
 
     try:
         logging.config.fileConfig (cfg_log)
@@ -66,10 +69,12 @@ def setting_up():
             log.exception('missing app configuration file <{}> : ABORT....'.format(cfg_file))
             sys.exit(1)
 
-        log.info('*** SESSION STARTED ***')
+        log.info('*** BEGIN SESSION ***')
         log.info('configuration file <{}> LOADED'.format(cfg_file))
 
         strict = strict_mode(app_config)
+
+        # asked_todate TODO aggiungere qui ?
 
         syncdb_instance = syncdb(db_dir=syncdb_dir ,db_file=syncdb_file, strict=strict) 
 
@@ -109,7 +114,7 @@ def import_strategies(app_config):
                         strategy_classes[strategy_id] = strategy_modules[strategy_id].get_strategy_class()
                         log.debug('module {} for strategy <{}> succesfully added to cerebro'.format(str(strategy_modules[strategy_id]),strategy))
                     else:
-                        # TEST : strategy_classes che valore ha qui ?
+                        # TODO TEST : strategy_classes che valore ha qui ?
                         log.debug('module {} for strategy <{}> already loaded'.format(str(strategy_modules[strategy_id]),strategy))
                 except Exception as e:
                     raise e
@@ -133,46 +138,40 @@ def load_securities(app_config, syncdb):
 
 def main():
 
-    today           = datetime.date.today() 
-    # today escluso :
-    #asked_todate    = today # TODO : RIPRISTINARE today - datetime.timedelta(days=1) # se nn specificato in config. TODO
-    asked_todate    = today - datetime.timedelta(days=1) # se nn specificato in config. TODO
-    print('asked_todate : ' + str(asked_todate))
-
     log, app_config, syncdb = setting_up()
 
+    today           = datetime.date.today() 
+    asked_todate    = today - datetime.timedelta(days=1) # se nn specificato in config. TODO
+    default_fromdate = '2018-06-01' # da config. # TODO
     path            = app_config['DATASOURCE']['path']
     cerebro         = bt.Cerebro(stdstats=False) 
+    log.info('Analisys period is {} - {}'.format(default_fromdate, asked_todate))
 
     try: 
         strategies, \
         strategy_classes = import_strategies (app_config)
         securities       = load_securities (app_config, syncdb) # hyp.: syncdb.load_securities(app_config) ? (no) TODO 
         found            = False
+        default_fromdate = datetime.datetime.strptime(default_fromdate, '%Y-%m-%d').date() ##
 
         # load_datafeeds(securities)
         #
         for security_id, _struct in securities.items():
-
-            default_fromdate = '2018-06-01' # da config. # TODO
-            default_fromdate = datetime.datetime.strptime(default_fromdate, '%Y-%m-%d') #.date()
-
             # attenzione :
             # l'update del record si può fare sempre dal momento che in generale ci si aspetta che ad ogni invocazione
             # per lo meno _struct.todate cambi rispetto al valore presente sul record
             #
             # TODO : il par. path è un attr. di syncdb .. ?
-            file_found, _fromdate, _todate = syncdb.select_security_datafeed(_struct, security_id, default_fromdate.date(), asked_todate, path) 
+            file_found, _fromdate, _todate = syncdb.select_security_datafeed(_struct, security_id, default_fromdate, asked_todate, path) 
             if file_found:    
                 #datafile = path + security_id + '.' + str(_fromdate) + '.' + str(_todate - datetime.timedelta(days=1)) + '.csv' 
                 datafile = path + security_id + '.' + str(_fromdate) + '.' + str(_todate) + '.csv' 
                 data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
-                                                        #fromdate=datetime.datetime.strptime(_fromdate, '%Y-%m-%d'),
-                                                        fromdate=default_fromdate,
-                                                        #todate=asked_todate, # TODO incrementare di 1 gg se asked_todate = today - detatime.timedelta(days=1)
-                                                        todate=asked_todate + datetime.timedelta(days=1), 
-                                                        adjclose=False, 
-                                                        decimals=5)
+                                                    #fromdate=datetime.datetime.strptime(_fromdate, '%Y-%m-%d'),
+                                                    fromdate=default_fromdate,
+                                                    todate=asked_todate + datetime.timedelta(days=1), 
+                                                    adjclose=False, 
+                                                    decimals=5)
 
                 cerebro.adddata(data, security_id)    
                 log.info('datafeed <{}> succesfully added to cerebro'.format(security_id))
@@ -184,14 +183,19 @@ def main():
             
             for strategy in strategies:
                 strategy_id = remove_postfix(strategy)
-                cerebro.addstrategy(strategy_classes[strategy_id], config=app_config, name=strategy)
+                cerebro.addstrategy(strategy_classes[strategy_id],
+                                    config=app_config, 
+                                    name=strategy, 
+                                    fromdate=default_fromdate, 
+                                    todate=asked_todate)
 
             cerebro.run()
             #cerebro.plot(style='candlestick', barup='green', bardown='black')
             syncdb.close()
         else:
             log.info('~ No security found ~')
-            log.info('*** finished ***')
+
+        log.info('*** END SESSION ***')
 
     except Exception as e: #BacktraderError as e ?
         log.exception(e)

@@ -8,6 +8,9 @@ import importlib
 
 _adapters   = {}
 
+class ModuleNotFound(Exception):
+    pass
+
 
 def load_module(module_name):
     
@@ -20,8 +23,8 @@ def load_module(module_name):
         try:
             _adapters[module] = importlib.import_module(module)
         except ImportError as e:
-            raise e ### fail to load model
+            raise ModuleNotFound(e) 
         else:
-            log.debug('module <{}> succesfully imported'.format(module))
+            log.info('module <{}> succesfully imported'.format(module))
     
     return _adapters[module]

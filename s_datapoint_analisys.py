@@ -3,8 +3,8 @@
 '''
 backtrader strategy test main module (run.py)
 '''
-from datetime import datetime
 import os, sys
+import datetime
 from loader import load_module
 import logging, logging.config, configparser
 import backtrader as bt
@@ -33,19 +33,36 @@ def get_strategy_class():
 
 class S_Datapoint_Analisys(bt.Strategy):
 
-    def __init__(self, config=None, name=None):
+    def __init__(self, config=None, name=None, fromdate=None, todate=None):
 
-        self.name = name    # controllare se None...
+        self.name = name    # TODO controllare se None...
 
         self.log = logging.getLogger (__name__)
-        self.log.info('ENTER STRATEGY <' + self.name + '> ' + repr(self.__class__))
+        self.log.info('__init__ Strategy <{}> <{}>'.format(repr(self.__class__), self.name))
+
+        if fromdate is not None and isinstance(fromdate, datetime.date):
+            self.fromdate = fromdate.strftime('%Y-%m-%d')
+        else:
+            self.log.error('Invalid fromdate par. to strategy {}'.format(self.name))
+        if todate is not None and isinstance(todate, datetime.date):
+            self.todate = todate.strftime('%Y-%m-%d')
+        else:
+            self.log.error('Invalid todate par. to strategy {}'.format(self.name))
 
         if config is not None and isinstance(config, configparser.ConfigParser):
             try:
                 configured_indicators = [_ind.strip() for _ind in config.get('STRATEGIES', name).split(',') if len(_ind)]
             except configparser.NoOptionError as e:
-                print('error : {}'.format(e))
+                # TODO possibile skip della stategia ?
+                self.log.error('No indicators found for strategy <{}> : {}'.format(name, e))
                 sys.exit(1)
+            try:
+                self.parquet_storage       = config.get('STORAGE', 'parquet')
+            except configparser.NoOptionError as e:
+                self.log.error('Missing option "parquet" in section "STORAGE" : fix it in order to save indicators result') 
+                self.parquet_storage = None
+                #self.parquet_storage = '/home/starq/tmp/backtrader_output/parquet/' # TODO rimpiazzare questo default...
+
         else:
             print('invalid **kwarg params passed to <' + repr(self.__class__) + '> instance')
             sys.exit(1)
@@ -55,15 +72,19 @@ class S_Datapoint_Analisys(bt.Strategy):
         self.indicators     = dict() ##
 
         for i_name in configured_indicators:
+            try:
+                self.indicators[i_name] = dict()
+                _mod        = self.indicators[i_name]['__module__'] = load_module(i_name) # .. può restituire direttamente l'istanza dell'indicatore?
+                ind_class   = self.indicators[i_name]['__class__']  = _mod.get_indicator_class()
 
-            self.indicators[i_name] = dict()
-            _mod        = self.indicators[i_name]['__module__'] = load_module(i_name) # .. può restituire direttamente l'istanza dell'indicatore?
-            ind_class   = self.indicators[i_name]['__class__']  = _mod.get_indicator_class()
+                for _, datafeed in enumerate(self.datas):
+                    self.indicators[i_name][datafeed._name] = dict()
+                    self.indicators[i_name][datafeed._name]['indicator_instance'] = ind_class(datafeed, strategy=self)
+                    self.indicators[i_name][datafeed._name]['output_dataframe']   = pd.DataFrame()
 
-            for _, datafeed in enumerate(self.datas):
-                self.indicators[i_name][datafeed._name] = dict()
-                self.indicators[i_name][datafeed._name]['indicator_instance'] = ind_class(datafeed, strategy=self)
-                self.indicators[i_name][datafeed._name]['output_dataframe']   = pd.DataFrame()
+            except Exception as e:  # ModuleNotFoundError ...
+                # gli indicatori non validi sono scartati e non pregiudicano l'esecuzione
+                self.log.error(e)
             
 
     def next_report(self):
@@ -122,20 +143,25 @@ class S_Datapoint_Analisys(bt.Strategy):
         ...As for writing the values to a DataFrame, you may pass a DataFrame as a named argument to the indicator and add the values, 
         but taking into account that appending values to a DataFrame is a very expensive operation, you may prefer to do it at once during Strategy.stop
         '''
-        self.log.info('EXIT STRATEGY <{}> {}, strategy.next loop_count = {}'.format(self.name, repr(self.__class__), str(self.loop_count)))
-
         for indicator, _dict in self.indicators.items():
             for item, detail in _dict.items():
-
-                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
                 try:
-                    print(str(self.name) + ' /// ' + str(indicator) + ' /// ' + str(item))
                     # salva il dataframe in formato parquet
                     #
-                    #print(detail['output_dataframe'])
-                    write_to_parquet (detail['output_dataframe'], '/home/starq/tmp/backtrader_output/' + self.name + '_' + str(indicator) + '_' + str(item) + '.parquet') 
-                    #print(item)
-                except TypeError as e:
-                    print('skipped item') 
+                    if self.parquet_storage is not None: # TODO meglio prevedere un default...
+                        # TODO in attesa di meglio :
+                        # ricava uno short name dell'indicatore dal par. indicator (vedi _name sull'impl. della classi indicatore)
+                        #
+                        ind_shortname = indicator[:-9]          # rimuove 'Indicator' alla fine
+                        ind_shortname = ind_shortname[2:]       # rimuove 'I_' all'inizio
+                        ind_shortname = ind_shortname.upper()   
+                        #pq_fname = self.parquet_storage + str(item) + '.' + self.fromdate + '.' + self.todate + '.' + str(indicator) + '.parquet'
+                        pq_fname = self.parquet_storage + str(item) + '.' + self.fromdate + '.' + self.todate + '.' + ind_shortname + '.parquet'
+                        write_to_parquet (detail['output_dataframe'], pq_fname)
+                        self.log.info('pyarrow.parquet.write_table <{}> DONE'.format(pq_fname))
+                except FileNotFoundError as e:
+                    self.log.error(e) 
+                except Exception:
                     pass
-                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+
+        self.log.info('Exit Strategy <{}> {}, strategy.next loop_count = {}'.format(self.name, repr(self.__class__), str(self.loop_count)))

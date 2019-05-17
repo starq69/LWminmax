@@ -14,13 +14,11 @@ def get_indicator_class():
 class InsideIndicator(bt.Indicator):
     lines = ('inside',)
 
-    _name = 'I_InsideIndicator'       ##
+    _name = 'I_InsideIndicator'     # DEVE corrispondere al nome modulo TODO : si può fare di meglio ?
 
-    #def __init__(self):
     def __init__(self, strategy=None):
 
         if strategy is not None and isinstance(strategy, bt.Strategy):
-            #print('InsideIndicator indicator attached to strategy')
             self.strategy = strategy
         else:
             self.log.error('something goes wrong during {} init : pls check parameters')
@@ -34,18 +32,18 @@ class InsideIndicator(bt.Indicator):
         '''
         invocata nella next() sull'ultimo datapoint
         '''
-        self.pdf = pd.DataFrame() # può essere locale
+        pdf = pd.DataFrame() 
         _len = len(self.data)
 
-        #self.pdf['float_dt']        = self.data.datetime.get(size=_len) ## KEY
+        #pdf['float_dt']        = self.data.datetime.get(size=_len) ## KEY
         # # https://community.backtrader.com/topic/1151/datetime-format-internally/3
 
-        self.pdf['datetime']        = [self.data.num2date(_internal_date).strftime('%d-%m-%Y') for _internal_date in self.data.datetime.get(size=_len)]
-        self.pdf['inside']          = self.inside.get(size=_len)
-        self.pdf['inside']          = self.pdf['inside'].replace(np.nan, 0).astype('int16', errors='ignore')
+        pdf['datetime']        = [self.data.num2date(_internal_date).strftime('%d-%m-%Y') for _internal_date in self.data.datetime.get(size=_len)]
+        pdf['inside']          = self.inside.get(size=_len)
+        pdf['inside']          = pdf['inside'].replace(np.nan, 0).astype('int16', errors='ignore')
 
-        self.pdf.set_index('datetime', inplace=True)
-        self.strategy.indicators[self._name][self.data._name]['output_dataframe'] = self.pdf ### NEW
+        pdf.set_index('datetime', inplace=True)
+        self.strategy.indicators[self._name][self.data._name]['output_dataframe'] = pdf ### NEW
 
 
     def next(self):
