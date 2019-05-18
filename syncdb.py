@@ -50,24 +50,20 @@ class syncdb():
             self.db_dir  = db_dir.strip()
             self.db_file = db_file.strip()
             db_filename  = self.db_dir + self.db_file 
+            # http://robyp.x10host.com/sqlite3.html#loaded
             db_is_new    = not os.path.exists(db_filename)
-
             try:
-                #self.conn = sqlite3.connect(db_filename) # OLD
-
+                self.conn = sqlite3.connect(db_filename)
                 if db_is_new:
                     self.create_default_schema()
                 else:
-                    self.conn = sqlite3.connect(db_filename) # NEW
                     self.log.info('syncdb <' + db_filename + '> CONNECTED')
-
-                #self.conn.close()
 
             except sqlite3.OperationalError as e:
                 raise e
         else:
             self.log.exception('invalid syncdb file name : <{}>'.format(self.db_dir + self.db_file))
-            sys.exit(1)
+            sys.exit(1) # TODO gestire questa eccezione in uscita
 
 
     def create_default_schema(self):
@@ -114,7 +110,6 @@ class syncdb():
 
     def select_file(self, security_id, fromdate, todate, path=None): # add FORMAT param TODO
         #
-        # rivedere i valori che restituisce #TODO
         # controllare path : TODO
         # in:
         # security_id       : string
@@ -122,6 +117,8 @@ class syncdb():
         #
         # out:
         # bool, string or None, string or None
+        # hyp: TODO
+        # filename or None
         #
         # NB. TODO
         # il par. todate non verrà più incrementato di 1 gg e NON ci sono impatti qui
@@ -134,11 +131,13 @@ class syncdb():
             _, fname    = os.path.split(f)
         except Exception as e:
             self.log.error('exception in select_file() : ' + str(e))
-            return
+            #return # TODO hyp: return None
+            return None
             
         if os.path.isfile(f):   # perfect match (from/to date)
             self.log.debug('Perfect file MATCH')
-            return True, str(fromdate), str(todate) 
+            #return True, str(fromdate), str(todate) # TODO Hyp: return f
+            return f
         else:
             # cerca il/i file del tipo <security_id>.<from>.<to>.csv e verifica la copertura del periodo richiesto
             #
@@ -153,11 +152,13 @@ class syncdb():
                 dt_file_todate   = datetime.datetime.strptime(file_todate, FORMAT).date()
                 if dt_file_fromdate <= fromdate and dt_file_todate >= todate:
                     self.log.debug('<{}> cover the asked analisys period'.format(fname))
-                    return True, file_fromdate, file_todate
+                    #return True, file_fromdate, file_todate # TODO hyp: return path + fname
+                    return path.strip() + fname
                 else:
                     self.log.debug('<{}> do NOT cover the asked period'.format(fname))
 
-            return False, None, None
+            #return False, None, None # TODO hyp: return None
+            return None
 
 
     def select_security_datafeed(self, _struct, security_id, fromdate, todate, path):
@@ -199,13 +200,15 @@ class syncdb():
         if self.strict :
            if _struct is not None:
                # (update)
-               file_cached, file_fromdate, file_todate = self.select_file(security_id, fromdate, todate, path)  
+               # TODO hyp: file_cached = self.select_file(security_id, fromdate, todate, path)
+               #file_cached, file_fromdate, file_todate = self.select_file(security_id, fromdate, todate, path)  
+               file_cached = self.select_file(security_id, fromdate, todate, path)
                if file_cached:
                    _update(security_id, fromdate, todate) # ..... TODO TEST
-                   #return True, file_fromdate, file_todate
-                   return True, datetime.datetime.strptime(file_fromdate, FORMAT).date(), datetime.datetime.strptime(file_todate, FORMAT).date()
+                   # TODO hyp: return file_cached
+                   #return True, datetime.datetime.strptime(file_fromdate, FORMAT).date(), datetime.datetime.strptime(file_todate, FORMAT).date()
+                   return file_cached
                else:
-                   #datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate - datetime.timedelta(days=1)) + '.csv'
                    datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
                    self.log.debug('SEGUE download sul file <{}>'.format(datafile))
                    c=subprocess.call(['../yahoodownload.py',
@@ -216,21 +219,26 @@ class syncdb():
                                     '--outfile', datafile])            #+#
                    if c != 0:
                        self.log.warning('FAIL to download data for security {}'.format(security_id))
-                       return False, None, None
+                       #return False, None, None # TODO hyp: return None/False
+                       return None
                    else:
                        _upsert(security_id, fromdate, todate)
-                       #return True, str(fromdate), str(todate)
-                       return True, fromdate, todate
+                       #return True, fromdate, todate    # TODO hyp : return datafile
+                       return datafile
            else:
                self.log.warning('WARNING : unknow security <{}>'.format(security_id))
-               return False, None, None
+               #return False, None, None # TODO hyp: return None/false
+               return None
         else:
             # (upsert)
-            file_cached, file_fromdate, file_todate = self.select_file(security_id, fromdate, todate, path)
+            # TODO hyp: file_cached = self.select_file(security_id, fromdate, todate, path)
+            #file_cached, file_fromdate, file_todate = self.select_file(security_id, fromdate, todate, path)
+            file_cached = self.select_file(security_id, fromdate, todate, path)
             if file_cached:
                 _upsert(security_id, fromdate, todate)
-                #return True, file_fromdate, file_todate
-                return True, datetime.datetime.strptime(file_fromdate, FORMAT).date(), datetime.datetime.strptime(file_todate, FORMAT).date()
+                # TODO hyp: return file_cached
+                #return True, datetime.datetime.strptime(file_fromdate, FORMAT).date(), datetime.datetime.strptime(file_todate, FORMAT).date()
+                return file_cached
             else:
                 #datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate - datetime.timedelta(days=1)) + '.csv'
                 datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
@@ -242,12 +250,16 @@ class syncdb():
                                  '--todate', str(todate + datetime.timedelta(days=1)), \
                                  '--outfile', datafile])            #+#
                 if c != 0:
+                    # TODO qui il file viene cmq creato vuoto e fa fallire il test al successivo run :
+                    # TODO nella select_file() restituire None se il file esiste ed è vuoto
+                    # testato in strict=no con security inesistente (codice errato)
                     self.log.warning('FAIL to download data for security {}'.format(security_id)) # ex DownloadFailException
-                    return False, None, None
+                    #return False, None, None # TODO hyp: return None/False
+                    return None
                 else:
                     _upsert(security_id, fromdate, todate)
-                    #return True, str(fromdate), str(todate)
-                    return True, fromdate, todate
+                    #return True, fromdate, todate # TODO hyp : return datafile
+                    return datafile
 
 
     def close(self):

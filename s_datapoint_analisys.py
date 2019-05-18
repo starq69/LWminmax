@@ -155,7 +155,6 @@ class S_Datapoint_Analisys(bt.Strategy):
                         ind_shortname = indicator[:-9]          # rimuove 'Indicator' alla fine
                         ind_shortname = ind_shortname[2:]       # rimuove 'I_' all'inizio
                         ind_shortname = ind_shortname.upper()   
-                        #pq_fname = self.parquet_storage + str(item) + '.' + self.fromdate + '.' + self.todate + '.' + str(indicator) + '.parquet'
                         pq_fname = self.parquet_storage + str(item) + '.' + self.fromdate + '.' + self.todate + '.' + ind_shortname + '.parquet'
                         write_to_parquet (detail['output_dataframe'], pq_fname)
                         self.log.info('pyarrow.parquet.write_table <{}> DONE'.format(pq_fname))

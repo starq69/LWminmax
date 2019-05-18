@@ -43,10 +43,16 @@ def setting_up():
     parent_dir  = os.path.split (base_dir)[0]
     cfg_file    = parent_dir + '/app.ini'
     cfg_log     = parent_dir + '/log.ini'
+
+    #################
+    # TODO : se corrisponde al par. path della syncdb.select_security_datafeed() e della syncdb.select_file()
+    #        rimuovere il par. ed utilizzare self.syncdb_dir ....
     try:
         syncdb_dir = app_config.get('STORAGE', 'syncdb')
     except Exception as e:
         syncdb_dir  = parent_dir + '/local_storage/'
+    #
+    #################
 
     syncdb_file = 'syncdb_test.db' # TODO TODO TODO concatenare eventuale version
 
@@ -79,14 +85,14 @@ def setting_up():
         syncdb_instance = syncdb(db_dir=syncdb_dir ,db_file=syncdb_file, strict=strict) 
 
     except configparser.Error as e:
-        log.exception ('INTERNAL ERROR : <{}>'.format (e))
-        sys.exit(1)
-        #raise e !!
+        log.error('INTERNAL ERROR : <{}>'.format (e))
+        #sys.exit(1)
+        raise e 
 
     except Exception as e:
-        log.exception ('INTERNAL ERROR : <{}>'.format (e))
-        sys.exit(1) 
-        #raise e !!
+        log.error('INTERNAL ERROR : <{}>'.format (e))
+        #sys.exit(1) 
+        raise e
 
     return log, app_config, syncdb_instance
 
@@ -154,6 +160,8 @@ def main():
         found            = False
         default_fromdate = datetime.datetime.strptime(default_fromdate, '%Y-%m-%d').date() ##
 
+        #print(str(type(asked_todate)) + ' - ' + str(type(default_fromdate)))
+
         # load_datafeeds(securities)
         #
         for security_id, _struct in securities.items():
@@ -162,10 +170,13 @@ def main():
             # per lo meno _struct.todate cambi rispetto al valore presente sul record
             #
             # TODO : il par. path è un attr. di syncdb .. ?
-            file_found, _fromdate, _todate = syncdb.select_security_datafeed(_struct, security_id, default_fromdate, asked_todate, path) 
-            if file_found:    
-                #datafile = path + security_id + '.' + str(_fromdate) + '.' + str(_todate - datetime.timedelta(days=1)) + '.csv' 
-                datafile = path + security_id + '.' + str(_fromdate) + '.' + str(_todate) + '.csv' 
+            # TODO hyp: datafile = syncdb.select_security_datafeed(_struct, security_id, default_fromdate, asked_todate, path)
+            #file_found, _fromdate, _todate = syncdb.select_security_datafeed(_struct, security_id, default_fromdate, asked_todate, path) 
+            datafile = syncdb.select_security_datafeed(_struct, security_id, default_fromdate, asked_todate, path) 
+            #if file_found:    
+            if datafile:    
+                # TODO hyp. nn serve più
+                #datafile = path + security_id + '.' + str(_fromdate) + '.' + str(_todate) + '.csv' 
                 data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
                                                     #fromdate=datetime.datetime.strptime(_fromdate, '%Y-%m-%d'),
                                                     fromdate=default_fromdate,
@@ -177,7 +188,7 @@ def main():
                 log.info('datafeed <{}> succesfully added to cerebro'.format(security_id))
                 found = True
 
-        if found:
+        if found: 
             #cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
             cerebro.broker.setcash(10000.0)
             
@@ -198,7 +209,8 @@ def main():
         log.info('*** END SESSION ***')
 
     except Exception as e: #BacktraderError as e ?
-        log.exception(e)
+        #log.exception(e)
+        log.error('Abnormal END : {}'.format(e))
         try:
             syncdb.close()
         except Exception:
