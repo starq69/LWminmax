@@ -61,10 +61,10 @@ def setting_up():
         log = logging.getLogger (__name__)
 
     except KeyError as e:
-        print('EXCEPTION during logging setup on key {}'.format(e))
+        print('EXCEPTION during logging setup on key {}'.format(e)) # TODO
         sys.exit(1)
     except configparser.DuplicateOptionError as e:
-        print('EXCEPTION during logging setup : {}'.format(e))
+        print('EXCEPTION during logging setup : {}'.format(e))      # TODO
         sys.exit(1)
 
     try:
@@ -90,7 +90,7 @@ def setting_up():
         raise e 
 
     except Exception as e:
-        log.error('INTERNAL ERROR : <{}>'.format (e))
+        #log.error('INTERNAL ERROR : <{}>'.format (e))
         #sys.exit(1) 
         raise e
 
@@ -144,7 +144,7 @@ def load_securities(app_config, syncdb):
 
 def main():
 
-    log, app_config, syncdb = setting_up()
+    log, app_config, syncdb = setting_up()  # TODO rivedere setting_up()
 
     today           = datetime.date.today() 
     asked_todate    = today - datetime.timedelta(days=1) # se nn specificato in config. TODO
@@ -153,10 +153,10 @@ def main():
     cerebro         = bt.Cerebro(stdstats=False) 
     log.info('Analisys period is {} - {}'.format(default_fromdate, asked_todate))
 
-    try: 
+    try:
         strategies, \
         strategy_classes = import_strategies (app_config)
-        securities       = load_securities (app_config, syncdb) # hyp.: syncdb.load_securities(app_config) ? (no) TODO 
+        securities       = load_securities (app_config, syncdb)
         found            = False
         default_fromdate = datetime.datetime.strptime(default_fromdate, '%Y-%m-%d').date() ##
 
@@ -170,13 +170,8 @@ def main():
             # per lo meno _struct.todate cambi rispetto al valore presente sul record
             #
             # TODO : il par. path è un attr. di syncdb .. ?
-            # TODO hyp: datafile = syncdb.select_security_datafeed(_struct, security_id, default_fromdate, asked_todate, path)
-            #file_found, _fromdate, _todate = syncdb.select_security_datafeed(_struct, security_id, default_fromdate, asked_todate, path) 
             datafile = syncdb.select_security_datafeed(_struct, security_id, default_fromdate, asked_todate, path) 
-            #if file_found:    
             if datafile:    
-                # TODO hyp. nn serve più
-                #datafile = path + security_id + '.' + str(_fromdate) + '.' + str(_todate) + '.csv' 
                 data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
                                                     #fromdate=datetime.datetime.strptime(_fromdate, '%Y-%m-%d'),
                                                     fromdate=default_fromdate,
@@ -208,8 +203,7 @@ def main():
 
         log.info('*** END SESSION ***')
 
-    except Exception as e: #BacktraderError as e ?
-        #log.exception(e)
+    except Exception as e:
         log.error('Abnormal END : {}'.format(e))
         try:
             syncdb.close()
