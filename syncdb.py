@@ -62,8 +62,9 @@ class syncdb():
             except sqlite3.OperationalError as e:
                 raise e
         else:
-            self.log.exception('invalid syncdb file name : <{}>'.format(self.db_dir + self.db_file))
-            sys.exit(1) # TODO gestire questa eccezione in uscita
+            self.log.error('invalid syncdb file name : <{}>'.format(self.db_dir + self.db_file))
+            raise e
+            #sys.exit(1) # TODO gestire questa eccezione in uscita
 
 
     def create_default_schema(self):
@@ -118,42 +119,41 @@ class syncdb():
         #
         # out:
         # string (filename) or None
-        #
-        # NB. TODO
-        # il par. todate non verrà più incrementato di 1 gg e NON ci sono impatti qui
+
+        self.log.info('select_file(<{}>'.format(security_id))
 
         FORMAT = '%Y-%m-%d'
         f = path.strip() + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
         self.log.debug('il file cercato è {}'.format(f))
 
-        try:
-            _, fname    = os.path.split(f)
-        except Exception as e:
-            self.log.error('exception in select_file() : ' + str(e))
-            return None
-            
-        if os.path.isfile(f):   # perfect match (from/to date)
-            self.log.debug('Perfect file MATCH')
-            return f
-        else:
-            # cerca il/i file del tipo <security_id>.<from>.<to>.csv e verifica la copertura del periodo richiesto
-            #
-            self.log.debug('segue get_file_items()')
-            flist = get_file_items(path, security_id+'.'+'*.csv', fullnames=False)
-            self.log.debug(flist)
-            for fname in flist:
-                _parts = fname.split('.')
-                file_fromdate = _parts[1]
-                file_todate   = _parts[2]
-                dt_file_fromdate = datetime.datetime.strptime(file_fromdate, FORMAT).date()
-                dt_file_todate   = datetime.datetime.strptime(file_todate, FORMAT).date()
-                if dt_file_fromdate <= fromdate and dt_file_todate >= todate:
-                    self.log.debug('<{}> cover the asked analisys period'.format(fname))
-                    return path.strip() + fname
-                else:
-                    self.log.debug('<{}> do NOT cover the asked period'.format(fname))
+        if os.path.isfile(f):
+            if os.path.getsize(f):
+                # dovrebbe controllare se ci sono almeno 2 righe... (1 record)
+                self.log.debug('file NON vuoto')
+                #self.log.debug('Perfect file MATCH')
+                return f
+            else:
+                self.log.warning('<{}> è vuoto : controllare security_id <{}>'.format(f, security_id))
+                os.remove(f)
 
-            return None
+        # cerca il/i file del tipo <security_id>.<from>.<to>.csv e verifica la copertura del periodo richiesto
+        #
+        self.log.debug('segue get_file_items()')
+        flist = get_file_items(path, security_id+'.'+'*.csv', fullnames=False)
+        self.log.debug(flist)
+        for fname in flist:
+            _parts = fname.split('.')
+            file_fromdate = _parts[1]
+            file_todate   = _parts[2]
+            dt_file_fromdate = datetime.datetime.strptime(file_fromdate, FORMAT).date()
+            dt_file_todate   = datetime.datetime.strptime(file_todate, FORMAT).date()
+            if dt_file_fromdate <= fromdate and dt_file_todate >= todate:
+                self.log.info('<{}> cover the asked analisys period'.format(fname))
+                return path.strip() + fname
+            else:
+                self.log.info('<{}> do NOT cover the asked period'.format(fname))
+
+        return None
 
 
     def select_security_datafeed(self, _struct, security_id, fromdate, todate, path):
@@ -179,7 +179,17 @@ class syncdb():
             self.conn.execute(sql, {'security_id':security_id, 'fromdate':fromdate, 'todate':todate})
             self.conn.commit()
 
+        def yahoo_csv_download(security_id, fromdate, todate, datafile):
+           return subprocess.call(['../yahoodownload.py',
+                            '--ticker', security_id, \
+                            '--fromdate', str(fromdate), \
+                            '--todate', str(todate + datetime.timedelta(days=1)), \
+                            '--outfile', str(datafile)])
+
+
         FORMAT = '%Y-%m-%d' # TODO
+
+        self.log.info('select_security_datafeed(<{}>)'.format(security_id))
 
         # in modalità 'strict' security_id deve esistere su syncdb.securities 
         # 
@@ -193,16 +203,22 @@ class syncdb():
                else:
                    datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
                    self.log.debug('SEGUE download sul file <{}>'.format(datafile))
-                   c=subprocess.call(['../yahoodownload.py',
-                                    '--ticker', security_id, \
-                                    '--fromdate', str(fromdate), \
-                                    #'--todate', str(todate), \
-                                    '--todate', str(todate + datetime.timedelta(days=1)), \
-                                    '--outfile', datafile])            #+#
-                   if c != 0:
+                   if yahoo_csv_download(security_id, fromdate, todate, datafile) != 0:
                        self.log.warning('FAIL to download data for security {}'.format(security_id))
+                       try:
+                           os.remove(datafile)
+                       except Exception as e:
+                           pass
                        return None
                    else:
+                       if os.path.getsize(datafile):
+                           # dovrebbe controllare se ci sono almeno 2 righe...
+                           self.log.debug('<{}> NON vuoto'.format(datafile))
+                       else:
+                           self.log.warning('<{}> è vuoto : controllare security_id <{}>'.format(datafile, security_id))
+                           os.remove(datafile)
+                           return None
+
                        _upsert(security_id, fromdate, todate)
                        return datafile
            else:
@@ -217,19 +233,22 @@ class syncdb():
             else:
                 datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
                 self.log.debug('SEGUE download sul file <{}>'.format(datafile))
-                c=subprocess.call(['../yahoodownload.py',
-                                 '--ticker', security_id, \
-                                 '--fromdate', str(fromdate), \
-                                 #'--todate', str(todate), \
-                                 '--todate', str(todate + datetime.timedelta(days=1)), \
-                                 '--outfile', datafile])            #+#
-                if c != 0:
-                    # TODO qui il file viene cmq creato vuoto e fa fallire il test al successivo run :
-                    # TODO nella select_file() restituire None se il file esiste ed è vuoto
-                    # testato in strict=no con security inesistente (codice errato)
+                if yahoo_csv_download(security_id, fromdate, todate, datafile) != 0:
                     self.log.warning('FAIL to download data for security {}'.format(security_id)) # ex DownloadFailException
+                    try:
+                        os.remove(datafile)
+                    except Exception as e:
+                        pass
                     return None
                 else:
+                    if os.path.getsize(datafile):
+                        # dovrebbe controllare se ci sono almeno 2 righe...
+                        self.log.debug('<{}> NON vuoto'.format(datafile))
+                    else:
+                        self.log.warning('<{}> è vuoto : controllare security_id <{}>'.format(datafile, security_id))
+                        os.remove(datafile)
+                        return None
+
                     _upsert(security_id, fromdate, todate)
                     return datafile
 

@@ -44,15 +44,10 @@ def setting_up():
     cfg_file    = parent_dir + '/app.ini'
     cfg_log     = parent_dir + '/log.ini'
 
-    #################
-    # TODO : se corrisponde al par. path della syncdb.select_security_datafeed() e della syncdb.select_file()
-    #        rimuovere il par. ed utilizzare self.syncdb_dir ....
     try:
         syncdb_dir = app_config.get('STORAGE', 'syncdb')
     except Exception as e:
         syncdb_dir  = parent_dir + '/local_storage/'
-    #
-    #################
 
     syncdb_file = 'syncdb_test.db' # TODO TODO TODO concatenare eventuale version
 
@@ -86,12 +81,10 @@ def setting_up():
 
     except configparser.Error as e:
         log.error('INTERNAL ERROR : <{}>'.format (e))
-        #sys.exit(1)
         raise e 
 
     except Exception as e:
-        #log.error('INTERNAL ERROR : <{}>'.format (e))
-        #sys.exit(1) 
+        log.error('INTERNAL ERROR : <{}>'.format (e))
         raise e
 
     return log, app_config, syncdb_instance
