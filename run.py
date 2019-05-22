@@ -141,10 +141,10 @@ def main():
 
     today           = datetime.date.today() 
     asked_todate    = today - datetime.timedelta(days=1) # se nn specificato in config. TODO
+    asked_todate     = datetime.datetime.strptime('2018-06-01', '%Y-%m-%d').date() ##       TEMP!!!!!!!!!!!!
     default_fromdate = '2018-06-01' # da config. # TODO
     path            = app_config['DATASOURCE']['path']
     cerebro         = bt.Cerebro(stdstats=False) 
-    log.info('Analisys period is {} - {}'.format(default_fromdate, asked_todate))
 
     try:
         strategies, \
@@ -152,6 +152,9 @@ def main():
         securities       = load_securities (app_config, syncdb)
         found            = False
         default_fromdate = datetime.datetime.strptime(default_fromdate, '%Y-%m-%d').date() ##
+        default_fromdate = datetime.datetime.strptime('2018-01-01', '%Y-%m-%d').date() ##
+
+        log.info('Analisys period is {} - {}'.format(default_fromdate, asked_todate))
 
         #print(str(type(asked_todate)) + ' - ' + str(type(default_fromdate)))
 
@@ -189,6 +192,7 @@ def main():
                                     todate=asked_todate)
 
             cerebro.run()
+
             #cerebro.plot(style='candlestick', barup='green', bardown='black')
             syncdb.close()
         else:

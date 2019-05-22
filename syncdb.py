@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, sys 
+import os, sys, re
 import fnmatch
 import sqlite3
 import datetime
@@ -120,6 +120,60 @@ class syncdb():
         # out:
         # string (filename) or None
 
+        def check_datapoints(f, fromdate, todate):
+            '''
+            verifica la presenza di records in f compresi tra fromdate/asked_todate
+
+            TEST : 
+            non è presente il file default_fromdate..asked_todate ma è presente un file
+            che include il suddetto intervallo; 
+            se questo file è parziale (non contiene tutti i records relativi al suo periodo dichiarato nel nome
+            tipicamente per assenza degli stessi dovuta a inizio/fine quotazione)
+            è necessario verificare la presenza di record compresi nel periodo richiesto poichè
+            è possibile il caso in cui non ce ne siano e questo produce l'IndexError su cerebro.run()
+            '''
+            data_expr = r'^([^,]+).+$' # regex per estrarre il campo data
+            with open(f, "rb") as f:
+
+                header = f.readline()
+                first = f.readline()
+                if first:
+                    f.seek(-2, 2)
+                    try:
+                        while f.read(1) != b"\n":
+                            f.seek(-2, 1)
+                    except OSError as e:
+                        print('OsError: {}'.format(e))
+
+                    last = f.readline()
+                    #self.log.debug('FIRST : {}'.format(first.decode('utf-8')))
+                    #self.log.debug('LAST  : {}'.format(last.decode('utf-8')))
+                    #self.log.debug('from date : {}'.format(re.findall(data_expr, first.decode('utf-8'))))
+                    #self.log.debug('to date   : {}'.format(re.findall(data_expr, last.decode('utf-8'))))
+                    _fromdate           = re.findall(data_expr, first.decode('utf-8'))[0]
+                    _todate             = re.findall(data_expr, last.decode('utf-8'))[0]
+                    self.log.debug('first datapoint : <{}>'.format(_fromdate))
+                    self.log.debug('last  datapoint : <{}>'.format(_todate))
+
+                    # TODO
+                    # controllare se la regex va in errore (datapoint/record non valido)
+                    #
+                    dt_file_fromdate    = datetime.datetime.strptime(_fromdate, FORMAT).date()
+                    dt_file_todate      = datetime.datetime.strptime(_todate, FORMAT).date()
+
+                    if dt_file_fromdate <= fromdate and dt_file_todate >= todate:
+                        # ci sono datapoints validi
+                        return True
+                    else:
+                        # no valid datapoints found
+                        return False
+
+                else:
+                    # No records found
+                    return False
+
+
+
         self.log.info('select_file(<{}>'.format(security_id))
 
         FORMAT = '%Y-%m-%d'
@@ -128,7 +182,9 @@ class syncdb():
 
         if os.path.isfile(f):
             if os.path.getsize(f):
-                # dovrebbe controllare se ci sono almeno 2 righe... (1 record)
+                # TODO DEVE controllare se ci sono almeno 2 righe... (1 record)
+                # potrei chiamare if check_datapoints(...) come sotto
+                #
                 self.log.debug('file NON vuoto')
                 #self.log.debug('Perfect file MATCH')
                 return f
@@ -149,9 +205,15 @@ class syncdb():
             dt_file_todate   = datetime.datetime.strptime(file_todate, FORMAT).date()
             if dt_file_fromdate <= fromdate and dt_file_todate >= todate:
                 self.log.info('<{}> cover the asked analisys period'.format(fname))
-                return path.strip() + fname
+
+                if check_datapoints (path.strip()+fname, fromdate, todate):
+                    return path.strip() + fname
+                else:
+                    self.log.warning('NO datapoints found on file {}'.format(fname))
+                
+                #return path.strip() + fname # TODO sostituire con la if sopra
             else:
-                self.log.info('<{}> do NOT cover the asked period'.format(fname))
+                self.log.warning('<{}> do NOT cover the asked period'.format(fname))
 
         return None
 
