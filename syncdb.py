@@ -127,12 +127,12 @@ class syncdb():
             TEST : 
             non è presente il file default_fromdate..asked_todate ma è presente un file
             che include il suddetto intervallo; 
-            se questo file è parziale (non contiene tutti i records relativi al suo periodo dichiarato nel nome
+            se questo file è parziale (non contiene tutti i records relativi al suo periodo 
             tipicamente per assenza degli stessi dovuta a inizio/fine quotazione)
             è necessario verificare la presenza di record compresi nel periodo richiesto poichè
-            è possibile il caso in cui non ce ne siano e questo produce l'IndexError su cerebro.run()
+            è possibile il caso in cui non ce ne siano e questo produce a valle IndexError su cerebro.run()
             '''
-            data_expr = r'^([^,]+).+$' # regex per estrarre il campo data
+            data_expr = r'^([^,]+).+$' # estrae il campo data
             with open(f, "rb") as f:
 
                 header = f.readline()
@@ -143,33 +143,34 @@ class syncdb():
                         while f.read(1) != b"\n":
                             f.seek(-2, 1)
                     except OSError as e:
-                        print('OsError: {}'.format(e))
+                        self.log.error('check_datapoints() error : {}'.format(e))
+                        return False
 
                     last = f.readline()
                     #self.log.debug('FIRST : {}'.format(first.decode('utf-8')))
                     #self.log.debug('LAST  : {}'.format(last.decode('utf-8')))
                     #self.log.debug('from date : {}'.format(re.findall(data_expr, first.decode('utf-8'))))
                     #self.log.debug('to date   : {}'.format(re.findall(data_expr, last.decode('utf-8'))))
+                    # TODO controllare se la regex va in errore (datapoint/record non valido)
+                    #
                     _fromdate           = re.findall(data_expr, first.decode('utf-8'))[0]
                     _todate             = re.findall(data_expr, last.decode('utf-8'))[0]
                     self.log.debug('first datapoint : <{}>'.format(_fromdate))
                     self.log.debug('last  datapoint : <{}>'.format(_todate))
 
-                    # TODO
-                    # controllare se la regex va in errore (datapoint/record non valido)
-                    #
                     dt_file_fromdate    = datetime.datetime.strptime(_fromdate, FORMAT).date()
                     dt_file_todate      = datetime.datetime.strptime(_todate, FORMAT).date()
 
                     if dt_file_fromdate <= fromdate and dt_file_todate >= todate:
-                        # ci sono datapoints validi
                         return True
                     else:
                         # no valid datapoints found
+                        self.log.warning('NO datapoints found for asked periods on file <{}>'.format(f))
                         return False
 
                 else:
                     # No records found
+                    self.log.warning('NO datapoints found on file <{}>'.format(f))
                     return False
 
 
@@ -182,11 +183,8 @@ class syncdb():
 
         if os.path.isfile(f):
             if os.path.getsize(f):
-                # TODO DEVE controllare se ci sono almeno 2 righe... (1 record)
-                # potrei chiamare if check_datapoints(...) come sotto
-                #
-                self.log.debug('file NON vuoto')
-                #self.log.debug('Perfect file MATCH')
+                self.log.debug('Perfect file MATCH')
+                # TODO DEVE controllare se ci sono almeno 2 righe... (1 record) --> check_datapoints() ?
                 return f
             else:
                 self.log.warning('<{}> è vuoto : controllare security_id <{}>'.format(f, security_id))
@@ -194,8 +192,8 @@ class syncdb():
 
         # cerca il/i file del tipo <security_id>.<from>.<to>.csv e verifica la copertura del periodo richiesto
         #
-        self.log.debug('segue get_file_items()')
-        flist = get_file_items(path, security_id+'.'+'*.csv', fullnames=False)
+        self.log.debug ('segue get_file_items()')
+        flist = get_file_items (path, security_id+'.'+'*.csv', fullnames=False)
         self.log.debug(flist)
         for fname in flist:
             _parts = fname.split('.')
@@ -208,10 +206,11 @@ class syncdb():
 
                 if check_datapoints (path.strip()+fname, fromdate, todate):
                     return path.strip() + fname
+                '''
                 else:
                     self.log.warning('NO datapoints found on file {}'.format(fname))
-                
-                #return path.strip() + fname # TODO sostituire con la if sopra
+                return path.strip() + fname # TODO sostituire con la if sopra
+                '''
             else:
                 self.log.warning('<{}> do NOT cover the asked period'.format(fname))
 
@@ -258,33 +257,36 @@ class syncdb():
         if self.strict :
            if _struct is not None:
                # (update)
-               file_cached = self.select_file(security_id, fromdate, todate, path)
+               file_cached = self.select_file (security_id, fromdate, todate, path)
                if file_cached:
                    _update(security_id, fromdate, todate) # ..... TODO TEST
                    return file_cached
                else:
                    datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
-                   self.log.debug('SEGUE download sul file <{}>'.format(datafile))
-                   if yahoo_csv_download(security_id, fromdate, todate, datafile) != 0:
-                       self.log.warning('FAIL to download data for security {}'.format(security_id))
+                   self.log.debug ('SEGUE download sul file <{}>'.format(datafile))
+                   if yahoo_csv_download (security_id, fromdate, todate, datafile) != 0:
+                       self.log.warning ('FAIL to download data for security {}'.format(security_id))
                        try:
                            os.remove(datafile)
                        except Exception as e:
                            pass
                        return None
                    else:
-                       if os.path.getsize(datafile):
-                           # dovrebbe controllare se ci sono almeno 2 righe...
-                           self.log.debug('<{}> NON vuoto'.format(datafile))
+                       if os.path.getsize (datafile):
+                           # TODO : dovrebbe controllare se ci sono almeno 2 righe...
+                           self.log.debug ('<{}> NON vuoto'.format(datafile))
                        else:
-                           self.log.warning('<{}> è vuoto : controllare security_id <{}>'.format(datafile, security_id))
-                           os.remove(datafile)
+                           self.log.warning ('CHECK security <{}> : empty downloaded file <{}>'.format(security_id, datafile))
+                           try:
+                                os.remove (datafile)
+                           except Exception as e:
+                                pass
                            return None
 
                        _upsert(security_id, fromdate, todate)
                        return datafile
            else:
-               self.log.warning('WARNING : unknow security <{}>'.format(security_id))
+               self.log.warning('UNKNOW security <{}>'.format(security_id))
                return None
         else:
             # (upsert)
@@ -294,7 +296,7 @@ class syncdb():
                 return file_cached
             else:
                 datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
-                self.log.debug('SEGUE download sul file <{}>'.format(datafile))
+                self.log.debug('DOWNLOAD on <{}>'.format(datafile))
                 if yahoo_csv_download(security_id, fromdate, todate, datafile) != 0:
                     self.log.warning('FAIL to download data for security {}'.format(security_id)) # ex DownloadFailException
                     try:
@@ -304,11 +306,14 @@ class syncdb():
                     return None
                 else:
                     if os.path.getsize(datafile):
-                        # dovrebbe controllare se ci sono almeno 2 righe...
+                        # TODO : dovrebbe controllare se ci sono almeno 2 righe...
                         self.log.debug('<{}> NON vuoto'.format(datafile))
                     else:
-                        self.log.warning('<{}> è vuoto : controllare security_id <{}>'.format(datafile, security_id))
-                        os.remove(datafile)
+                        self.log.warning ('CHECK security <{}> : empty downloaded file <{}>'.format(security_id, datafile))
+                        try:
+                            os.remove(datafile)
+                        except Exception as e:
+                            pass
                         return None
 
                     _upsert(security_id, fromdate, todate)
