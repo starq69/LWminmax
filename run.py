@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import os, sys, re
+import argparse
+import datetime as dt
 import subprocess
-import datetime
 from loader import load_module
 import logging, logging.config, configparser
 import backtrader as bt
@@ -119,13 +120,15 @@ def setting_up():
         # concatenare ev. version nel nome file db
         #
         try:
-            syncdb_dir = app_config.get('STORAGE', 'syncdb')
+            syncdb_dir  = app_config.get('STORAGE', 'syncdb')
+            path        = app_config.get('STORAGE','yahoo_csv_data')
         except Exception as e:
             syncdb_dir  = parent_dir + '/local_storage/'
-        syncdb_file = 'syncdb_test.db' 
+
+        syncdb_file = 'syncdb_test.db' # TODO
+
         strict = strict_mode(app_config)
-        # asked_todate TODO aggiungere qui ?
-        return syncdb (db_dir=syncdb_dir ,db_file=syncdb_file, strict=strict) ##
+        return syncdb (db_dir=syncdb_dir ,db_file=syncdb_file, path=path, strict=strict) ##
 
 
     base_dir    = os.path.dirname (os.path.realpath(__file__))
@@ -140,45 +143,77 @@ def setting_up():
     return log, app_config, syncdb_instance
 
 
+def parse_args(pargs=None):
+    #
+    # TODO
+    # può essere invocata nella setting_up() dopo la get_config per impostare eventuali default come specificato in configurazione
+    # es. strict
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description=(
+            'Multiple Values and Brackets'
+        )
+    )
+    '''
+    parser.add_argument('--data0', default='../../datas/nvda-1999-2014.txt',
+                        required=False, help='Data0 to read in')
+    '''
+    # Defaults for dates
+    yesterday = dt.datetime.strftime(dt.date.today() - dt.timedelta(days=1),'%Y-%m-%d')
+
+    parser.add_argument('--fromdate', default='2018-01-01', help='Date in YYYY-MM-DD format')
+    parser.add_argument('--todate', default=yesterday, help='Date in YYYY-MM-DD format')
+    parser.add_argument('--strict', default='yes', choices=['yes', 'no'], help='strict can be yes or no')
+
+    '''
+    parser.add_argument('--cerebro', required=False, default='',
+                        metavar='kwargs', help='kwargs in key=value format')
+
+    parser.add_argument('--broker', required=False, default='',
+                        metavar='kwargs', help='kwargs in key=value format')
+
+    parser.add_argument('--sizer', required=False, default='',
+                        metavar='kwargs', help='kwargs in key=value format')
+
+    parser.add_argument('--strat', required=False, default='',
+                        metavar='kwargs', help='kwargs in key=value format')
+
+    parser.add_argument('--plot', required=False, default='',
+                        nargs='?', const='{}',
+                        metavar='kwargs', help='kwargs in key=value format')
+    '''
+    _args   = vars(parser.parse_args())
+    _from   = dt.datetime.strptime(_args['fromdate'], '%Y-%m-%d').date()
+    _to     = dt.datetime.strptime(_args['todate'], '%Y-%m-%d').date()
+    _strict = _args['strict']
+
+    return _from, _to, _strict
+
+
 def main():
 
-    today            = datetime.date.today() 
-    asked_todate     = today - datetime.timedelta(days=1) # se nn specificato in config. TODO
-    asked_todate     = datetime.datetime.strptime('2018-06-01', '%Y-%m-%d').date() ##       TEMP!!!!!!!!!!!!
-    #default_fromdate = '2018-06-01' # da config. # TODO
-    #default_fromdate = datetime.datetime.strptime(default_fromdate, '%Y-%m-%d').date() ##
-    default_fromdate = datetime.datetime.strptime('2018-01-01', '%Y-%m-%d').date() ##
-
+    run_fromdate, run_todate, _strict = parse_args()
+    # TODO attenzione a strict: vale quello letto da config. in setting_up() e passato a syncdb : necessario integrare i run_settings di quant_adapter_layer
     log, app_config, syncdb = setting_up()  
 
-    path            = app_config['DATASOURCE']['path']
-
-    cerebro         = bt.Cerebro(stdstats=False) 
-
     try:
+        cerebro         = bt.Cerebro(stdstats=False) 
+
         strategies, \
         strategy_classes = import_strategies (app_config)
         securities       = load_securities (app_config, syncdb)
         found            = False
 
-        log.info('Analisys period is {} - {}'.format(default_fromdate, asked_todate))
-
-        #print(str(type(asked_todate)) + ' - ' + str(type(default_fromdate)))
+        log.info('Analisys period is {} - {}'.format(run_fromdate, run_todate))
 
         # load_datafeeds(securities)
         #
         for security_id, _struct in securities.items():
-            # attenzione :
-            # l'update del record si può fare sempre dal momento che in generale ci si aspetta che ad ogni invocazione
-            # per lo meno _struct.todate cambi rispetto al valore presente sul record
-            #
-            # TODO : il par. path è un attr. di syncdb .. ?
-            datafile = syncdb.select_security_datafeed(_struct, security_id, default_fromdate, asked_todate, path) 
+            datafile = syncdb.select_security_datafeed (_struct, security_id, run_fromdate, run_todate) 
             if datafile:    
-                data = btfeeds.YahooFinanceCSVData (dataname=datafile,    #+#
-                                                    #fromdate=datetime.datetime.strptime(_fromdate, '%Y-%m-%d'),
-                                                    fromdate=default_fromdate,
-                                                    todate=asked_todate + datetime.timedelta(days=1), 
+                data = btfeeds.YahooFinanceCSVData (dataname=datafile,
+                                                    fromdate=run_fromdate,
+                                                    todate=run_todate + dt.timedelta(days=1), 
                                                     adjclose=False, 
                                                     decimals=5)
 
@@ -195,8 +230,8 @@ def main():
                 cerebro.addstrategy(strategy_classes[strategy_id],
                                     config=app_config, 
                                     name=strategy, 
-                                    fromdate=default_fromdate, 
-                                    todate=asked_todate)
+                                    fromdate=run_fromdate, 
+                                    todate=run_todate)
 
             cerebro.run()
 

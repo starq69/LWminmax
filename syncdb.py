@@ -39,16 +39,16 @@ def get_file_items (path, pattern=None, sort=True, fullnames=True):
 
 class syncdb():
 
-    def __init__(self, db_dir=None, db_file=None, strict=False):
+    def __init__(self, db_dir=None, db_file=None, path=None, strict=False):
 
         self.log = logging.getLogger (__name__)
 
         self.strict = strict
-        self.db_dir = db_dir
 
         if db_dir and db_file: 
             self.db_dir  = db_dir.strip()
             self.db_file = db_file.strip()
+            self.path    = path.strip()
             db_filename  = self.db_dir + self.db_file 
             # http://robyp.x10host.com/sqlite3.html#loaded
             db_is_new    = not os.path.exists(db_filename)
@@ -178,7 +178,7 @@ class syncdb():
         self.log.info('select_file(<{}>'.format(security_id))
 
         FORMAT = '%Y-%m-%d'
-        f = path.strip() + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+        f = self.path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
         self.log.debug('il file cercato è {}'.format(f))
 
         if os.path.isfile(f):
@@ -193,7 +193,7 @@ class syncdb():
         # cerca il/i file del tipo <security_id>.<from>.<to>.csv e verifica la copertura del periodo richiesto
         #
         self.log.debug ('segue get_file_items()')
-        flist = get_file_items (path, security_id+'.'+'*.csv', fullnames=False)
+        flist = get_file_items (self.path, security_id+'.'+'*.csv', fullnames=False)
         self.log.debug(flist)
         for fname in flist:
             _parts = fname.split('.')
@@ -204,20 +204,16 @@ class syncdb():
             if dt_file_fromdate <= fromdate and dt_file_todate >= todate:
                 self.log.info('<{}> cover the asked analisys period'.format(fname))
 
-                if check_datapoints (path.strip()+fname, fromdate, todate):
-                    return path.strip() + fname
-                '''
-                else:
-                    self.log.warning('NO datapoints found on file {}'.format(fname))
-                return path.strip() + fname # TODO sostituire con la if sopra
-                '''
+                if check_datapoints (self.path+fname, fromdate, todate):
+                    return self.path + fname
             else:
                 self.log.warning('<{}> do NOT cover the asked period'.format(fname))
 
         return None
 
 
-    def select_security_datafeed(self, _struct, security_id, fromdate, todate, path):
+    #def select_security_datafeed(self, _struct, security_id, fromdate, todate, path):
+    def select_security_datafeed(self, _struct, security_id, fromdate, todate):
         #
         # in:
         # _struct           : dict or None
@@ -257,12 +253,12 @@ class syncdb():
         if self.strict :
            if _struct is not None:
                # (update)
-               file_cached = self.select_file (security_id, fromdate, todate, path)
+               file_cached = self.select_file (security_id, fromdate, todate) #, path)
                if file_cached:
                    _update(security_id, fromdate, todate) # ..... TODO TEST
                    return file_cached
                else:
-                   datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+                   datafile = self.path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
                    self.log.debug ('SEGUE download sul file <{}>'.format(datafile))
                    if yahoo_csv_download (security_id, fromdate, todate, datafile) != 0:
                        self.log.warning ('FAIL to download data for security {}'.format(security_id))
@@ -290,12 +286,12 @@ class syncdb():
                return None
         else:
             # (upsert)
-            file_cached = self.select_file(security_id, fromdate, todate, path)
+            file_cached = self.select_file(security_id, fromdate, todate) #, path)
             if file_cached:
                 _upsert(security_id, fromdate, todate)
                 return file_cached
             else:
-                datafile = path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+                datafile = self.path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
                 self.log.debug('DOWNLOAD on <{}>'.format(datafile))
                 if yahoo_csv_download(security_id, fromdate, todate, datafile) != 0:
                     self.log.warning('FAIL to download data for security {}'.format(security_id)) # ex DownloadFailException
