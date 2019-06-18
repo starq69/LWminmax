@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import os, sys, re
+import logging, logging.config, configparser
 import argparse
 import datetime as dt
 import subprocess
 from loader import load_module
-import logging, logging.config, configparser
 import backtrader as bt
 import backtrader.feeds as btfeeds
 from syncdb import syncdb
+from settings import * 
 
 
 class NoStrategyFound(Exception):
@@ -18,6 +19,22 @@ class NoStrategyFound(Exception):
 
 class NoSecurityFound(Exception):
     pass
+
+
+def as_dict(config):
+    """
+    https://stackoverflow.com/questions/1773793/convert-configparser-items-to-dictionary/23944270#23944270
+    Converts a ConfigParser object into a dictionary.
+
+    The resulting dictionary has sections as keys which point to a dict of the
+    sections options as key => value pairs.
+    """
+    the_dict = {}
+    for section in config.sections():
+        the_dict[section] = {}
+        for key, val in config.items(section):
+            the_dict[section][key] = val
+    return the_dict
 
 
 def remove_postfix(s):
@@ -193,8 +210,21 @@ def parse_args(pargs=None):
 def main():
 
     run_fromdate, run_todate, _strict = parse_args()
-    # TODO attenzione a strict: vale quello letto da config. in setting_up() e passato a syncdb : necessario integrare i run_settings di quant_adapter_layer
+    # TODO attenzione a strict: vale quello letto da config. in setting_up() e passato a syncdb...
     log, app_config, syncdb = setting_up()  
+
+    ## DEVEL : INTEGRAZIONE MODULO SETTINGS.py
+    print('APP CONFIG : ')
+    print(app_config)
+
+    #hyp
+    #log, run_settings, syncdb = setting_up()
+    run_settings = override_defaults([app_config])
+
+    print('RUN SETTINGS : ')
+    print(run_settings)
+    #sys.exit(1)
+
 
     try:
         cerebro         = bt.Cerebro(stdstats=False) 
