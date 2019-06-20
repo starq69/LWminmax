@@ -49,6 +49,8 @@ class S_Datapoint_Analisys(bt.Strategy):
         else:
             self.log.error('Invalid todate par. to strategy {}'.format(self.name))
 
+        # TODO
+        # dopo l'introduzione dei settings/conventions config qui ora è un dict
         if config is not None and isinstance(config, configparser.ConfigParser):
             try:
                 configured_indicators = [_ind.strip() for _ind in config.get('STRATEGIES', name).split(',') if len(_ind)]
@@ -61,7 +63,7 @@ class S_Datapoint_Analisys(bt.Strategy):
             except configparser.NoOptionError as e:
                 self.log.error('Missing option "parquet" in section "STORAGE" : fix it in order to save indicators result') 
                 self.parquet_storage = None
-                #self.parquet_storage = '/home/starq/tmp/backtrader_output/parquet/' # TODO rimpiazzare questo default...
+                # raise ?
 
         else:
             print('invalid **kwarg params passed to <' + repr(self.__class__) + '> instance')

@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: iso-8859-15 -*-
 
-import sys, logging
+import sys, logging, argparse, datetime as dt
 from configparser import ConfigParser as ConfigParser
 
 __all__ = ['app', 'override_defaults', 'defaults']
+          # '_configparser_as_dict_']
+
+yesterday = dt.datetime.strftime(dt.date.today() - dt.timedelta(days=1),'%Y-%m-%d')
 
 ''' sections (uppercase)
 '''
+_INTERNALS_         = 'INTERNALS'
 _OPTIONS_           = 'OPTIONS'
 _STORAGE_           = 'STORAGE'
 _STRATEGIES_        = 'STRATEGIES'
@@ -16,20 +20,23 @@ _SECURITIES_        = 'SECURITIES'
 
 '''options (lowercase)
 '''
+_configparser_as_dict_  = 'configparser_as_dict'
 _strict_            = 'strict'
 _syncdb_            = 'syncdb'
 _parquet_           = 'parquet'
 _yahoo_csv_data_    = 'yahoo_csv_data'
 _securities_        = 'securities'
 _fromdate_          = 'fromdate'
+_todate_            = 'todate'
 
 ''' sections/options composition
 '''
+_KV_INTERNALS_      = {_configparser_as_dict_ : 'yes'}
 _KV_OPTIONS_        = {_strict_ : 'yes'}
 _KV_STORAGE_        = {_syncdb_ : None, _parquet_ : None, _yahoo_csv_data_ : None}
 _KV_STRATEGIES_     = dict()
 _KV_DATAFEEDS_      = {_securities_  : list()}
-_KV_SECURITIES_     = {_fromdate_ : '2010-12-31'}
+_KV_SECURITIES_     = {_fromdate_ : '2010-12-31', _todate_ : yesterday} 
 
 '''sections che possono definire opzioni arbitrarie
 '''
@@ -40,6 +47,7 @@ no_strict_section = (
 '''DEFAULT SETTINGS
 '''
 defaults = {
+        _INTERNALS_      : _KV_INTERNALS_,
         _OPTIONS_        : _KV_OPTIONS_,
         _STORAGE_        : _KV_STORAGE_,
         _STRATEGIES_     : _KV_STRATEGIES_,
@@ -65,6 +73,22 @@ DEFAULTS = MappingProxyType(default_config)
 def foo(config=DEFAULTS):
     ...
 '''
+
+def args_parser(pargs=None):
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description=(
+            'Multiple Values and Brackets'
+        )
+    )
+    # TODO
+    # mi servono i defaults ?
+    parser.add_argument('--fromdate', default='2018-01-02', help='Date in YYYY-MM-DD format')
+    parser.add_argument('--todate', default=yesterday, help='Date in YYYY-MM-DD format')
+    parser.add_argument('--strict', default='yes', choices=['yes', 'no'], help='strict can be yes or no')
+
+    return parser.parse_args()
+
 
 def merge_settings (defaults, configured, debug=False): 
     '''
@@ -101,7 +125,6 @@ def merge_settings (defaults, configured, debug=False):
     except Exception as e:
                 log.error('merge_policy exception : {}'.format(e))
                 run_settings = None
-                #raise
 
     if debug:
         log.debug('merged configuration :')
@@ -112,11 +135,29 @@ def merge_settings (defaults, configured, debug=False):
     return run_settings
 
 
-def getlist(option, sep=',', chars=None):
-    '''
-    Return a list from a ConfigParser option. By default,
-    split on a comma and strip whitespaces.
+def merge_arguments(defaults, args):
 
+    log = logging.getLogger(__name__)
+    #print('ARGS : <{}>'.format(args))
+    if type(defaults) is dict:
+        keys        = []
+        sections    = {}
+        for section, options in defaults.items():
+            keys += [*options]
+            for option in options:
+                sections[option] = section
+
+        for karg, arg in args.items():
+            if karg in keys:
+                #print('KEY ARGUMENT : <{}> dovrà essere sovrascritto'.format(karg))
+                defaults[sections[karg]][karg] = arg
+            else:
+                log.warning('UNKNOW Argument <{}>'.format(karg))
+
+
+def getlist(option, sep=',', chars=None):
+    '''Return a list from a ConfigParser option. By default,
+    split on a comma and strip whitespaces.
     Return a stripped string if sep is not found in option.
     '''
     if option.find(sep) >= 0:
@@ -136,29 +177,31 @@ def parse_items(options):
     return _dict
 
 
-#def overriden_by(modifiers):
-def override_defaults(modifiers):
+def override_defaults(modifiers):   # ex overriden_by()
 
-    run_settings = dict()
+    run_settings = None
     passed       = False
 
     if type(modifiers) is list:
         for modifier in modifiers:
-            if type(modifier) is ConfigParser:
-                # https://stackoverflow.com/questions/1773793/convert-configparser-items-to-dictionary
-                # config_parser_dict = { s : dict(modifier.items(s)) for s in modifier.sections() }
-                # modifier.items(s) ==> lista di tuple : contiene una tupla per ogni option : ('option', 'value')
-                # es.: [('syncdb', '/path/to/local_storage/'), ('parquet', '/path/to/parquet/'), ('yahoo_csv_data', '/path/to/yahoo_csv_cache/')]
-
-                configured = { s : parse_items(modifier.items(s)) for s in modifier.sections() }
-                print('configparser dictionary :')
-                print(configured)
-                print('...segue merge configurazione')
-                run_settings = merge_settings(defaults, configured, debug=True)
+            _type = type(modifier)
+            if _type is ConfigParser:
+                ''' https://stackoverflow.com/questions/1773793/convert-configparser-items-to-dictionary
+                config_parser_dict = { s : dict(modifier.items(s)) for s in modifier.sections() }
+                modifier.items(s) ==> lista di tuple : contiene una tupla per ogni option : ('option', 'value')
+                es.: [('syncdb', '/path/to/local_storage/'), ('parquet', '/path/to/parquet/'), ('yahoo_csv_data', '/path/to/yahoo_csv_cache/')]
+                '''
+                configured      = { s : parse_items(modifier.items(s)) for s in modifier.sections() }
+                run_settings    = merge_settings (defaults, configured) #, debug=True)
                 if run_settings:
                     passed = True
+            elif _type is argparse.Namespace:
+                if run_settings:
+                    configured = merge_arguments(run_settings, vars(modifier))
+                else:
+                    configured = merge_arguments(defaults, vars(modifier))
             else:
-                print(str(type(modifier)) + ' is not a configparser')
+                log.error('invalid param passed to override_defaults()')
     else:
         log.warning('overriden_by() params is NOT valid : use defaults')
         run_settings = defaults

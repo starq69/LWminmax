@@ -29,12 +29,12 @@ def as_dict(config):
     The resulting dictionary has sections as keys which point to a dict of the
     sections options as key => value pairs.
     """
-    the_dict = {}
+    _dict = {}
     for section in config.sections():
-        the_dict[section] = {}
+        _dict[section] = {}
         for key, val in config.items(section):
-            the_dict[section][key] = val
-    return the_dict
+            _dict[section][key] = val
+    return _dict
 
 
 def remove_postfix(s):
@@ -52,7 +52,9 @@ def import_strategies(app_config):
     strategy_classes = dict()
 
     try:
-        strategies = [ss for ss in app_config.options('STRATEGIES') if len(ss)]
+        # TODO
+        #strategies = [ss for ss in app_config.options('STRATEGIES') if len(ss)] # OLD
+        strategies = [ss for ss in app_config['STRATEGIES'].keys() if len(ss)]   # NEW
     except configparser.Error as e:
         raise e
 
@@ -78,7 +80,9 @@ def import_strategies(app_config):
 def load_securities(app_config, syncdb):
 
     try:
-        securities = [ss.strip() for ss in app_config.get('DATAFEEDS', 'securities').split(',') if len(ss)]
+        # TODO
+        #securities = [ss.strip() for ss in app_config.get('DATAFEEDS', 'securities').split(',') if len(ss)]
+        securities = [ss.strip() for ss in app_config['DATAFEEDS']['securities'] if len(ss)]
     except configparser.NoOptionError as e:
         raise e # TODO TESTARE
     if not len(securities):
@@ -127,7 +131,17 @@ def setting_up():
         except Exception as e:
             log.error('EXCEPTION during parsing configuration : <{}>'.format (e))
             sys.exit(1) 
-        return app_config
+
+        # TODO
+        '''
+        if _configparser_as_dict_ : 
+            run_settings = override_defaults([app_config, args_parser()])
+            return run_settings
+
+        return app_config   # ConfigParser
+        '''
+        return override_defaults([app_config, args_parser()])
+
 
     def get_syncdb (app_config):
         #
@@ -137,8 +151,18 @@ def setting_up():
         # concatenare ev. version nel nome file db
         #
         try:
-            syncdb_dir  = app_config.get('STORAGE', 'syncdb')
-            path        = app_config.get('STORAGE','yahoo_csv_data')
+            # TODO
+            '''
+            if _configparser_as_dict_:
+                syncdb_dir  = app_config['STORAGE']['syncdb']
+                path        = app_config['STORAGE']['yahoo_csv_data']
+            else:
+                syncdb_dir  = app_config.get('STORAGE', 'syncdb')
+                path        = app_config.get('STORAGE','yahoo_csv_data')
+            '''
+            syncdb_dir  = app_config['STORAGE']['syncdb']
+            path        = app_config['STORAGE']['yahoo_csv_data']
+
         except Exception as e:
             syncdb_dir  = parent_dir + '/local_storage/'
 
@@ -159,7 +183,24 @@ def setting_up():
 
     return log, app_config, syncdb_instance
 
+# NEW
+def args_parser(pargs=None):
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description=(
+            'Multiple Values and Brackets'
+        )
+    )
+    # Defaults for dates
+    yesterday = dt.datetime.strftime(dt.date.today() - dt.timedelta(days=1),'%Y-%m-%d')
 
+    parser.add_argument('--fromdate', default='2018-01-02', help='Date in YYYY-MM-DD format')
+    parser.add_argument('--todate', default=yesterday, help='Date in YYYY-MM-DD format')
+    parser.add_argument('--strict', default='yes', choices=['yes', 'no'], help='strict can be yes or no')
+
+    return parser.parse_args()
+
+#OLD
 def parse_args(pargs=None):
     #
     # TODO
@@ -211,20 +252,16 @@ def main():
 
     run_fromdate, run_todate, _strict = parse_args()
     # TODO attenzione a strict: vale quello letto da config. in setting_up() e passato a syncdb...
+    
     log, app_config, syncdb = setting_up()  
 
     ## DEVEL : INTEGRAZIONE MODULO SETTINGS.py
-    print('APP CONFIG : ')
+    print('APP CONFIG ({}): '.format(type(app_config)))
     print(app_config)
 
     #hyp
     #log, run_settings, syncdb = setting_up()
-    run_settings = override_defaults([app_config])
-
-    print('RUN SETTINGS : ')
-    print(run_settings)
     #sys.exit(1)
-
 
     try:
         cerebro         = bt.Cerebro(stdstats=False) 
