@@ -3,7 +3,7 @@
 
 import os, sys, re
 import logging, logging.config, configparser
-import argparse
+#import argparse
 import datetime as dt
 import subprocess
 from loader import load_module
@@ -96,13 +96,28 @@ def load_securities(app_config, syncdb):
 def setting_up():
 
     def strict_mode (app_config):
+        '''
         try:
             strict_mode = app_config.getboolean('OPTIONS', 'strict')
             log.info('strict mode is {}'.format(strict_mode))
             return strict_mode
+
         except Exception as e:
             log.warning('invalid strict mode specified : {} Now is set to False'.format(e))
             return False 
+        '''
+        _strict = app_config['OPTIONS']['strict'].strip().lower()
+        if _strict in ['1', 'yes', 'true', 'on']:
+            return True
+        elif _strict in ['0', 'no', 'false', 'off'] :
+            return False
+        else:
+            log.warning('invalid strict mode specified : <{}> Now is set to False'.format(_strict))
+            return False 
+
+
+
+
 
     def get_log (cfg_log):
         try:
@@ -183,8 +198,8 @@ def setting_up():
 
     return log, app_config, syncdb_instance
 
-# NEW
-def args_parser(pargs=None):
+'''
+#def args_parser(pargs=None):
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         description=(
@@ -199,7 +214,7 @@ def args_parser(pargs=None):
     parser.add_argument('--strict', default='yes', choices=['yes', 'no'], help='strict can be yes or no')
 
     return parser.parse_args()
-
+'''
 #OLD
 def parse_args(pargs=None):
     #
@@ -250,18 +265,19 @@ def parse_args(pargs=None):
 
 def main():
 
-    run_fromdate, run_todate, _strict = parse_args()
+    #run_fromdate, run_todate, _strict = parse_args()
     # TODO attenzione a strict: vale quello letto da config. in setting_up() e passato a syncdb...
     
     log, app_config, syncdb = setting_up()  
+    run_fromdate    = dt.datetime.strptime(app_config['SECURITIES']['fromdate'], '%Y-%m-%d').date()
+    run_todate      = dt.datetime.strptime(app_config['SECURITIES']['todate'], '%Y-%m-%d').date()
+    _strict         = app_config['OPTIONS']['strict']
 
     ## DEVEL : INTEGRAZIONE MODULO SETTINGS.py
     print('APP CONFIG ({}): '.format(type(app_config)))
     print(app_config)
-
     #hyp
     #log, run_settings, syncdb = setting_up()
-    #sys.exit(1)
 
     try:
         cerebro         = bt.Cerebro(stdstats=False) 

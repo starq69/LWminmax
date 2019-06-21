@@ -4,7 +4,7 @@
 import sys, logging, argparse, datetime as dt
 from configparser import ConfigParser as ConfigParser
 
-__all__ = ['app', 'override_defaults', 'defaults']
+__all__ = ['app', 'override_defaults', 'defaults', 'args_parser']
           # '_configparser_as_dict_']
 
 yesterday = dt.datetime.strftime(dt.date.today() - dt.timedelta(days=1),'%Y-%m-%d')
@@ -85,7 +85,7 @@ def args_parser(pargs=None):
     # mi servono i defaults ?
     parser.add_argument('--fromdate', default='2018-01-02', help='Date in YYYY-MM-DD format')
     parser.add_argument('--todate', default=yesterday, help='Date in YYYY-MM-DD format')
-    parser.add_argument('--strict', default='yes', choices=['yes', 'no'], help='strict can be yes or no')
+    parser.add_argument('--strict', default='yes', choices=['yes', 'no', '1', '0', 'true', 'false', 'on', 'off'], help='strict can be yes/1/true/on or no/0/false/off')
 
     return parser.parse_args()
 
