@@ -52,12 +52,9 @@ def import_strategies(app_config):
     strategy_classes = dict()
 
     try:
-        # TODO
-        #strategies = [ss for ss in app_config.options('STRATEGIES') if len(ss)] # OLD
-        strategies = [ss for ss in app_config['STRATEGIES'].keys() if len(ss)]   # NEW
+        strategies = [ss for ss in app_config['STRATEGIES'].keys() if len(ss)]
     except configparser.Error as e:
         raise e
-
     else:
         if not strategies:
             raise NoStrategyFound('No strategy found on configuration, pls specify at list one in section STRATEGIES')
@@ -78,7 +75,7 @@ def import_strategies(app_config):
 
 
 def load_securities(app_config, syncdb):
-
+    '''
     try:
         # TODO
         #securities = [ss.strip() for ss in app_config.get('DATAFEEDS', 'securities').split(',') if len(ss)]
@@ -87,37 +84,15 @@ def load_securities(app_config, syncdb):
         raise e # TODO TESTARE
     if not len(securities):
         raise NoSecurityFound('Empty security list found on configuration!')
+    '''
+    securities = [ss.strip() for ss in app_config['DATAFEEDS']['securities'] if len(ss)]
+    if not len(securities):
+        raise NoSecurityFound('Empty security list found on configuration!')
 
-    # select from syncdb.securities
-    #
     return syncdb.load_securities (securities) 
 
 
 def setting_up():
-
-    def strict_mode (app_config):
-        '''
-        try:
-            strict_mode = app_config.getboolean('OPTIONS', 'strict')
-            log.info('strict mode is {}'.format(strict_mode))
-            return strict_mode
-
-        except Exception as e:
-            log.warning('invalid strict mode specified : {} Now is set to False'.format(e))
-            return False 
-        '''
-        _strict = app_config['OPTIONS']['strict'].strip().lower()
-        if _strict in ['1', 'yes', 'true', 'on']:
-            return True
-        elif _strict in ['0', 'no', 'false', 'off'] :
-            return False
-        else:
-            log.warning('invalid strict mode specified : <{}> Now is set to False'.format(_strict))
-            return False 
-
-
-
-
 
     def get_log (cfg_log):
         try:
@@ -129,98 +104,74 @@ def setting_up():
         except (configparser.DuplicateOptionError, Exception) as e:
             print('EXCEPTION during logging setup : {}'.format(e))      # TODO
             sys.exit(1)
+        else:
+            log.info('*** BEGIN SESSION ***')
         return log
+
 
     def get_config (cfg_file):
         try:
             app_config = configparser.ConfigParser() #allow_no_value=True)
-            app_config.optionxform = str    # non converte i nomi opzione in lowercase (https://docs.python.org/2/library/configparser.html#ConfigParser.RawConfigParser.optionxform)
+            app_config.optionxform = str # non converte i nomi opzione in lowercase
+
             if not app_config.read (cfg_file):
-                log.exception('MISSING app configuration file <{}> : ABORT....'.format(cfg_file))
-                sys.exit(1)
-            log.info('*** BEGIN SESSION ***')
-            log.info('configuration file <{}> LOADED'.format(cfg_file))
+                log.error('MISSING configuration file <{}>'.format(cfg_file))
+                log.info('Use default settings')
+            else:
+                log.info('configuration file <{}> LOADED'.format(cfg_file))
         except configparser.Error as e:
             log.error('ERROR during parsing configuration : <{}>'.format (e))
-            sys.exit(1) 
+            log.info('UNABLE to load configuration file : we use default settings')
         except Exception as e:
             log.error('EXCEPTION during parsing configuration : <{}>'.format (e))
-            sys.exit(1) 
+            log.info('UNABLE to load configuration file : we use default settings')
 
-        # TODO
-        '''
-        if _configparser_as_dict_ : 
-            run_settings = override_defaults([app_config, args_parser()])
-            return run_settings
-
-        return app_config   # ConfigParser
-        '''
         return override_defaults([app_config, args_parser()])
 
 
     def get_syncdb (app_config):
-        #
-        # TODO
-        # passiamo tutti i parametri di config. relativi a syncdb (non solo strict)
-        # TODO 
-        # concatenare ev. version nel nome file db
-        #
-        try:
-            # TODO
-            '''
-            if _configparser_as_dict_:
-                syncdb_dir  = app_config['STORAGE']['syncdb']
-                path        = app_config['STORAGE']['yahoo_csv_data']
-            else:
-                syncdb_dir  = app_config.get('STORAGE', 'syncdb')
-                path        = app_config.get('STORAGE','yahoo_csv_data')
-            '''
-            syncdb_dir  = app_config['STORAGE']['syncdb']
-            path        = app_config['STORAGE']['yahoo_csv_data']
-
-        except Exception as e:
-            syncdb_dir  = parent_dir + '/local_storage/'
-
+        # TODO passare tutti i parametri di config. relativi a syncdb (non solo strict) e concatenare ev. version nel nome file db
+        syncdb_dir  = app_config['STORAGE']['syncdb']
+        path        = app_config['STORAGE']['yahoo_csv_data']
+        if not syncdb_dir : syncdb_dir  = parent_dir + '/local_storage/'
+        if not path       : path = parent_dir
         syncdb_file = 'syncdb_test.db' # TODO
-
-        strict = strict_mode(app_config)
-        return syncdb (db_dir=syncdb_dir ,db_file=syncdb_file, path=path, strict=strict) ##
+        return syncdb (db_dir=syncdb_dir ,db_file=syncdb_file, path=path, strict=strict_mode(app_config))
 
 
-    base_dir    = os.path.dirname (os.path.realpath(__file__))
-    parent_dir  = os.path.split (base_dir)[0]
-    cfg_file    = parent_dir + '/app.ini'
-    cfg_log     = parent_dir + '/log.ini'
+    def strict_mode (app_config):
+        _strict = app_config['OPTIONS']['strict'].strip().lower() # strip() non necessario ?
+        if _strict in ['1', 'yes', 'true', 'on']:
+            return True
+        elif _strict in ['0', 'no', 'false', 'off'] :
+            return False
+        else: # ridondante ?
+            log.warning('invalid strict mode : <{}> Now is set to False'.format(_strict))
+            return False 
+
+
+    args = vars(args_parser())
+
+    if _log_settings_file_ in args:
+        cfg_log = args[_log_settings_file_]
+    else:
+        cfg_log = _log_settings_file_name_
+
+    if _ini_settings_file_ in args:
+        cfg_file = args[_ini_settings_file_]
+    else:
+        cfg_file = _ini_settings_file_name_
 
     log             = get_log (cfg_log)
     app_config      = get_config (cfg_file)
     syncdb_instance = get_syncdb (app_config)
+    run_fromdate    = dt.datetime.strptime(app_config['SECURITIES']['fromdate'], '%Y-%m-%d').date() # TODO
+    run_todate      = dt.datetime.strptime(app_config['SECURITIES']['todate'], '%Y-%m-%d').date()   # TODO
 
-    return log, app_config, syncdb_instance
+    return log, app_config, syncdb_instance, run_fromdate, run_todate
 
-'''
-#def args_parser(pargs=None):
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        description=(
-            'Multiple Values and Brackets'
-        )
-    )
-    # Defaults for dates
-    yesterday = dt.datetime.strftime(dt.date.today() - dt.timedelta(days=1),'%Y-%m-%d')
-
-    parser.add_argument('--fromdate', default='2018-01-02', help='Date in YYYY-MM-DD format')
-    parser.add_argument('--todate', default=yesterday, help='Date in YYYY-MM-DD format')
-    parser.add_argument('--strict', default='yes', choices=['yes', 'no'], help='strict can be yes or no')
-
-    return parser.parse_args()
-'''
 #OLD
 def parse_args(pargs=None):
-    #
-    # TODO
-    # può essere invocata nella setting_up() dopo la get_config per impostare eventuali default come specificato in configurazione
-    # es. strict
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         description=(
@@ -265,19 +216,8 @@ def parse_args(pargs=None):
 
 def main():
 
-    #run_fromdate, run_todate, _strict = parse_args()
-    # TODO attenzione a strict: vale quello letto da config. in setting_up() e passato a syncdb...
-    
-    log, app_config, syncdb = setting_up()  
-    run_fromdate    = dt.datetime.strptime(app_config['SECURITIES']['fromdate'], '%Y-%m-%d').date()
-    run_todate      = dt.datetime.strptime(app_config['SECURITIES']['todate'], '%Y-%m-%d').date()
-    _strict         = app_config['OPTIONS']['strict']
-
-    ## DEVEL : INTEGRAZIONE MODULO SETTINGS.py
-    print('APP CONFIG ({}): '.format(type(app_config)))
+    log, app_config, syncdb, run_fromdate, run_todate  = setting_up()  
     print(app_config)
-    #hyp
-    #log, run_settings, syncdb = setting_up()
 
     try:
         cerebro         = bt.Cerebro(stdstats=False) 
