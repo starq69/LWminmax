@@ -4,8 +4,7 @@
 import os, sys, logging, argparse, datetime as dt
 from configparser import ConfigParser as ConfigParser
 
-__all__ = ['app', 'override_defaults', 'defaults', 'args_parser', '_ini_settings_file_', '_log_settings_file_', '_ini_settings_file_name_', '_log_settings_file_name_']
-          # '_configparser_as_dict_']
+__all__ = ['app', 'override_defaults', 'defaults', 'args_parser', '_ini_settings_file_', '_log_settings_file_', '_default_ini_settings_file_', '_default_log_settings_file_']
 
 yesterday = dt.datetime.strftime(dt.date.today() - dt.timedelta(days=1),'%Y-%m-%d')
 
@@ -38,7 +37,7 @@ parent_dir  = os.path.split (base_dir)[0]
 
 _KV_INTERNALS_      = {_configparser_as_dict_ : 'yes', _ini_settings_file_ : parent_dir + '/app.ini', _log_settings_file_ : parent_dir + '/log.ini'}
 _KV_OPTIONS_        = {_strict_ : 'yes'}
-_KV_STORAGE_        = {_syncdb_ : None, _parquet_ : None, _yahoo_csv_data_ : None}
+_KV_STORAGE_        = {_syncdb_ : None, _parquet_ : None, _yahoo_csv_data_ : None}  #TODO : assegnare defaults!
 _KV_STRATEGIES_     = dict()
 _KV_DATAFEEDS_      = {_securities_  : list()}
 _KV_SECURITIES_     = {_fromdate_ : '2017-12-31', _todate_ : yesterday} 
@@ -62,10 +61,10 @@ defaults = {
 
 ''' app config sections
 '''
-app = frozenset(defaults.keys())    #TODO
+app = frozenset(defaults.keys())
 
-_ini_settings_file_name_   = defaults[_INTERNALS_][_ini_settings_file_]
-_log_settings_file_name_   = defaults[_INTERNALS_][_log_settings_file_]
+_default_ini_settings_file_   = defaults[_INTERNALS_][_ini_settings_file_]
+_default_log_settings_file_   = defaults[_INTERNALS_][_log_settings_file_]
 ''' 
 https://stackoverflow.com/questions/39440190/a-workaround-for-pythons-missing-frozen-dict-type
 
@@ -88,11 +87,9 @@ def args_parser(pargs=None):
             'Multiple Values and Brackets'
         )
     )
-    # TODO
-    # mi servono i defaults ?
+    '''https://stackoverflow.com/questions/30487767/check-if-argparse-optional-argument-is-set-or-not'''
     parser.add_argument('--fromdate', default=argparse.SUPPRESS, help='Date in YYYY-MM-DD format')
     parser.add_argument('--todate', default=yesterday, help='Date in YYYY-MM-DD format')
-    '''https://stackoverflow.com/questions/30487767/check-if-argparse-optional-argument-is-set-or-not'''
     parser.add_argument('--strict', default=argparse.SUPPRESS, choices=['yes', 'no', '1', '0', 'true', 'false', 'on', 'off'], help='strict can be yes/1/true/on or no/0/false/off')
     parser.add_argument('--globalconfig', default=argparse.SUPPRESS)
     parser.add_argument('--logconfig', default=argparse.SUPPRESS)

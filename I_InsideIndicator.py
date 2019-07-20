@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import logging, sys
 import backtrader as bt
 import backtrader.indicators as btind
 import pandas as pd
@@ -18,6 +19,8 @@ class InsideIndicator(bt.Indicator):
 
     def __init__(self, strategy=None):
 
+        self.log        = logging.getLogger (__name__)
+
         if strategy is not None and isinstance(strategy, bt.Strategy):
             self.strategy = strategy
         else:
@@ -32,6 +35,7 @@ class InsideIndicator(bt.Indicator):
         '''
         invocata nella next() sull'ultimo datapoint
         '''
+
         pdf = pd.DataFrame() 
         _len = len(self.data)
 
@@ -48,6 +52,8 @@ class InsideIndicator(bt.Indicator):
 
     def next(self):
 
+        msg = ''
+
         inside_high       = self.data.high[0] <= self.data.high[- int(self.i)] ### <
         inside_low        = self.data.low[0]  >= self.data.low[- int(self.i)]  ### >
 
@@ -62,6 +68,10 @@ class InsideIndicator(bt.Indicator):
         #
         if len(self.data) == self.data.buflen():
             self.report_dataframe()     ###
+            msg += 'LAST'
+
+            # qui debug solo x last datapoint
+            self.log.debug(self.data.datetime.datetime().strftime('%d-%m-%Y')+ ' - ' + self.data._name + ' - ' + msg)
 
 
 class New_InsideIndicator(bt.Indicator):

@@ -3,8 +3,8 @@
 
 import os, sys, re
 import logging, logging.config, configparser
-#import argparse
 import datetime as dt
+from collections import OrderedDict
 import subprocess
 from loader import load_module
 import backtrader as bt
@@ -37,54 +37,48 @@ def as_dict(config):
     return _dict
 
 
-def remove_postfix(s):
-    try:
-        _id = re.match(r"(.*)_\d+$", s).group(1)
-    except AttributeError as e:
-        _id = s
-    return _id
-
-
 def import_strategies(app_config):
+
+    def remove_postfix(s):
+        try:
+            _id = re.match(r"(.*)_\d+$", s).group(1)
+        except AttributeError as e:
+            _id = s
+        return _id
 
     log = logging.getLogger (__name__)
     strategy_modules = dict()
-    strategy_classes = dict()
+    strategy_classes = OrderedDict()
+
 
     try:
-        strategies = [ss for ss in app_config['STRATEGIES'].keys() if len(ss)]
+        strategy_labels = [ss for ss in app_config['STRATEGIES'].keys() if len(ss)]
     except configparser.Error as e:
         raise e
     else:
-        if not strategies:
+        if not strategy_labels:
             raise NoStrategyFound('No strategy found on configuration, pls specify at list one in section STRATEGIES')
         else:
-            for strategy in strategies:
-                strategy_id = remove_postfix(strategy)
+            for strategy_label in strategy_labels:
+                strategy_id = remove_postfix(strategy_label)
                 try:
                     if strategy_id not in strategy_modules:
                         strategy_modules[strategy_id] = load_module(strategy_id) 
-                        strategy_classes[strategy_id] = strategy_modules[strategy_id].get_strategy_class()
-                        log.debug('module {} for strategy <{}> succesfully added to cerebro'.format(str(strategy_modules[strategy_id]),strategy))
+                        log.debug('module {} for strategy <{}> succesfully added to cerebro'.format(str(strategy_modules[strategy_id]),strategy_label))
                     else:
                         # TODO TEST : strategy_classes che valore ha qui ?
-                        log.debug('module {} for strategy <{}> already loaded'.format(str(strategy_modules[strategy_id]),strategy))
+                        log.debug('module {} for strategy <{}> already loaded'.format(str(strategy_modules[strategy_id]),strategy_label))
+                    
+                    strategy_classes[strategy_label] = strategy_modules[strategy_id].get_strategy_class()
+
                 except Exception as e:
                     raise e
-    return strategies, strategy_classes
+
+    return strategy_classes
 
 
 def load_securities(app_config, syncdb):
-    '''
-    try:
-        # TODO
-        #securities = [ss.strip() for ss in app_config.get('DATAFEEDS', 'securities').split(',') if len(ss)]
-        securities = [ss.strip() for ss in app_config['DATAFEEDS']['securities'] if len(ss)]
-    except configparser.NoOptionError as e:
-        raise e # TODO TESTARE
-    if not len(securities):
-        raise NoSecurityFound('Empty security list found on configuration!')
-    '''
+
     securities = [ss.strip() for ss in app_config['DATAFEEDS']['securities'] if len(ss)]
     if not len(securities):
         raise NoSecurityFound('Empty security list found on configuration!')
@@ -120,11 +114,11 @@ def setting_up():
             else:
                 log.info('configuration file <{}> LOADED'.format(cfg_file))
         except configparser.Error as e:
-            log.error('ERROR during parsing configuration : <{}>'.format (e))
-            log.info('UNABLE to load configuration file : we use default settings')
+            log.error('during parsing configuration file : <{}>'.format (e))
+            raise e
         except Exception as e:
             log.error('EXCEPTION during parsing configuration : <{}>'.format (e))
-            log.info('UNABLE to load configuration file : we use default settings')
+            raise e
 
         return override_defaults([app_config, args_parser()])
 
@@ -155,12 +149,12 @@ def setting_up():
     if _log_settings_file_ in args:
         cfg_log = args[_log_settings_file_]
     else:
-        cfg_log = _log_settings_file_name_
+        cfg_log = _default_log_settings_file_
 
     if _ini_settings_file_ in args:
         cfg_file = args[_ini_settings_file_]
     else:
-        cfg_file = _ini_settings_file_name_
+        cfg_file = _default_ini_settings_file_
 
     log             = get_log (cfg_log)
     app_config      = get_config (cfg_file)
@@ -170,59 +164,14 @@ def setting_up():
 
     return log, app_config, syncdb_instance, run_fromdate, run_todate
 
-#OLD
-def parse_args(pargs=None):
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        description=(
-            'Multiple Values and Brackets'
-        )
-    )
-    '''
-    parser.add_argument('--data0', default='../../datas/nvda-1999-2014.txt',
-                        required=False, help='Data0 to read in')
-    '''
-    # Defaults for dates
-    yesterday = dt.datetime.strftime(dt.date.today() - dt.timedelta(days=1),'%Y-%m-%d')
-
-    parser.add_argument('--fromdate', default='2018-01-01', help='Date in YYYY-MM-DD format')
-    parser.add_argument('--todate', default=yesterday, help='Date in YYYY-MM-DD format')
-    parser.add_argument('--strict', default='yes', choices=['yes', 'no'], help='strict can be yes or no')
-
-    '''
-    parser.add_argument('--cerebro', required=False, default='',
-                        metavar='kwargs', help='kwargs in key=value format')
-
-    parser.add_argument('--broker', required=False, default='',
-                        metavar='kwargs', help='kwargs in key=value format')
-
-    parser.add_argument('--sizer', required=False, default='',
-                        metavar='kwargs', help='kwargs in key=value format')
-
-    parser.add_argument('--strat', required=False, default='',
-                        metavar='kwargs', help='kwargs in key=value format')
-
-    parser.add_argument('--plot', required=False, default='',
-                        nargs='?', const='{}',
-                        metavar='kwargs', help='kwargs in key=value format')
-    '''
-    _args   = vars(parser.parse_args())
-    _from   = dt.datetime.strptime(_args['fromdate'], '%Y-%m-%d').date()
-    _to     = dt.datetime.strptime(_args['todate'], '%Y-%m-%d').date()
-    _strict = _args['strict']
-
-    return _from, _to, _strict
-
 
 def main():
 
     log, app_config, syncdb, run_fromdate, run_todate  = setting_up()  
-    print(app_config)
 
     try:
         cerebro         = bt.Cerebro(stdstats=False) 
 
-        strategies, \
         strategy_classes = import_strategies (app_config)
         securities       = load_securities (app_config, syncdb)
         found            = False
@@ -247,17 +196,15 @@ def main():
         if found: 
             #cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
             cerebro.broker.setcash(10000.0)
-            
-            for strategy in strategies:
-                strategy_id = remove_postfix(strategy)
-                cerebro.addstrategy(strategy_classes[strategy_id],
+
+            for strategy_label in strategy_classes:
+                cerebro.addstrategy(strategy_classes[strategy_label],
                                     config=app_config, 
-                                    name=strategy, 
+                                    name=strategy_label, 
                                     fromdate=run_fromdate, 
                                     todate=run_todate)
 
             cerebro.run()
-
             #cerebro.plot(style='candlestick', barup='green', bardown='black')
             syncdb.close()
         else:
@@ -266,7 +213,7 @@ def main():
         log.info('*** END SESSION ***')
 
     except Exception as e:
-        log.error('Abnormal END : {}'.format(e))
+        log.error('ABEND : {}'.format(e))
         try:
             syncdb.close()
         except Exception:

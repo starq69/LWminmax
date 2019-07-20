@@ -13,6 +13,12 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+
+class StrategyInizializationFailed(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+
 # tnks to Wes McKinney (https://wesmckinney.com/blog/python-parquet-update/)
 #
 def write_to_parquet(df, out_path, compression='SNAPPY'):
@@ -49,6 +55,7 @@ class S_Datapoint_Analisys(bt.Strategy):
         else:
             self.log.error('Invalid todate par. to strategy {}'.format(self.name))
 
+        '''
         # TODO
         # dopo l'introduzione dei settings/conventions config qui ora è un dict
         if config is not None and isinstance(config, configparser.ConfigParser):
@@ -66,11 +73,23 @@ class S_Datapoint_Analisys(bt.Strategy):
                 # raise ?
 
         else:
-            print('invalid **kwarg params passed to <' + repr(self.__class__) + '> instance')
-            sys.exit(1)
+            raise (StrategyInizializationFailed('invalid **kwarg params passed to {} instance : config=<{}>, name=<{}>, fromdate=<{}>, todate=<{}>' \
+                    .format( repr(self.__class__), type(config), type(name), type(fromdate), type(todate) )))
+        '''
+        if config is not None and isinstance(config, dict):
+            configured_indicators = [_ind.strip() for _ind in config['STRATEGIES'][self.name] if len(_ind)]
+            if not len(configured_indicators):
+                self.log.error('No indicators found for strategy <{}> : {}'.format(self.name, e))
+                sys.exit(1)
+            self.parquet_storage = config['STORAGE']['parquet']
+            if not self.parquet_storage:
+                self.log.error('Missing option "parquet" in section "STORAGE" : fix it in order to save indicators result')
+                sys.exit(1)
+        else:
+            raise (StrategyInizializationFailed('invalid **kwarg params passed to {} instance : config=<{}>, name=<{}>, fromdate=<{}>, todate=<{}>' \
+                    .format( repr(self.__class__), type(config), type(name), type(fromdate), type(todate) )))
 
-        self.loop_count = 0
-        
+        self.loop_count     = 0
         self.indicators     = dict() ##
 
         for i_name in configured_indicators:
