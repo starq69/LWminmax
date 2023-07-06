@@ -4,7 +4,15 @@
 import os, sys, logging, argparse, datetime as dt
 from configparser import ConfigParser as ConfigParser
 
-__all__ = ['app', 'override_defaults', 'defaults', 'args_parser', '_ini_settings_file_', '_log_settings_file_', '_default_ini_settings_file_', '_default_log_settings_file_']
+__all__ = ['app', 
+           'override_defaults', 
+           'defaults', 
+           'args_parser', 
+           '_ini_settings_file_', 
+           '_log_settings_file_', 
+           '_default_ini_settings_file_', 
+           '_default_log_settings_file_',
+           'parent_dir']
 
 yesterday = dt.datetime.strftime(dt.date.today() - dt.timedelta(days=1),'%Y-%m-%d')
 
@@ -185,6 +193,8 @@ def parse_items(options):
 
 
 def override_defaults(modifiers):   # ex overriden_by()
+
+    log = logging.getLogger(__name__)
 
     run_settings = None
     passed       = False
