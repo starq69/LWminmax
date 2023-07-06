@@ -84,6 +84,7 @@ def load_securities(app_config, syncdb):
         raise NoSecurityFound('Empty security list found on configuration!')
 
     return syncdb.load_securities (securities) 
+    #return securities
 
 
 def setting_up():
@@ -124,6 +125,18 @@ def setting_up():
 
 
     def get_syncdb (app_config):
+        '''starq@2023:TODO
+            [DATAFEEDS]
+            	origin=sqlite/duckdb/csv_cache
+
+            gestire origin :
+                =sqlite --> ASIS (usa sqlite3)
+                =duckdb --> nuova classe di interfacciamento x duckdb (x Nasdaq --> tabella MNQ.M1)
+                =local  --> nuova classe senza backend sql solo per load_securities/select_security_datafeed che usa quello che trova su /local_storage/csv_cache/  
+                            sempre in base a quanto specificato in [DATAFEEDS]securities e [SECURITIES] 
+        '''
+
+
         # TODO passare tutti i parametri di config. relativi a syncdb (non solo strict) e concatenare ev. version nel nome file db
         syncdb_dir  = app_config['STORAGE']['syncdb']
         path        = app_config['STORAGE']['yahoo_csv_data']

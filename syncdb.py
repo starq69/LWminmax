@@ -7,6 +7,7 @@ import sqlite3
 import datetime
 import logging, logging.config, configparser
 import subprocess
+from datasource import datasource
 
 '''
 class DownloadFailException(Exception):
@@ -37,7 +38,7 @@ def get_file_items (path, pattern=None, sort=True, fullnames=True):
     return _items
 
 
-class syncdb():
+class syncdb(datasource):
 
     def __init__(self, db_dir=None, db_file=None, path=None, strict=False):
 
@@ -53,10 +54,10 @@ class syncdb():
             # http://robyp.x10host.com/sqlite3.html#loaded
             db_is_new    = not os.path.exists(db_filename)
             try:
-                self.conn = sqlite3.connect(db_filename)
                 if db_is_new:
                     self.create_default_schema()
                 else:
+                    self.conn = sqlite3.connect(db_filename)
                     self.log.info('syncdb <' + db_filename + '> CONNECTED')
 
             except sqlite3.OperationalError as e:

@@ -35,20 +35,25 @@ _syncdb_                    = 'syncdb'
 _parquet_                   = 'parquet'
 _yahoo_csv_data_            = 'yahoo_csv_data'
 _securities_                = 'securities'
+_source_                    = 'source'
+_timeframe_                 = 'timeframe'
 _fromdate_                  = 'fromdate'
 _todate_                    = 'todate'
 
 ''' sections/options composition
 '''
-base_dir    = os.path.dirname (os.path.realpath(__file__))
-parent_dir  = os.path.split (base_dir)[0]
+base_dir        = os.path.dirname (os.path.realpath(__file__))
+parent_dir      = os.path.split (base_dir)[0]
+default_source  = parent_dir + '/local_storage/yahoo_csv_cache/'
 
 _KV_INTERNALS_      = {_configparser_as_dict_ : 'yes', _ini_settings_file_ : parent_dir + '/app.ini', _log_settings_file_ : parent_dir + '/log.ini'}
 _KV_OPTIONS_        = {_strict_ : 'yes'}
-_KV_STORAGE_        = {_syncdb_ : None, _parquet_ : None, _yahoo_csv_data_ : None}  #TODO : assegnare defaults!
+#_KV_STORAGE_        = {_syncdb_ : None, _parquet_ : None, _yahoo_csv_data_ : None}  #TODO : assegnare defaults!
+_KV_STORAGE_        = {_syncdb_ : parent_dir + '/local_storage/', _parquet_ : parent_dir + '/local_storage/parquet/', _yahoo_csv_data_ : parent_dir + '/local_storage/yahoo_csv_cache/'}
 _KV_STRATEGIES_     = dict()
-_KV_DATAFEEDS_      = {_securities_  : list()}
-_KV_SECURITIES_     = {_fromdate_ : '2017-12-31', _todate_ : yesterday} 
+_KV_DATAFEEDS_      = {_securities_  : list(), _source_ : default_source}
+#_KV_SECURITIES_     = {_fromdate_ : '2017-12-31', _todate_ : yesterday} 
+_KV_SECURITIES_     = {_fromdate_ : None, _todate_ : None, _timeframe_ : 'M1'}
 
 '''sections che possono definire opzioni arbitrarie
 '''
@@ -96,11 +101,12 @@ def args_parser(pargs=None):
         )
     )
     '''https://stackoverflow.com/questions/30487767/check-if-argparse-optional-argument-is-set-or-not'''
-    parser.add_argument('--fromdate', default=argparse.SUPPRESS, help='Date in YYYY-MM-DD format')
-    parser.add_argument('--todate', default=yesterday, help='Date in YYYY-MM-DD format')
-    parser.add_argument('--strict', default=argparse.SUPPRESS, choices=['yes', 'no', '1', '0', 'true', 'false', 'on', 'off'], help='strict can be yes/1/true/on or no/0/false/off')
-    parser.add_argument('--globalconfig', default=argparse.SUPPRESS)
-    parser.add_argument('--logconfig', default=argparse.SUPPRESS)
+    parser.add_argument('--fromdate',       default=argparse.SUPPRESS, help='Date in YYYY-MM-DD format')
+    parser.add_argument('--todate',         default=argparse.SUPPRESS, help='Date in YYYY-MM-DD format')
+    parser.add_argument('--timeframe',      default=argparse.SUPPRESS, choices=['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1'])
+    parser.add_argument('--strict',         default=argparse.SUPPRESS, choices=['yes', 'no', '1', '0', 'true', 'false', 'on', 'off'], help='strict can be yes/1/true/on or no/0/false/off')
+    parser.add_argument('--globalconfig',   default=argparse.SUPPRESS)
+    parser.add_argument('--logconfig',      default=argparse.SUPPRESS)
 
     return parser.parse_args()
 
@@ -113,10 +119,9 @@ def merge_settings (defaults, configured, debug=False):
 
     return a dict with all defaults eventually updated with configured items
     '''
-
     func_name = sys._getframe().f_code.co_name
     log = logging.getLogger(__name__)
-    log.info('==> Running {}()'.format(func_name))
+    #log.info('==> Running {}()'.format(func_name))
 
     run_settings    = {}
 
@@ -126,7 +131,7 @@ def merge_settings (defaults, configured, debug=False):
             _msg = 'default section : [{}]'.format(section)
 
             if section in configured:
-                log.debug(_msg + ' + found in config')
+                #log.debug(_msg + ' + found in config')
                 run_settings[section] = defaults[section]
                 for option, value in configured[section].items():
                     if option in run_settings[section] or section in no_strict_section:    ##
@@ -145,7 +150,7 @@ def merge_settings (defaults, configured, debug=False):
         log.debug('merged configuration :')
         for section, options in run_settings.items(): log.debug('[{}] = {}'.format(section, options)) 
 
-    log.info('<== leave {}()'.format(func_name))
+    #log.info('<== leave {}()'.format(func_name))
 
     return run_settings
 
@@ -225,5 +230,10 @@ def override_defaults(modifiers):   # ex overriden_by()
 
     if not passed:
         run_settings = defaults
+
+    debug=True #
+    if debug:
+        log.debug('RUN SESSION SETTINGS :')
+        for section, options in run_settings.items(): log.debug('[{}] = {}'.format(section, options))     
 
     return run_settings

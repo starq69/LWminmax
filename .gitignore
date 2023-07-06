@@ -5,3 +5,5 @@
 *.csv
 .ipynb_checkpoints/
 __pycache__/
+.vscode/
+_path.txt
