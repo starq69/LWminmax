@@ -52,7 +52,7 @@ def import_strategies(app_config):
 
 
     try:
-        strategy_labels = [ss for ss in app_config['STRATEGIES'].keys() if len(ss)]
+        strategy_labels = [ss for ss in app_config[_STRATEGIES_].keys() if len(ss)]
     except configparser.Error as e:
         raise e
     else:
@@ -79,7 +79,7 @@ def import_strategies(app_config):
 
 def load_securities(app_config, syncdb):
 
-    securities = [ss.strip() for ss in app_config['DATAFEEDS']['securities'] if len(ss)]
+    securities = [ss.strip() for ss in app_config[_DATAFEEDS_]['securities'] if len(ss)] #starq@2023
     if not len(securities):
         raise NoSecurityFound('Empty security list found on configuration!')
 
@@ -138,8 +138,8 @@ def setting_up():
 
 
         # TODO passare tutti i parametri di config. relativi a syncdb (non solo strict) e concatenare ev. version nel nome file db
-        syncdb_dir  = app_config['STORAGE']['syncdb']
-        path        = app_config['STORAGE']['yahoo_csv_data']
+        syncdb_dir  = app_config[_STORAGE_]['syncdb']
+        path        = app_config[_STORAGE_]['yahoo_csv_data']
         if not syncdb_dir : syncdb_dir  = parent_dir + '/local_storage/'
         if not path       : path = parent_dir
         syncdb_file = 'syncdb_test.db' # TODO
@@ -147,7 +147,7 @@ def setting_up():
 
 
     def strict_mode (app_config):
-        _strict = app_config['OPTIONS']['strict'].strip().lower() # strip() non necessario ?
+        _strict = app_config[_OPTIONS_]['strict'].strip().lower() # strip() non necessario ?
         if _strict in ['1', 'yes', 'true', 'on']:
             return True
         elif _strict in ['0', 'no', 'false', 'off'] :
@@ -172,8 +172,8 @@ def setting_up():
     log             = get_log (cfg_log)
     app_config      = get_config (cfg_file)
     syncdb_instance = get_syncdb (app_config)
-    run_fromdate    = dt.datetime.strptime(app_config['SECURITIES']['fromdate'], '%Y-%m-%d').date() # TODO
-    run_todate      = dt.datetime.strptime(app_config['SECURITIES']['todate'], '%Y-%m-%d').date()   # TODO
+    run_fromdate    = dt.datetime.strptime(app_config[_SECURITIES_]['fromdate'], '%Y-%m-%d').date() # TODO
+    run_todate      = dt.datetime.strptime(app_config[_SECURITIES_]['todate'], '%Y-%m-%d').date()   # TODO
 
     return log, app_config, syncdb_instance, run_fromdate, run_todate
 

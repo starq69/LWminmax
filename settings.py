@@ -12,7 +12,13 @@ __all__ = ['app',
            '_log_settings_file_', 
            '_default_ini_settings_file_', 
            '_default_log_settings_file_',
-           'parent_dir']
+           'parent_dir',
+           '_INTERNALS_',
+           '_OPTIONS_',
+           '_STORAGE_',
+           '_STRATEGIES_',
+           '_DATAFEEDS_',
+           '_SECURITIES_']
 
 yesterday = dt.datetime.strftime(dt.date.today() - dt.timedelta(days=1),'%Y-%m-%d')
 
@@ -119,7 +125,7 @@ def merge_settings (defaults, configured, debug=False):
 
     return a dict with all defaults eventually updated with configured items
     '''
-    func_name = sys._getframe().f_code.co_name
+    #func_name = sys._getframe().f_code.co_name
     log = logging.getLogger(__name__)
     #log.info('==> Running {}()'.format(func_name))
 

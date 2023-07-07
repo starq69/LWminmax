@@ -12,6 +12,7 @@ import backtrader.feeds as btfeeds
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
+from settings import *
 
 
 class StrategyInizializationFailed(Exception):
@@ -60,13 +61,13 @@ class S_Datapoint_Analisys(bt.Strategy):
         # dopo l'introduzione dei settings/conventions config qui ora è un dict
         if config is not None and isinstance(config, configparser.ConfigParser):
             try:
-                configured_indicators = [_ind.strip() for _ind in config.get('STRATEGIES', name).split(',') if len(_ind)]
+                configured_indicators = [_ind.strip() for _ind in config.get(_STRATEGIES_, name).split(',') if len(_ind)]
             except configparser.NoOptionError as e:
                 # TODO possibile skip della stategia ?
                 self.log.error('No indicators found for strategy <{}> : {}'.format(name, e))
                 sys.exit(1)
             try:
-                self.parquet_storage       = config.get('STORAGE', 'parquet')
+                self.parquet_storage       = config.get(_STORAGE_, 'parquet')
             except configparser.NoOptionError as e:
                 self.log.error('Missing option "parquet" in section "STORAGE" : fix it in order to save indicators result') 
                 self.parquet_storage = None
@@ -77,11 +78,11 @@ class S_Datapoint_Analisys(bt.Strategy):
                     .format( repr(self.__class__), type(config), type(name), type(fromdate), type(todate) )))
         '''
         if config is not None and isinstance(config, dict):
-            configured_indicators = [_ind.strip() for _ind in config['STRATEGIES'][self.name] if len(_ind)]
+            configured_indicators = [_ind.strip() for _ind in config[_STRATEGIES_][self.name] if len(_ind)] #starq@2023
             if not len(configured_indicators):
                 self.log.error('No indicators found for strategy <{}> : {}'.format(self.name, e))
                 sys.exit(1)
-            self.parquet_storage = config['STORAGE']['parquet']
+            self.parquet_storage = config[_STORAGE_]['parquet']
             if not self.parquet_storage:
                 self.log.error('Missing option "parquet" in section "STORAGE" : fix it in order to save indicators result')
                 sys.exit(1)
