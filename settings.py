@@ -3,6 +3,8 @@
 
 import os, sys, logging, argparse, datetime as dt
 from configparser import ConfigParser as ConfigParser
+from pathlib import Path
+
 
 __all__ = ['app', 
            'override_defaults', 
@@ -40,6 +42,7 @@ _strict_                    = 'strict'
 _syncdb_                    = 'syncdb'
 _parquet_                   = 'parquet'
 _yahoo_csv_data_            = 'yahoo_csv_data'
+_duckdb_data_               = 'duckdb_data'
 _securities_                = 'securities'
 _source_                    = 'source'
 _timeframe_                 = 'timeframe'
@@ -48,14 +51,32 @@ _todate_                    = 'todate'
 
 ''' sections/options composition
 '''
-base_dir        = os.path.dirname (os.path.realpath(__file__))
-parent_dir      = os.path.split (base_dir)[0]
-default_source  = parent_dir + '/local_storage/yahoo_csv_cache/'
+#base_dir        = os.path.dirname (os.path.realpath(__file__))
+base_dir        = Path.cwd()    #starq@new --> can also be Path(__file__) ?
+#parent_dir      = os.path.split (base_dir)[0]
+parent_dir      = base_dir.parent
 
-_KV_INTERNALS_      = {_configparser_as_dict_ : 'yes', _ini_settings_file_ : parent_dir + '/app.ini', _log_settings_file_ : parent_dir + '/log.ini'}
+#local_storage   = parent_dir + '/local_storage/'
+local_storage   = parent_dir /  'local_storage'
+
+#default_source  = parent_dir + '/local_storage/yahoo_csv_cache/'
+default_source  = local_storage / 'yahoo_csv_cache'
+
+#_KV_INTERNALS_      = {_configparser_as_dict_ : 'yes', _ini_settings_file_ : parent_dir + '/app.ini', _log_settings_file_ : parent_dir + '/log.ini'}
+_KV_INTERNALS_      = {_configparser_as_dict_ : 'yes', _ini_settings_file_ : parent_dir / 'app.ini', _log_settings_file_ : parent_dir / 'log.ini'}
+
 _KV_OPTIONS_        = {_strict_ : 'yes'}
-#_KV_STORAGE_        = {_syncdb_ : None, _parquet_ : None, _yahoo_csv_data_ : None}  #TODO : assegnare defaults!
-_KV_STORAGE_        = {_syncdb_ : parent_dir + '/local_storage/', _parquet_ : parent_dir + '/local_storage/parquet/', _yahoo_csv_data_ : parent_dir + '/local_storage/yahoo_csv_cache/'}
+
+_KV_STORAGE_        = {
+                        _syncdb_            : local_storage, 
+                        #_parquet_           : local_storage + '/parquet/', 
+                        _parquet_           : local_storage / 'parquet',
+                        #_yahoo_csv_data_    : local_storage + '/yahoo_csv_cache/',
+                        _yahoo_csv_data_    : local_storage / 'yahoo_csv_cache',
+                        #_duckdb_data_       : local_storage + '/duckdb_data/'
+                        _duckdb_data_       : local_storage / 'duckdb_data'
+                      }
+
 _KV_STRATEGIES_     = dict()
 _KV_DATAFEEDS_      = {_securities_  : list(), _source_ : default_source}
 #_KV_SECURITIES_     = {_fromdate_ : '2017-12-31', _todate_ : yesterday} 

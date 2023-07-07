@@ -10,6 +10,8 @@ from loader import load_module
 import backtrader as bt
 import backtrader.feeds as btfeeds
 from syncdb import syncdb
+from csv_cache import csv_cache
+from duckdb_data import duckdb_data
 from settings import * 
 
 
@@ -127,23 +129,36 @@ def setting_up():
     def get_syncdb (app_config):
         '''starq@2023:TODO
             [DATAFEEDS]
-            	origin=sqlite/duckdb/csv_cache
+            	source=sqlite/duckdb/csv_cache
 
-            gestire origin :
+            gestire source :
                 =sqlite --> ASIS (usa sqlite3)
                 =duckdb --> nuova classe di interfacciamento x duckdb (x Nasdaq --> tabella MNQ.M1)
                 =local  --> nuova classe senza backend sql solo per load_securities/select_security_datafeed che usa quello che trova su /local_storage/csv_cache/  
-                            sempre in base a quanto specificato in [DATAFEEDS]securities e [SECURITIES] 
+                            sempre in base a quanto specificato in [DATAFEEDS]securities e [SECURITIES] from/todate
         '''
 
+        _source_ = app_config[_DATAFEEDS_]['source']
+        #log.info('--> source is <{}>'.format(_source_)
+        
+        if _source_ == 'sqlite':
+            # TODO passare tutti i parametri di config. relativi a syncdb (non solo strict) e concatenare ev. version nel nome file db
+            syncdb_dir  = app_config[_STORAGE_]['syncdb']
+            path        = app_config[_STORAGE_]['yahoo_csv_data']
+            if not syncdb_dir : syncdb_dir  = parent_dir + '/local_storage/'
+            if not path       : path = parent_dir
+            syncdb_file = 'syncdb_test.db' # TODO
+            return syncdb (db_dir=syncdb_dir ,db_file=syncdb_file, path=path, strict=strict_mode(app_config))
+        
+        elif _source_ == 'duckdb':
+            syncdb_dir  = app_config[_STORAGE_]['duckdb_data']
+            path        = app_config[_STORAGE_]['yahoo_csv_data']
+            syncdb_file = '001.db' # TODO
 
-        # TODO passare tutti i parametri di config. relativi a syncdb (non solo strict) e concatenare ev. version nel nome file db
-        syncdb_dir  = app_config[_STORAGE_]['syncdb']
-        path        = app_config[_STORAGE_]['yahoo_csv_data']
-        if not syncdb_dir : syncdb_dir  = parent_dir + '/local_storage/'
-        if not path       : path = parent_dir
-        syncdb_file = 'syncdb_test.db' # TODO
-        return syncdb (db_dir=syncdb_dir ,db_file=syncdb_file, path=path, strict=strict_mode(app_config))
+            return duckdb_data(db_dir=syncdb_dir, db_file=syncdb_file, strict=strict_mode(app_config))
+        
+        elif _source_ == 'csv_cache':
+            return csv_cache(strict=strict_mode(app_config))
 
 
     def strict_mode (app_config):

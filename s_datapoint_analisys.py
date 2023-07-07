@@ -13,6 +13,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 from settings import *
+from pathlib import Path
 
 
 class StrategyInizializationFailed(Exception):
@@ -166,7 +167,7 @@ class S_Datapoint_Analisys(bt.Strategy):
         but taking into account that appending values to a DataFrame is a very expensive operation, you may prefer to do it at once during Strategy.stop
         '''
         for indicator, _dict in self.indicators.items():
-            for item, detail in _dict.items():
+            for item, detail in _dict.items():                
                 try:
                     # salva il dataframe in formato parquet
                     #
@@ -177,12 +178,16 @@ class S_Datapoint_Analisys(bt.Strategy):
                         ind_shortname = indicator[:-9]          # rimuove 'Indicator' alla fine
                         ind_shortname = ind_shortname[2:]       # rimuove 'I_' all'inizio
                         ind_shortname = ind_shortname.upper()   
-                        pq_fname = self.parquet_storage + str(item) + '.' + self.fromdate + '.' + self.todate + '.' + ind_shortname + '.parquet'
+
+                        pq_fname = str(item) + '.' + self.fromdate + '.' + self.todate + '.' + ind_shortname + '.parquet'                
+                        pq_fname = self.parquet_storage / pq_fname
+                        #self.log.debug('pq_fname : {}'.format(str(Path(pq_fname))))
+
                         write_to_parquet (detail['output_dataframe'], pq_fname)
                         self.log.info('pyarrow.parquet.write_table <{}> DONE'.format(pq_fname))
                 except FileNotFoundError as e:
                     self.log.error(e) 
-                except Exception:
-                    pass
+                except Exception as e:  # 'module' object / type 'xxxIndicator' is not subscriptable
+                    pass            
 
         self.log.info('Exit Strategy <{}> {}, strategy.next loop_count = {}'.format(self.name, repr(self.__class__), str(self.loop_count)))

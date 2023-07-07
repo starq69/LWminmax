@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os, sys, re
+from pathlib import Path
 import fnmatch
 import sqlite3
 import datetime
@@ -43,34 +44,27 @@ class syncdb(datasource):
     def __init__(self, db_dir=None, db_file=None, path=None, strict=False):
 
         self.log = logging.getLogger (__name__)
+        super().__init__(db_dir, db_file, path, strict) # validation
 
-        self.strict = strict
+        db_filename  = self.db_dir / self.db_file
 
-        if db_dir and db_file: 
-            self.db_dir  = db_dir.strip()
-            self.db_file = db_file.strip()
-            self.path    = path.strip()
-            db_filename  = self.db_dir + self.db_file 
-            # http://robyp.x10host.com/sqlite3.html#loaded
-            db_is_new    = not os.path.exists(db_filename)
-            try:
-                if db_is_new:
-                    self.create_default_schema()
-                else:
-                    self.conn = sqlite3.connect(db_filename)
-                    self.log.info('syncdb <' + db_filename + '> CONNECTED')
+        # http://robyp.x10host.com/sqlite3.html#loaded
+        db_is_new    = not os.path.exists(db_filename)
+        try:
+            if db_is_new:
+                self.create_default_schema()
+            else:
+                self.conn = sqlite3.connect(db_filename)
+                self.log.info('syncdb <' + str(Path(db_filename)) + '> CONNECTED')
 
-            except sqlite3.OperationalError as e:
-                raise e
-        else:
-            self.log.error('invalid syncdb file name : <{}>'.format(self.db_dir + self.db_file))
+        except sqlite3.OperationalError as e:
             raise e
-            #sys.exit(1) # TODO gestire questa eccezione in uscita
 
 
     def create_default_schema(self):
 
-        schema_file = self.db_dir + 'default_syncdb_schema.sql'
+        schema_file = self.db_dir / 'default_syncdb_schema.sql'
+
         self.log.info('syncdb NOT FOUND : create default schema <{}>'.format(schema_file))
         try:
             with open(schema_file, 'rt') as f:
@@ -176,11 +170,15 @@ class syncdb(datasource):
 
 
 
-        self.log.info('select_file(<{}>'.format(security_id))
+        self.log.info('select_file(<{}>)'.format(security_id))
 
         FORMAT = '%Y-%m-%d'
-        f = self.path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
-        self.log.debug('il file cercato è {}'.format(f))
+        #f = self.path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+        f = security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+        f = self.path / f
+        #self.log.debug('il file cercato è {}'.format(f))
+        self.log.debug('il file cercato è {}'.format(str(Path(f))))
+
 
         if os.path.isfile(f):
             if os.path.getsize(f):
@@ -188,14 +186,14 @@ class syncdb(datasource):
                 # TODO DEVE controllare se ci sono almeno 2 righe... (1 record) --> check_datapoints() ?
                 return f
             else:
-                self.log.warning('<{}> è vuoto : controllare security_id <{}>'.format(f, security_id))
+                self.log.warning('<{}> è vuoto : controllare security_id <{}>'.format(str(Path(f)), security_id))
                 os.remove(f)
 
         # cerca il/i file del tipo <security_id>.<from>.<to>.csv e verifica la copertura del periodo richiesto
         #
-        self.log.debug ('segue get_file_items()')
+        #self.log.debug ('segue get_file_items()')
         flist = get_file_items (self.path, security_id+'.'+'*.csv', fullnames=False)
-        self.log.debug(flist)
+        #self.log.debug('flist : {}'.format(flist))
         for fname in flist:
             _parts = fname.split('.')
             file_fromdate = _parts[1]
@@ -205,8 +203,9 @@ class syncdb(datasource):
             if dt_file_fromdate <= fromdate and dt_file_todate >= todate:
                 self.log.info('<{}> cover the asked analisys period'.format(fname))
 
-                if check_datapoints (self.path+fname, fromdate, todate):
-                    return self.path + fname
+                if check_datapoints (self.path / fname, fromdate, todate):
+                    self.log.debug('check_datapoints OK : path <{}> fname <{}>'.format(str(Path(self.path)), fname))
+                    return self.path / fname
             else:
                 self.log.warning('<{}> do NOT cover the asked period'.format(fname))
 
@@ -255,6 +254,7 @@ class syncdb(datasource):
            if _struct is not None:
                # (update)
                file_cached = self.select_file (security_id, fromdate, todate) #, path)
+               self.log.debug('file cached (strict): '.format(file_cached)) #starq@temp
                if file_cached:
                    _update(security_id, fromdate, todate) # ..... TODO TEST
                    return file_cached
@@ -288,6 +288,8 @@ class syncdb(datasource):
         else:
             # (upsert)
             file_cached = self.select_file(security_id, fromdate, todate) #, path)
+            #self.log.debug('file cached (no strict): {}'.format(str(Path(file_cached)))) #starq@temp
+
             if file_cached:
                 _upsert(security_id, fromdate, todate)
                 return file_cached
