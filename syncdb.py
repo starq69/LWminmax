@@ -237,12 +237,14 @@ class syncdb(datasource):
             self.conn.commit()
 
         def yahoo_csv_download(security_id, fromdate, todate, datafile):
-           return subprocess.call(['../yahoodownload.py',
+            return False
+            '''
+            return subprocess.call(['../yahoodownload.py',
                             '--ticker', security_id, \
                             '--fromdate', str(fromdate), \
                             '--todate', str(todate + datetime.timedelta(days=1)), \
                             '--outfile', str(datafile)])
-
+            '''
 
         FORMAT = '%Y-%m-%d' # TODO
 
@@ -259,7 +261,9 @@ class syncdb(datasource):
                    _update(security_id, fromdate, todate) # ..... TODO TEST
                    return file_cached
                else:
-                   datafile = self.path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+                   datafile = security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+                   #datafile = self.path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+                   datafile = self.path / datafile 
                    self.log.debug ('SEGUE download sul file <{}>'.format(datafile))
                    if yahoo_csv_download (security_id, fromdate, todate, datafile) != 0:
                        self.log.warning ('FAIL to download data for security {}'.format(security_id))
@@ -294,7 +298,10 @@ class syncdb(datasource):
                 _upsert(security_id, fromdate, todate)
                 return file_cached
             else:
-                datafile = self.path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+                datafile = security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+                datafile = self.path / datafile 
+                #datafile = self.path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+
                 self.log.debug('DOWNLOAD on <{}>'.format(datafile))
                 if yahoo_csv_download(security_id, fromdate, todate, datafile) != 0:
                     self.log.warning('FAIL to download data for security {}'.format(security_id)) # ex DownloadFailException

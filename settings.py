@@ -57,7 +57,7 @@ base_dir        = Path.cwd()    #starq@new --> can also be Path(__file__) ?
 parent_dir      = base_dir.parent
 
 #local_storage   = parent_dir + '/local_storage/'
-local_storage   = parent_dir /  'local_storage'
+local_storage   = parent_dir / 'local_storage'
 
 #default_source  = parent_dir + '/local_storage/yahoo_csv_cache/'
 default_source  = local_storage / 'yahoo_csv_cache'
@@ -224,7 +224,7 @@ def parse_items(options):
     return _dict
 
 
-def override_defaults(modifiers):   # ex overriden_by()
+def override_defaults(modifiers):
 
     log = logging.getLogger(__name__)
 
@@ -243,12 +243,30 @@ def override_defaults(modifiers):   # ex overriden_by()
                 configured      = { s : parse_items(modifier.items(s)) for s in modifier.sections() }
                 run_settings    = merge_settings (defaults, configured) #, debug=True)
                 if run_settings:
-                    passed = True
+                    log.info('validazione intervallo [fromdate..todate] ...')
+                    if (dt.datetime.strptime(run_settings[_SECURITIES_][_fromdate_], '%Y-%m-%d').date() < \
+                        dt.datetime.strptime(run_settings[_SECURITIES_][_todate_], '%Y-%m-%d').date()):
+                        passed = True
+                    else:    
+                        log.error('INVALID PERIOD : {} - {}'.format(run_settings[_SECURITIES_][_fromdate_], \
+                                                                    run_settings[_SECURITIES_][_todate_]))
+
+                        passed = False
             elif _type is argparse.Namespace:
                 if run_settings:
                     configured = merge_arguments(run_settings, vars(modifier))
                 else:
                     configured = merge_arguments(defaults, vars(modifier))
+
+                log.info('validazione intervallo [fromdate..todate] ...')
+                if (dt.datetime.strptime(run_settings[_SECURITIES_][_fromdate_], '%Y-%m-%d').date() < \
+                    dt.datetime.strptime(run_settings[_SECURITIES_][_todate_], '%Y-%m-%d').date()):
+                    passed = True
+                else:    
+                    log.error('INVALID PERIOD : {} - {}'.format(run_settings[_SECURITIES_][_fromdate_], \
+                                                                run_settings[_SECURITIES_][_todate_]))
+                    passed = False            
+
             else:
                 log.error('invalid param passed to override_defaults()')
     else:
@@ -260,7 +278,7 @@ def override_defaults(modifiers):   # ex overriden_by()
 
     debug=True #
     if debug:
-        log.debug('RUN SESSION SETTINGS :')
+        log.debug('RUN SESSION SETTINGS ({}):'.format(str(passed)))
         for section, options in run_settings.items(): log.debug('[{}] = {}'.format(section, options))     
 
     return run_settings

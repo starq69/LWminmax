@@ -22,6 +22,9 @@ class NoStrategyFound(Exception):
 class NoSecurityFound(Exception):
     pass
 
+class InvalidPeriod(BaseException):
+    pass
+
 
 def as_dict(config):
     """
@@ -112,7 +115,7 @@ def setting_up():
             app_config.optionxform = str # non converte i nomi opzione in lowercase
 
             if not app_config.read (cfg_file):
-                log.error('MISSING configuration file <{}>'.format(cfg_file))
+                log.warning('MISSING configuration file <{}>'.format(cfg_file))
                 log.info('Use default settings')
             else:
                 log.info('configuration file <{}> LOADED'.format(cfg_file))
@@ -172,6 +175,8 @@ def setting_up():
             return False 
 
 
+    _expection = None
+
     args = vars(args_parser())
 
     if _log_settings_file_ in args:
@@ -190,63 +195,71 @@ def setting_up():
     run_fromdate    = dt.datetime.strptime(app_config[_SECURITIES_]['fromdate'], '%Y-%m-%d').date() # TODO
     run_todate      = dt.datetime.strptime(app_config[_SECURITIES_]['todate'], '%Y-%m-%d').date()   # TODO
 
-    return log, app_config, syncdb_instance, run_fromdate, run_todate
+    if run_fromdate > run_todate :
+        _expection = 'Periodo NON valido : verificare fromdate/todate.'
+
+    return _expection, log, app_config, syncdb_instance, run_fromdate, run_todate
 
 
 def main():
 
-    log, app_config, syncdb, run_fromdate, run_todate  = setting_up()  
+    failure, log, app_config, syncdb, run_fromdate, run_todate  = setting_up()
 
-    try:
-        cerebro         = bt.Cerebro(stdstats=False) 
+    if failure is not None:
+        log.exception(failure)
 
-        strategy_classes = import_strategies (app_config)
-        securities       = load_securities (app_config, syncdb)
-        found            = False
+    else:
 
-        log.info('Analisys period is {} - {}'.format(run_fromdate, run_todate))
-
-        # load_datafeeds(securities)
-        #
-        for security_id, _struct in securities.items():
-            datafile = syncdb.select_security_datafeed (_struct, security_id, run_fromdate, run_todate) 
-            if datafile:    
-                data = btfeeds.YahooFinanceCSVData (dataname=datafile,
-                                                    fromdate=run_fromdate,
-                                                    todate=run_todate + dt.timedelta(days=1), 
-                                                    adjclose=False, 
-                                                    decimals=5)
-
-                cerebro.adddata(data, security_id)    
-                log.info('datafeed <{}> succesfully added to cerebro'.format(security_id))
-                found = True
-
-        if found: 
-            #cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
-            cerebro.broker.setcash(10000.0)
-
-            for strategy_label in strategy_classes:
-                cerebro.addstrategy(strategy_classes[strategy_label],
-                                    config=app_config, 
-                                    name=strategy_label, 
-                                    fromdate=run_fromdate, 
-                                    todate=run_todate)
-
-            cerebro.run()
-            #cerebro.plot(style='candlestick', barup='green', bardown='black')
-            syncdb.close()
-        else:
-            log.warning('~ No security found ~')
-
-        log.info('*** END SESSION ***')
-
-    except Exception as e:
-        log.error('ABEND : {}'.format(e))
         try:
-            syncdb.close()
-        except Exception:
-            pass
-        sys.exit(1)
+            cerebro          = bt.Cerebro(stdstats=False) 
+
+            strategy_classes = import_strategies (app_config)
+            securities       = load_securities (app_config, syncdb)
+            found            = False
+
+            log.info('Analisys period is {} - {}'.format(run_fromdate, run_todate))
+
+            # load_datafeeds(securities)
+            #
+            for security_id, _struct in securities.items():
+                datafile = syncdb.select_security_datafeed (_struct, security_id, run_fromdate, run_todate) 
+                if datafile:    
+                    data = btfeeds.YahooFinanceCSVData (dataname=datafile,
+                                                        fromdate=run_fromdate,
+                                                        todate=run_todate + dt.timedelta(days=1), 
+                                                        adjclose=False, 
+                                                        decimals=5)
+
+                    cerebro.adddata(data, security_id)    
+                    log.info('datafeed <{}> succesfully added to cerebro'.format(security_id))
+                    found = True
+
+            if found: 
+                #cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
+                cerebro.broker.setcash(10000.0)
+
+                for strategy_label in strategy_classes:
+                    cerebro.addstrategy(strategy_classes[strategy_label],
+                                        config=app_config, 
+                                        name=strategy_label, 
+                                        fromdate=run_fromdate, 
+                                        todate=run_todate)
+
+                cerebro.run()
+                #cerebro.plot(style='candlestick', barup='green', bardown='black')
+                syncdb.close()
+            else:
+                log.warning('~ No security found ~')
+
+            log.info('*** END SESSION ***')
+
+        except Exception as e:
+            log.error('ABEND : {}'.format(e))
+            try:
+                syncdb.close()
+            except Exception:
+                pass
+            sys.exit(1)
 
 
 if __name__ == '__main__':
