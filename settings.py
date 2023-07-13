@@ -243,6 +243,8 @@ def override_defaults(modifiers):
                 configured      = { s : parse_items(modifier.items(s)) for s in modifier.sections() }
                 run_settings    = merge_settings (defaults, configured) #, debug=True)
                 if run_settings:
+                    passed = True
+                    '''
                     log.info('validazione intervallo [fromdate..todate] ...')
                     if (dt.datetime.strptime(run_settings[_SECURITIES_][_fromdate_], '%Y-%m-%d').date() < \
                         dt.datetime.strptime(run_settings[_SECURITIES_][_todate_], '%Y-%m-%d').date()):
@@ -252,12 +254,15 @@ def override_defaults(modifiers):
                                                                     run_settings[_SECURITIES_][_todate_]))
 
                         passed = False
+                    '''
             elif _type is argparse.Namespace:
                 if run_settings:
                     configured = merge_arguments(run_settings, vars(modifier))
                 else:
                     configured = merge_arguments(defaults, vars(modifier))
+                passed = True
 
+                '''
                 log.info('validazione intervallo [fromdate..todate] ...')
                 if (dt.datetime.strptime(run_settings[_SECURITIES_][_fromdate_], '%Y-%m-%d').date() < \
                     dt.datetime.strptime(run_settings[_SECURITIES_][_todate_], '%Y-%m-%d').date()):
@@ -265,8 +270,8 @@ def override_defaults(modifiers):
                 else:    
                     log.error('INVALID PERIOD : {} - {}'.format(run_settings[_SECURITIES_][_fromdate_], \
                                                                 run_settings[_SECURITIES_][_todate_]))
-                    passed = False            
-
+                    passed = False
+                '''            
             else:
                 log.error('invalid param passed to override_defaults()')
     else:

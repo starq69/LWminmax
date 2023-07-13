@@ -20,18 +20,21 @@ class datasource():
         self.db_file    = ''
         self.path       = ''
         '''
-        self.log.debug('db_dir : <{}>, db_file : <{}>'.format(db_dir, db_file))
+        #self.log.debug('db_dir : <{}>, db_file : <{}>'.format(db_dir, db_file))
+        self.log.debug(f'db_dir : <{db_dir}>, db_file : <{db_file}>')
 
         #db_dir = Path(db_dir)
         if db_dir and os.path.isdir(db_dir) : #and is_valid_filename(db_file, platform="universal"):
             self.db_dir =db_dir
             self.db_file=db_file
         else:
-            self.log.error('invalid datasource path : <{}>'.format(db_dir))
+            #self.log.error('invalid datasource path : <{}>'.format(db_dir))
+            self.log.error(f'invalid datasource path : <{db_dir}>')
             sys.exit(1)
 
         if is_valid_filename(db_file, platform="universal"):
             self.db_file=db_file
         else:
-            self.log.error('invalid db_file : <{}>'.format(db_file))
+            #self.log.error('invalid db_file : <{}>'.format(db_file))
+            self.log.error(f'invalid db_file : <{db_file}>')
             sys.exit(1)
