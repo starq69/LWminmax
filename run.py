@@ -8,11 +8,12 @@ from collections import OrderedDict
 import subprocess
 from loader import load_module
 import backtrader as bt
-import backtrader.feeds as btfeeds
+#import backtrader.feeds as btfeeds
 from syncdb import syncdb
 from csv_cache import csv_cache
 from duckdb_data import duckdb_data
 from settings import * 
+#import traceback
 
 
 class NoStrategyFound(Exception):
@@ -53,7 +54,8 @@ def import_strategies(app_config):
 
     log = logging.getLogger (__name__)
     strategy_modules = dict()
-    strategy_classes = OrderedDict()
+    #strategy_classes = OrderedDict()   
+    strategy_classes = dict()           #starq@TEST
 
 
     try:
@@ -69,10 +71,11 @@ def import_strategies(app_config):
                 try:
                     if strategy_id not in strategy_modules:
                         strategy_modules[strategy_id] = load_module(strategy_id) 
-                        log.debug('module {} for strategy <{}> succesfully added to cerebro'.format(str(strategy_modules[strategy_id]),strategy_label))
+                        #log.info('module {} for strategy <{}> succesfully added to cerebro'.format(str(strategy_modules[strategy_id]),strategy_label))
+                        log.info(f'module {strategy_modules[strategy_id]} for strategy <{strategy_label}> succesfully added to cerebro')
                     else:
                         # TODO TEST : strategy_classes che valore ha qui ?
-                        log.debug('module {} for strategy <{}> already loaded'.format(str(strategy_modules[strategy_id]),strategy_label))
+                        log.info('module {} for strategy <{}> already loaded'.format(str(strategy_modules[strategy_id]),strategy_label))
                     
                     strategy_classes[strategy_label] = strategy_modules[strategy_id].get_strategy_class()
 
@@ -89,7 +92,6 @@ def load_securities(app_config, syncdb):
         raise NoSecurityFound('Empty security list found on configuration!')
 
     return syncdb.load_securities (securities) 
-    #return securities
 
 
 def setting_up():
@@ -164,7 +166,10 @@ def setting_up():
             return duckdb_data(db_dir=syncdb_dir, db_file=syncdb_file, strict=strict_mode(app_config))
         
         elif _source_ == 'csv_cache':
-            return csv_cache(strict=strict_mode(app_config))
+            syncdb_dir  = app_config[_STORAGE_]['yahoo_csv_data']
+            path        = app_config[_STORAGE_]['yahoo_csv_data'] # ....
+            syncdb_file = 'batch.csv' # TODO
+            return csv_cache(db_dir=syncdb_dir, db_file=syncdb_file, strict=strict_mode(app_config))
         else:
             return None
 
@@ -213,7 +218,7 @@ def main():
     failure, log, app_config, syncdb, run_fromdate, run_todate  = setting_up()
 
     if failure is not None:  
-        log.error(failure) # se log.exception() stampa una riga NoneType...
+        log.error(failure) # se log.exception(failure) stampa una riga NoneType...
     else:
         try:
             cerebro          = bt.Cerebro(stdstats=False) 
@@ -227,15 +232,17 @@ def main():
             #
             for security_id, _struct in securities.items():
                 datafile = syncdb.select_security_datafeed (_struct, security_id, run_fromdate, run_todate) 
-                if datafile:    
+                if datafile: 
+                    '''
                     data = btfeeds.YahooFinanceCSVData (dataname=datafile,
                                                         fromdate=run_fromdate,
                                                         todate=run_todate + dt.timedelta(days=1), 
                                                         adjclose=False, 
                                                         decimals=5)
+                    '''
+                    data = syncdb.parse_data(datafile, run_fromdate, run_todate + dt.timedelta(days=1))
 
                     cerebro.adddata(data, security_id)    
-                    #log.info('datafeed <{}> succesfully added to cerebro'.format(security_id))
                     log.info(f'datafeed <{security_id}> succesfully added to cerebro')
                     found = True
 
@@ -243,13 +250,20 @@ def main():
                 #cerebro.addwriter(bt.WriterFile, csv=True, out="output.csv")
                 cerebro.broker.setcash(10000.0)
 
-                for strategy_label in strategy_classes:
+                log.debug(f'---> strategy_classes : {strategy_classes}')
+
+                for strategy_label, _ in strategy_classes.items():
+                #for strategy_label in strategy_classes:
+
+                    #log.debug(f'---> _label = {strategy_classes[strategy_label]}')
+                    #log.debug(f'---> name   = {strategy_label}')
+                             
                     cerebro.addstrategy(strategy_classes[strategy_label],
                                         config=app_config, 
                                         name=strategy_label, 
                                         fromdate=run_fromdate, 
                                         todate=run_todate)
-
+                    
                 cerebro.run()
                 #cerebro.plot(style='candlestick', barup='green', bardown='black')
                 syncdb.close()
@@ -260,6 +274,7 @@ def main():
 
         except Exception as e:
             log.error('ABEND : {}'.format(e))
+            #print(traceback.format_exc())
             try:
                 syncdb.close()
             except Exception:
