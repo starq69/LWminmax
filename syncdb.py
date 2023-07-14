@@ -7,8 +7,9 @@ import fnmatch
 import sqlite3
 import datetime
 import logging, logging.config, configparser
-import subprocess
+#import subprocess
 from datasource import datasource
+import backtrader.feeds as btfeeds
 
 '''
 class DownloadFailException(Exception):
@@ -169,15 +170,15 @@ class syncdb(datasource):
                     return False
 
 
-
-        self.log.info('select_file(<{}>)'.format(security_id))
+        #self.log.info('select_file(<{}>)'.format(security_id))
+        self.log.info(f'select_file(<{security_id}>)')
 
         FORMAT = '%Y-%m-%d'
         #f = self.path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
         f = security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
         f = self.path / f
-        #self.log.debug('il file cercato è {}'.format(f))
-        self.log.debug('il file cercato è {}'.format(str(Path(f))))
+        #self.log.debug('il file cercato è {}'.format(str(Path(f))))
+        self.log.debug(f'il file cercato è {str(Path(f))}') #.format(str(Path(f))))
 
 
         if os.path.isfile(f):
@@ -191,7 +192,6 @@ class syncdb(datasource):
 
         # cerca il/i file del tipo <security_id>.<from>.<to>.csv e verifica la copertura del periodo richiesto
         #
-        #self.log.debug ('segue get_file_items()')
         flist = get_file_items (self.path, security_id+'.'+'*.csv', fullnames=False)
         #self.log.debug('flist : {}'.format(flist))
         for fname in flist:
@@ -324,6 +324,14 @@ class syncdb(datasource):
 
                     _upsert(security_id, fromdate, todate)
                     return datafile
+
+
+    def parse_data(self, datafile, run_fromdate=None, run_todate=None):
+        return btfeeds.YahooFinanceCSVData (dataname=datafile,
+                                            fromdate=run_fromdate,
+                                            todate=run_todate, # + dt.timedelta(days=1), 
+                                            adjclose=False, 
+                                            decimals=5)
 
 
     def close(self):
