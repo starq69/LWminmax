@@ -4,10 +4,11 @@
 import os, sys, re
 from pathlib import Path
 import fnmatch
-#import datetime
+import datetime as dt
 import logging, logging.config
 from datasource import datasource
 import pandas as pd 
+import backtrader as bt
 import backtrader.feeds as btfeeds
 
 
@@ -79,9 +80,15 @@ class csv_cache(datasource):
 
         for _idx, _values in _batch.items():
             _key = _values['security'] + '.' + str(_idx) 
-            _securities[_key] = _values['day']
+            #_securities[_key] = _values['day']
+            _securities[_key] = _values['day'] #+ ' 00:00:00' #starq@new
 
         self.log.debug(f'----> securities : {_securities}')
+
+        # starq@new
+        # associo il dizionario all'istanza per impostare fromdate nella parse_data()  
+        self.securities = _securities
+
         return _securities 
 
 
@@ -101,6 +108,10 @@ class csv_cache(datasource):
         fromdate    : non utilizzata
         todate      : non utilizzata
         '''
+
+        #starq@new
+        self.security_id = security_id
+
         _security = r'^([^.]+).+$'
         security_id = re.findall(_security, security_id)[0]
 
@@ -113,13 +124,27 @@ class csv_cache(datasource):
 
 
     def parse_data(self, datafile, run_fromdate=None, run_todate=None):
+        '''
+        todo:
+        ottenere offset dal TZ relativo al giorno : a cura del processo che genera il batch
+        '''
+        fromdate        =   dt.datetime.strptime(self.securities[self.security_id], '%Y-%m-%d')
+        _offset_open    =   dt.timedelta(minutes=810)   # 810min da 00:00 a 13:30
+        fromdate        +=  _offset_open
+        _session_length =   dt.timedelta(minutes=450)   # durata sessione (13:30-21:00)
+        todate          =  fromdate + _session_length
+
+        self.log.debug(f'fromdate (parse_data) -----> {fromdate}')        
+        self.log.debug(f'todate   (parse_data) -----> {todate}')        
 
         return btfeeds.GenericCSVData(dataname=datafile,
-                                      #fromdate=run_fromdate,
-                                      #todate=run_todate + dt.timedelta(days=1),
+                                      fromdate=fromdate,
+                                      todate=todate, #run_todate + dt.timedelta(days=1),
                                       nullvalue=0.0,
                                       dtformat=('%Y-%m-%d'),
                                       tmformat=('%H:%M:%S'),
+                                      timeframe=bt.TimeFrame.Minutes,
+                                      #compression=5,
                                       separator='\t',
                                       datetime=0,                        
                                       time=1,

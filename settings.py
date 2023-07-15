@@ -262,16 +262,6 @@ def override_defaults(modifiers):
                     configured = merge_arguments(defaults, vars(modifier))
                 passed = True
 
-                '''
-                log.info('validazione intervallo [fromdate..todate] ...')
-                if (dt.datetime.strptime(run_settings[_SECURITIES_][_fromdate_], '%Y-%m-%d').date() < \
-                    dt.datetime.strptime(run_settings[_SECURITIES_][_todate_], '%Y-%m-%d').date()):
-                    passed = True
-                else:    
-                    log.error('INVALID PERIOD : {} - {}'.format(run_settings[_SECURITIES_][_fromdate_], \
-                                                                run_settings[_SECURITIES_][_todate_]))
-                    passed = False
-                '''            
             else:
                 log.error('invalid param passed to override_defaults()')
     else:

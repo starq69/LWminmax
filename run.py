@@ -201,9 +201,9 @@ def setting_up():
     log             = get_log (cfg_log)
     app_config      = get_config (cfg_file)
     syncdb_instance = get_syncdb (app_config)
-    run_fromdate    = dt.datetime.strptime(app_config[_SECURITIES_]['fromdate'], '%Y-%m-%d').date()
-    run_todate      = dt.datetime.strptime(app_config[_SECURITIES_]['todate'], '%Y-%m-%d').date()
-
+    run_fromdate    = dt.datetime.strptime(app_config[_SECURITIES_]['fromdate'], '%Y-%m-%d')#.date()
+    run_todate      = dt.datetime.strptime(app_config[_SECURITIES_]['todate'], '%Y-%m-%d')#.date()
+   
     if syncdb_instance is None:
         failure = f'Unable to Instantiate syncdb Instance {app_config[_DATAFEEDS_]["source"]}.'
 
@@ -242,7 +242,8 @@ def main():
                     '''
                     data = syncdb.parse_data(datafile, run_fromdate, run_todate + dt.timedelta(days=1))
 
-                    cerebro.adddata(data, security_id)    
+                    cerebro.adddata(data, security_id)
+                    #cerebro.resampledata(data, timeframe=bt.TimeFrame.Minutes, compression=1)
                     log.info(f'datafeed <{security_id}> succesfully added to cerebro')
                     found = True
 
@@ -265,7 +266,8 @@ def main():
                                         todate=run_todate)
                     
                 cerebro.run()
-                #cerebro.plot(style='candlestick', barup='green', bardown='black')
+                cerebro.plot(style='candlestick', barup='green', bardown='black')
+                
                 syncdb.close()
             else:
                 log.warning('~ No security found ~')
