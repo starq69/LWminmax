@@ -65,6 +65,7 @@ class csv_cache(datasource):
 
     def load_securities(self, securities):
 
+        func_name   = sys._getframe().f_code.co_name
         _securities = dict() # override
 
         '''
@@ -80,10 +81,9 @@ class csv_cache(datasource):
 
         for _idx, _values in _batch.items():
             _key = _values['security'] + '.' + str(_idx) 
-            #_securities[_key] = _values['day']
             _securities[_key] = _values['day'] #+ ' 00:00:00' #starq@new
 
-        self.log.debug(f'----> securities : {_securities}')
+        self.log.debug(f'<{func_name}> ----> securities : {_securities}')
 
         # starq@new
         # associo il dizionario all'istanza per impostare fromdate nella parse_data()  
@@ -108,6 +108,7 @@ class csv_cache(datasource):
         fromdate    : non utilizzata
         todate      : non utilizzata
         '''
+        func_name   = sys._getframe().f_code.co_name
 
         #starq@new
         self.security_id = security_id
@@ -118,7 +119,7 @@ class csv_cache(datasource):
         _datafile = security_id + '.' + _struct + '.csv'
         _datafile = self.db_dir / _datafile
 
-        self.log.debug(f'datafile ---> <{_datafile}>')
+        self.log.debug(f'<{func_name}> ----> datafile : <{_datafile}>')
         
         return _datafile
 
@@ -128,14 +129,15 @@ class csv_cache(datasource):
         todo:
         ottenere offset dal TZ relativo al giorno : a cura del processo che genera il batch
         '''
+        func_name       = sys._getframe().f_code.co_name
         fromdate        =   dt.datetime.strptime(self.securities[self.security_id], '%Y-%m-%d')
         _offset_open    =   dt.timedelta(minutes=810)   # 810min da 00:00 a 13:30
         fromdate        +=  _offset_open
         _session_length =   dt.timedelta(minutes=450)   # durata sessione (13:30-21:00)
         todate          =  fromdate + _session_length
 
-        self.log.debug(f'fromdate (parse_data) -----> {fromdate}')        
-        self.log.debug(f'todate   (parse_data) -----> {todate}')        
+        self.log.debug(f'<{func_name}> ----> fromdate : {fromdate}')        
+        self.log.debug(f'<{func_name}> ----> todate   : {todate}')        
 
         return btfeeds.GenericCSVData(dataname=datafile,
                                       fromdate=fromdate,
@@ -144,7 +146,6 @@ class csv_cache(datasource):
                                       dtformat=('%Y-%m-%d'),
                                       tmformat=('%H:%M:%S'),
                                       timeframe=bt.TimeFrame.Minutes,
-                                      #compression=5,
                                       separator='\t',
                                       datetime=0,                        
                                       time=1,

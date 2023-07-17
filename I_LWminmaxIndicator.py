@@ -70,7 +70,8 @@ class LWminmaxIndicator(bt.Indicator):
         #pdf['float_dt']        = self.data.datetime.get(size=_len) ## KEY
         # # https://community.backtrader.com/topic/1151/datetime-format-internally/3
 
-        pdf['datetime']        = [self.data.num2date(_internal_date).strftime('%d-%m-%Y') for _internal_date in self.data.datetime.get(size=_len)]
+        #pdf['datetime']        = [self.data.num2date(_internal_date).strftime('%d-%m-%Y') for _internal_date in self.data.datetime.get(size=_len)]
+        pdf['datetime']        = [self.data.num2date(_internal_date).strftime('%d-%m-%Y %H:%M') for _internal_date in self.data.datetime.get(size=_len)] # '%Y-%m-%d %H:%M:%S'
 
         pdf['LW_max']          = self.LW_max.get(size=_len)
         #pdf['LW_max']          = pdf['LW_max'].apply(pd.to_numeric, downcast='float') 

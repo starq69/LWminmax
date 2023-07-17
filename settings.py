@@ -55,31 +55,19 @@ _todate_                    = 'todate'
 base_dir        = Path.cwd()    #starq@new --> can also be Path(__file__) ?
 #parent_dir      = os.path.split (base_dir)[0]
 parent_dir      = base_dir.parent
-
-#local_storage   = parent_dir + '/local_storage/'
 local_storage   = parent_dir / 'local_storage'
-
-#default_source  = parent_dir + '/local_storage/yahoo_csv_cache/'
 default_source  = local_storage / 'yahoo_csv_cache'
 
-#_KV_INTERNALS_      = {_configparser_as_dict_ : 'yes', _ini_settings_file_ : parent_dir + '/app.ini', _log_settings_file_ : parent_dir + '/log.ini'}
 _KV_INTERNALS_      = {_configparser_as_dict_ : 'yes', _ini_settings_file_ : parent_dir / 'app.ini', _log_settings_file_ : parent_dir / 'log.ini'}
-
 _KV_OPTIONS_        = {_strict_ : 'yes'}
-
 _KV_STORAGE_        = {
                         _syncdb_            : local_storage, 
-                        #_parquet_           : local_storage + '/parquet/', 
                         _parquet_           : local_storage / 'parquet',
-                        #_yahoo_csv_data_    : local_storage + '/yahoo_csv_cache/',
                         _yahoo_csv_data_    : local_storage / 'yahoo_csv_cache',
-                        #_duckdb_data_       : local_storage + '/duckdb_data/'
                         _duckdb_data_       : local_storage / 'duckdb_data'
                       }
-
 _KV_STRATEGIES_     = dict()
 _KV_DATAFEEDS_      = {_securities_  : list(), _source_ : default_source}
-#_KV_SECURITIES_     = {_fromdate_ : '2017-12-31', _todate_ : yesterday} 
 _KV_SECURITIES_     = {_fromdate_ : None, _todate_ : None, _timeframe_ : 'M1'}
 
 '''sections che possono definire opzioni arbitrarie
@@ -178,7 +166,6 @@ def merge_settings (defaults, configured, debug=False):
         for section, options in run_settings.items(): log.debug('[{}] = {}'.format(section, options)) 
 
     #log.info('<== leave {}()'.format(func_name))
-
     return run_settings
 
 
@@ -244,17 +231,7 @@ def override_defaults(modifiers):
                 run_settings    = merge_settings (defaults, configured) #, debug=True)
                 if run_settings:
                     passed = True
-                    '''
-                    log.info('validazione intervallo [fromdate..todate] ...')
-                    if (dt.datetime.strptime(run_settings[_SECURITIES_][_fromdate_], '%Y-%m-%d').date() < \
-                        dt.datetime.strptime(run_settings[_SECURITIES_][_todate_], '%Y-%m-%d').date()):
-                        passed = True
-                    else:    
-                        log.error('INVALID PERIOD : {} - {}'.format(run_settings[_SECURITIES_][_fromdate_], \
-                                                                    run_settings[_SECURITIES_][_todate_]))
 
-                        passed = False
-                    '''
             elif _type is argparse.Namespace:
                 if run_settings:
                     configured = merge_arguments(run_settings, vars(modifier))
@@ -273,7 +250,9 @@ def override_defaults(modifiers):
 
     debug=True #
     if debug:
-        log.debug('RUN SESSION SETTINGS ({}):'.format(str(passed)))
-        for section, options in run_settings.items(): log.debug('[{}] = {}'.format(section, options))     
+        #log.debug('RUN SESSION SETTINGS ({}):'.format(str(passed)))
+        log.debug(f'RUN SESSION SETTINGS ({str(passed)}) :')
+        #for section, options in run_settings.items(): log.debug('[{}] = {}'.format(section, options))     
+        for section, options in run_settings.items(): log.debug(f'[{section}] = {options}')     
 
     return run_settings

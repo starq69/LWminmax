@@ -4,8 +4,8 @@
 import os, sys, re
 import logging, logging.config, configparser
 import datetime as dt
-from collections import OrderedDict
-import subprocess
+#from collections import OrderedDict
+#import subprocess
 from loader import load_module
 import backtrader as bt
 #import backtrader.feeds as btfeeds
@@ -135,16 +135,6 @@ def setting_up():
 
 
     def get_syncdb (app_config):
-        '''starq@2023:TODO
-            [DATAFEEDS]
-            	source=sqlite/duckdb/csv_cache
-
-            gestire source :
-                =sqlite --> ASIS (usa sqlite3)
-                =duckdb --> nuova classe di interfacciamento x duckdb (x Nasdaq --> tabella MNQ.M1)
-                =local  --> nuova classe senza backend sql solo per load_securities/select_security_datafeed che usa quello che trova su /local_storage/csv_cache/  
-                            sempre in base a quanto specificato in [DATAFEEDS]securities e [SECURITIES] from/todate
-        '''
 
         _source_ = app_config[_DATAFEEDS_]['source']
         #log.info('--> source is <{}>'.format(_source_)
@@ -233,13 +223,7 @@ def main():
             for security_id, _struct in securities.items():
                 datafile = syncdb.select_security_datafeed (_struct, security_id, run_fromdate, run_todate) 
                 if datafile: 
-                    '''
-                    data = btfeeds.YahooFinanceCSVData (dataname=datafile,
-                                                        fromdate=run_fromdate,
-                                                        todate=run_todate + dt.timedelta(days=1), 
-                                                        adjclose=False, 
-                                                        decimals=5)
-                    '''
+
                     data = syncdb.parse_data(datafile, run_fromdate, run_todate + dt.timedelta(days=1))
 
                     cerebro.adddata(data, security_id)

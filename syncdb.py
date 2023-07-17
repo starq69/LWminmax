@@ -5,8 +5,8 @@ import os, sys, re
 from pathlib import Path
 import fnmatch
 import sqlite3
-import datetime
-import logging, logging.config, configparser
+import datetime as dt
+import logging, logging.config #, configparser
 #import subprocess
 from datasource import datasource
 import backtrader.feeds as btfeeds
@@ -154,8 +154,8 @@ class syncdb(datasource):
                     self.log.debug('first datapoint : <{}>'.format(_fromdate))
                     self.log.debug('last  datapoint : <{}>'.format(_todate))
 
-                    dt_file_fromdate    = datetime.datetime.strptime(_fromdate, FORMAT).date()
-                    dt_file_todate      = datetime.datetime.strptime(_todate, FORMAT).date()
+                    dt_file_fromdate    = dt.datetime.strptime(_fromdate, FORMAT).date()
+                    dt_file_todate      = dt.datetime.strptime(_todate, FORMAT).date()
 
                     if dt_file_fromdate <= fromdate and dt_file_todate >= todate:
                         return True
@@ -177,8 +177,7 @@ class syncdb(datasource):
         #f = self.path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
         f = security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
         f = self.path / f
-        #self.log.debug('il file cercato è {}'.format(str(Path(f))))
-        self.log.debug(f'il file cercato è {str(Path(f))}') #.format(str(Path(f))))
+        self.log.debug(f'il file cercato è {str(Path(f))}')
 
 
         if os.path.isfile(f):
@@ -198,8 +197,8 @@ class syncdb(datasource):
             _parts = fname.split('.')
             file_fromdate = _parts[1]
             file_todate   = _parts[2]
-            dt_file_fromdate = datetime.datetime.strptime(file_fromdate, FORMAT).date()
-            dt_file_todate   = datetime.datetime.strptime(file_todate, FORMAT).date()
+            dt_file_fromdate = dt.datetime.strptime(file_fromdate, FORMAT).date()
+            dt_file_todate   = dt.datetime.strptime(file_todate, FORMAT).date()
             if dt_file_fromdate <= fromdate and dt_file_todate >= todate:
                 self.log.info('<{}> cover the asked analisys period'.format(fname))
 
@@ -242,7 +241,7 @@ class syncdb(datasource):
             return subprocess.call(['../yahoodownload.py',
                             '--ticker', security_id, \
                             '--fromdate', str(fromdate), \
-                            '--todate', str(todate + datetime.timedelta(days=1)), \
+                            '--todate', str(todate + dt.timedelta(days=1)), \
                             '--outfile', str(datafile)])
             '''
 
@@ -329,7 +328,7 @@ class syncdb(datasource):
     def parse_data(self, datafile, run_fromdate=None, run_todate=None):
         return btfeeds.YahooFinanceCSVData (dataname=datafile,
                                             fromdate=run_fromdate,
-                                            todate=run_todate, # + dt.timedelta(days=1), 
+                                            todate=run_todate + dt.timedelta(days=1), 
                                             adjclose=False, 
                                             decimals=5)
 
