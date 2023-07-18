@@ -67,20 +67,15 @@ class csv_cache(datasource):
         func_name   = sys._getframe().f_code.co_name
         _securities = dict() # override
 
-        '''
-        if os.path.getsize(self.db_file):
-            pass
-        else:
-            pass
-        '''
-
         # load batch into pandas dataframe
         #
         _batch = pd.read_csv(self.db_file, header=None, sep='\t', names=['security', 'day']).to_dict('index')
 
         for _idx, _values in _batch.items():
-            _key = _values['security'] + '.' + str(_idx) 
-            _securities[_key] = _values['day'] #+ ' 00:00:00' #starq@new
+            #_key = _values['security'] + '.' + str(_idx)        # es MNQ.1
+            _key = _values['security'] + '.' + _values['day']   # es. MNQ.2023-02-23 --> ottimale per i file output x indicatore prodotti dalla strategy (.parquet)
+
+            _securities[_key] = _values['day'] #+ ' 00:00:00' 
 
         self.log.debug(f'<{func_name}> ----> securities : {_securities}')
 

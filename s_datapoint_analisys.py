@@ -165,7 +165,6 @@ class S_Datapoint_Analisys(bt.Strategy):
 
                         pq_fname = str(item) + '.' + self.fromdate + '.' + self.todate + '.' + ind_shortname + '.parquet'                
                         pq_fname = self.parquet_storage / pq_fname
-                        #self.log.debug('pq_fname : {}'.format(str(Path(pq_fname))))
 
                         write_to_parquet (detail['output_dataframe'], pq_fname)
                         self.log.info(f'pyarrow.parquet.write_table <{pq_fname}> DONE') #.format(pq_fname))
