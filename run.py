@@ -191,21 +191,17 @@ def setting_up():
     log             = get_log (cfg_log)
     app_config      = get_config (cfg_file)
     syncdb_instance = get_syncdb (app_config)
-    run_fromdate    = dt.datetime.strptime(app_config[_SECURITIES_]['fromdate'], '%Y-%m-%d')#.date()
-    run_todate      = dt.datetime.strptime(app_config[_SECURITIES_]['todate'], '%Y-%m-%d')#.date()
-   
+
+
     if syncdb_instance is None:
         failure = f'Unable to Instantiate syncdb Instance {app_config[_DATAFEEDS_]["source"]}.'
 
-    if run_fromdate > run_todate :
-        failure = f'Invalid period --> [{run_fromdate}..{run_todate}]'
-
-    return failure, log, app_config, syncdb_instance, run_fromdate, run_todate
+    return failure, log, app_config, syncdb_instance
 
 
 def main():
 
-    failure, log, app_config, syncdb, run_fromdate, run_todate  = setting_up()
+    failure, log, app_config, syncdb = setting_up()
 
     if failure is not None:  
         log.error(failure) # se log.exception(failure) stampa una riga NoneType...
@@ -213,19 +209,19 @@ def main():
         try:
             cerebro          = bt.Cerebro(stdstats=False) 
             strategy_classes = import_strategies (app_config)
-            securities       = load_securities (app_config, syncdb)
+            securities       = load_securities (app_config, syncdb) # hyp: run_pool = load_securities(...)
             found            = False
-
-            log.info(f'Analisys period is {run_fromdate}...{run_todate}')
 
             # load_datafeeds(securities)
             #
+            log.debug(f'<<securities.items() : >> {securities.items()}')
+
             for security_id, _struct in securities.items():
-                datafile = syncdb.select_security_datafeed (_struct, security_id, run_fromdate, run_todate) 
+                
+                datafile = syncdb.select_security_datafeed (_struct, security_id)
                 if datafile: 
 
-                    data = syncdb.parse_data(datafile, run_fromdate, run_todate + dt.timedelta(days=1))
-
+                    data = syncdb.parse_data(datafile)
                     cerebro.adddata(data, security_id)
                     #cerebro.resampledata(data, timeframe=bt.TimeFrame.Minutes, compression=1)
                     log.info(f'datafeed <{security_id}> succesfully added to cerebro')
@@ -238,16 +234,10 @@ def main():
                 log.debug(f'---> strategy_classes : {strategy_classes}')
 
                 for strategy_label, _ in strategy_classes.items():
-                #for strategy_label in strategy_classes:
 
-                    #log.debug(f'---> _label = {strategy_classes[strategy_label]}')
-                    #log.debug(f'---> name   = {strategy_label}')
-                             
                     cerebro.addstrategy(strategy_classes[strategy_label],
-                                        config=app_config, 
-                                        name=strategy_label, 
-                                        fromdate=run_fromdate, 
-                                        todate=run_todate)
+                                        config=app_config,
+                                        name=strategy_label)
                     
                 cerebro.run()
                 cerebro.plot(style='candlestick', barup='green', bardown='black')

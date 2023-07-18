@@ -54,7 +54,6 @@ class csv_cache(datasource):
         self.log = logging.getLogger (__name__)
         super().__init__(db_dir, db_file, path, strict) # validation
         
-        #db_filename  = self.db_dir / self.db_file
         self.db_file = self.db_dir / self.db_file
         if not os.path.exists(self.db_file):
             self.log.warning(f'MISSING batch/db file <{Path(self.db_file)}>')
@@ -92,7 +91,7 @@ class csv_cache(datasource):
         return _securities 
 
 
-    def select_file(self, security_id, fromdate, todate, path=None): # add FORMAT param TODO
+    def select_file(self, security_id, fromdate=None, todate=None, path=None): # add FORMAT param TODO
 
         return None
 
@@ -101,7 +100,7 @@ class csv_cache(datasource):
     TODO
     cambiare il nome
     '''
-    def select_security_datafeed(self, _struct, security_id, fromdate=None, todate=None):
+    def select_security_datafeed(self, _struct, security_id): #, fromdate=None, todate=None):
         '''
         _struct     : stringa in formato YYYY-MM-DD (è la colonna 'day' in batch.csv)
         security_id : campo 'security' in bacth.csv + '.' + indice del record in bacth.csv : es.: MNQ.0 
@@ -124,24 +123,25 @@ class csv_cache(datasource):
         return _datafile
 
 
-    def parse_data(self, datafile, run_fromdate=None, run_todate=None):
+    def parse_data(self, datafile): #, run_fromdate=None, run_todate=None):
         '''
         todo:
         ottenere offset dal TZ relativo al giorno : a cura del processo che genera il batch
         '''
         func_name       = sys._getframe().f_code.co_name
-        fromdate        =   dt.datetime.strptime(self.securities[self.security_id], '%Y-%m-%d')
-        _offset_open    =   dt.timedelta(minutes=810)   # 810min da 00:00 a 13:30
-        fromdate        +=  _offset_open
-        _session_length =   dt.timedelta(minutes=450)   # durata sessione (13:30-21:00)
-        todate          =  fromdate + _session_length
 
+        fromdate        =   dt.datetime.strptime(self.securities[self.security_id], '%Y-%m-%d')
+        _offset_open    =   dt.timedelta(minutes=870)   # 810min da 00:00 a 14:30
+        fromdate        +=  _offset_open
+        _session_length =   dt.timedelta(minutes=390)   # 6h 1/2 durata sessione (14:30-21:00)
+        todate          =  fromdate + _session_length
+        '''
         self.log.debug(f'<{func_name}> ----> fromdate : {fromdate}')        
         self.log.debug(f'<{func_name}> ----> todate   : {todate}')        
-
+        '''
         return btfeeds.GenericCSVData(dataname=datafile,
                                       fromdate=fromdate,
-                                      todate=todate, #run_todate + dt.timedelta(days=1),
+                                      todate=todate,
                                       nullvalue=0.0,
                                       dtformat=('%Y-%m-%d'),
                                       tmformat=('%H:%M:%S'),

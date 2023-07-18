@@ -163,9 +163,8 @@ def merge_settings (defaults, configured, debug=False):
 
     if debug:
         log.debug('merged configuration :')
-        for section, options in run_settings.items(): log.debug('[{}] = {}'.format(section, options)) 
+        for section, options in run_settings.items(): log.debug(f'[{section}] = {options}') #.format(section, options)) 
 
-    #log.info('<== leave {}()'.format(func_name))
     return run_settings
 
 
@@ -250,9 +249,7 @@ def override_defaults(modifiers):
 
     debug=True #
     if debug:
-        #log.debug('RUN SESSION SETTINGS ({}):'.format(str(passed)))
-        log.debug(f'RUN SESSION SETTINGS ({str(passed)}) :')
-        #for section, options in run_settings.items(): log.debug('[{}] = {}'.format(section, options))     
+        log.debug(f'RUN SESSION SETTINGS ({str(passed)}) :')  
         for section, options in run_settings.items(): log.debug(f'[{section}] = {options}')     
 
     return run_settings

@@ -96,8 +96,9 @@ class syncdb(datasource):
             for row in cursor.fetchall():
                 code, start_date, end_date      = row
                 _securities[code]               = dict()
-                _securities[code]['start_date'] = start_date
-                _securities[code]['end_date']   = end_date
+                _securities[code]['fromdate'] = start_date
+                _securities[code]['todate']   = end_date
+
                 #not_found.remove(code)
 
         except Exception as e:
@@ -175,6 +176,8 @@ class syncdb(datasource):
 
         FORMAT = '%Y-%m-%d'
         #f = self.path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+
+
         f = security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
         f = self.path / f
         self.log.debug(f'il file cercato è {str(Path(f))}')
@@ -212,7 +215,8 @@ class syncdb(datasource):
 
 
     #def select_security_datafeed(self, _struct, security_id, fromdate, todate, path):
-    def select_security_datafeed(self, _struct, security_id, fromdate, todate):
+    #def select_security_datafeed(self, _struct, security_id, fromdate, todate):
+    def select_security_datafeed(self, _struct, security_id):
         #
         # in:
         # _struct           : dict or None
@@ -249,22 +253,31 @@ class syncdb(datasource):
 
         self.log.info('select_security_datafeed(<{}>)'.format(security_id))
 
+        # starq@NEW
+        #
+        try:
+            self.fromdate = dt.datetime.strptime(_struct['fromdate'], '%Y-%m-%d').date()
+            self.todate   = dt.datetime.strptime(_struct['todate'], '%Y-%m-%d').date()
+        except Exception as e:
+            self.log.debug(f'Missing or invalid from/to date for security <{security_id}>')
+            # imposto un default per from/to date?
+            raise e
+
         # in modalità 'strict' security_id deve esistere su syncdb.securities 
         # 
         if self.strict :
            if _struct is not None:
                # (update)
-               file_cached = self.select_file (security_id, fromdate, todate) #, path)
+               file_cached = self.select_file (security_id, self.fromdate, self.todate) #, path)
                self.log.debug('file cached (strict): '.format(file_cached)) #starq@temp
                if file_cached:
-                   _update(security_id, fromdate, todate) # ..... TODO TEST
+                   _update(security_id, self.fromdate, self.todate) # ..... TODO TEST
                    return file_cached
                else:
-                   datafile = security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
-                   #datafile = self.path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+                   datafile = security_id + '.' + str(self.fromdate) + '.' + str(self.todate) + '.csv'
                    datafile = self.path / datafile 
                    self.log.debug ('SEGUE download sul file <{}>'.format(datafile))
-                   if yahoo_csv_download (security_id, fromdate, todate, datafile) != 0:
+                   if yahoo_csv_download (security_id, self.fromdate, self.todate, datafile) != 0:
                        self.log.warning ('FAIL to download data for security {}'.format(security_id))
                        try:
                            os.remove(datafile)
@@ -283,26 +296,24 @@ class syncdb(datasource):
                                 pass
                            return None
 
-                       _upsert(security_id, fromdate, todate)
+                       _upsert(security_id, self.fromdate, self.todate)
                        return datafile
            else:
                self.log.warning('UNKNOW security <{}>'.format(security_id))
                return None
         else:
             # (upsert)
-            file_cached = self.select_file(security_id, fromdate, todate) #, path)
+            file_cached = self.select_file(security_id, self.fromdate, self.todate) #, path)
             #self.log.debug('file cached (no strict): {}'.format(str(Path(file_cached)))) #starq@temp
 
             if file_cached:
-                _upsert(security_id, fromdate, todate)
+                _upsert(security_id, self.fromdate, self.todate)
                 return file_cached
             else:
-                datafile = security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
+                datafile = security_id + '.' + str(self.fromdate) + '.' + str(self.todate) + '.csv'
                 datafile = self.path / datafile 
-                #datafile = self.path + security_id + '.' + str(fromdate) + '.' + str(todate) + '.csv'
-
                 self.log.debug('DOWNLOAD on <{}>'.format(datafile))
-                if yahoo_csv_download(security_id, fromdate, todate, datafile) != 0:
+                if yahoo_csv_download(security_id, self.fromdate, self.todate, datafile) != 0:
                     self.log.warning('FAIL to download data for security {}'.format(security_id)) # ex DownloadFailException
                     try:
                         os.remove(datafile)
@@ -321,14 +332,14 @@ class syncdb(datasource):
                             pass
                         return None
 
-                    _upsert(security_id, fromdate, todate)
+                    _upsert(security_id, self.fromdate, self.todate)
                     return datafile
 
 
-    def parse_data(self, datafile, run_fromdate=None, run_todate=None):
+    def parse_data(self, datafile):    
         return btfeeds.YahooFinanceCSVData (dataname=datafile,
-                                            fromdate=run_fromdate,
-                                            todate=run_todate + dt.timedelta(days=1), 
+                                            fromdate=self.fromdate,
+                                            todate=self.todate + dt.timedelta(days=1), 
                                             adjclose=False, 
                                             decimals=5)
 

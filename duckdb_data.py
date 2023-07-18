@@ -55,7 +55,7 @@ class duckdb_data(datasource):
         return _securities 
 
 
-    def select_file(self, security_id, fromdate, todate, path=None): # add FORMAT param TODO
+    def select_file(self, security_id, fromdate=None, todate=None, path=None): # add FORMAT param TODO
         #
         # controllare path : TODO
         # in:
@@ -74,7 +74,7 @@ class duckdb_data(datasource):
     TODO
     cambiare il nome
     '''
-    def select_security_datafeed(self, _struct, security_id, fromdate, todate):
+    def select_security_datafeed(self, _struct, security_id):
         #
         # in:
         # _struct           : dict or None
